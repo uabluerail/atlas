@@ -70,7 +70,8 @@ function abstractSynchronousLayout(assign, graph, params) {
     if (i % 10 === 0) {
       console.log(`Iteration ${i}/${iterations}`);
     }
-    iterate(settings, matrices.nodes, matrices.edges);
+    const {delta} = iterate(settings, matrices.nodes, matrices.edges);
+    if (settings.deltaThreshold > 0 && delta <= settings.deltaThreshold) break;
   }
 
   // Applying

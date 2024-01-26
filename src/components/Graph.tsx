@@ -50,6 +50,7 @@ interface MootNode {
 
 interface Cluster {
   label?: string;
+  displayName?: string;
   idx: string;
   x?: number;
   y?: number;
@@ -60,31 +61,11 @@ interface Cluster {
 
 const knownClusterColorMappings: Map<string, string> = new Map();
 
-knownClusterColorMappings.set("Japanese Language Cluster", "#BC002D");
-knownClusterColorMappings.set("Persian Language Cluster", "#c66b00");
-knownClusterColorMappings.set("Korean Language Cluster", "#0e448f");
-knownClusterColorMappings.set("Brasil Supercluster", "#009739");
-knownClusterColorMappings.set("Brasilian Swiftie Subcluster", "#6e1799");
-knownClusterColorMappings.set("Turkish Language Minicluster", "#743232");
-knownClusterColorMappings.set("Web3", "#eac72d");
-knownClusterColorMappings.set("Musician Subcluster", "#e051a9");
-knownClusterColorMappings.set("Wrestling Subcluster", "#db1fbf");
-knownClusterColorMappings.set("Hellthread Metacluster", "#f07b3c");
-knownClusterColorMappings.set("Front-end Developers", "#cf8d46");
-knownClusterColorMappings.set("BSky English Language Metacluster", "#018b7c");
-knownClusterColorMappings.set("Goose Metacluster", "#870566	");
-// knownClusterColorMappings.set("TPOT", "#01aee3");
-knownClusterColorMappings.set("Trans + Queer Shitposters", "#7b61ff");
-knownClusterColorMappings.set("Alf Minicluster", "#f00006");
-knownClusterColorMappings.set("Furries", "#1ae828");
-knownClusterColorMappings.set("Squid Cluster", "#220e7d");
-knownClusterColorMappings.set("Ukrainian Cluster", "#ffd700");
-knownClusterColorMappings.set("Italian Cluster", "#008C45");
-knownClusterColorMappings.set("Gay Himbo Cluster", "#b45b00");
-knownClusterColorMappings.set("Portugal Cluster", "#008eef");
-knownClusterColorMappings.set("Education Cluster", "#0185e3");
-
-// knownClusterColorMappings.set("BIPOC in Tech", "#ff7b7b");
+knownClusterColorMappings.set("ua", "#ffd700");
+knownClusterColorMappings.set("ua-other", "#85B53C");
+knownClusterColorMappings.set("be", "darkred");
+knownClusterColorMappings.set("ru", "#57372c");
+knownClusterColorMappings.set("ru-other", "red");
 
 function constructEdgeMap(graph: MultiDirectedGraph): Map<string, Edge> {
   const edgeMap = new Map<string, Edge>();
@@ -240,6 +221,7 @@ const GraphContainer: React.FC<{}> = () => {
           const viewportPos = sigma.graphToViewport(cluster as Coordinates);
           newClusters.push({
             label: cluster.label,
+            displayName: cluster.displayName,
             idx: cluster.idx,
             x: viewportPos.x,
             y: viewportPos.y,
@@ -451,7 +433,7 @@ const GraphContainer: React.FC<{}> = () => {
   async function fetchGraph() {
     let fetchURL = "https://s3.jazco.io/exported_graph_minified.json";
     if (isLocal) {
-      fetchURL = "https://s3.jazco.io/exported_graph_minified_test.json";
+      fetchURL = "/exporter/out/exported_graph_enriched.json";
     }
 
     const textGraph = await fetch(fetchURL);
@@ -587,7 +569,7 @@ const GraphContainer: React.FC<{}> = () => {
                     zIndex: 3,
                   }}
                 >
-                  {cluster.label}
+                  {cluster.displayName || cluster.label}
                 </div>
               );
             }
@@ -596,9 +578,9 @@ const GraphContainer: React.FC<{}> = () => {
         <SocialGraph />
         <div className="left-1/2 bottom-10 lg:tall:bottom-20 transform -translate-x-1/2 w-5/6 lg:w-fit z-50 fixed">
           <div className="bg-white shadow sm:rounded-lg py-1">
-            <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-3">
+            <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
               <div className="flex flex-col items-baseline bg-white text-center">
-                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-4">
+                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-6">
                   Users{" "}
                   <span className="hidden lg:inline-block">Represented</span>
                 </dt>
@@ -609,7 +591,7 @@ const GraphContainer: React.FC<{}> = () => {
                 </dd>
               </div>
               <div className="flex flex-col items-baseline bg-white text-center">
-                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-4">
+                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-6">
                   Connections{" "}
                   <span className="hidden lg:inline-block">Represented</span>
                 </dt>
@@ -617,19 +599,6 @@ const GraphContainer: React.FC<{}> = () => {
                   {selectedNodeEdges
                     ? selectedNodeEdges.length.toLocaleString()
                     : edgeCount.toLocaleString()}
-                </dd>
-              </div>
-              <div className="flex flex-col items-baseline bg-white text-center">
-                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-4 px-4">
-                  Interactions{" "}
-                  <span className="hidden lg:inline-block">Represented</span>
-                </dt>
-                <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
-                  {inWeight >= 0 && outWeight >= 0
-                    ? `${Math.round(inWeight).toLocaleString()} / ${Math.round(
-                        outWeight
-                      ).toLocaleString()}`
-                    : Math.round(totalWeight).toLocaleString()}
                 </dd>
               </div>
             </dl>
@@ -649,29 +618,6 @@ const GraphContainer: React.FC<{}> = () => {
                 />
               </div>
               <div className="relative flex gap-x-3 ml-4 w-full flex-col">
-                <div className="flex flex-row">
-                  <div className="flex h-6 items-center mt-auto mb-auto">
-                    <input
-                      id="neighbors"
-                      name="neighbors"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={showSecondDegreeNeighbors}
-                      onChange={() =>
-                        setShowSecondDegreeNeighbors(!showSecondDegreeNeighbors)
-                      }
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="neighbors"
-                      className="font-medium text-gray-900"
-                    >
-                      2°<span className="hidden md:inline"> Neighbors</span>
-                      <span className="md:hidden">Neigh...</span>
-                    </label>
-                  </div>
-                </div>
                 <div className="flex flex-row">
                   <div className="flex h-6 items-center">
                     <input
@@ -700,7 +646,7 @@ const GraphContainer: React.FC<{}> = () => {
       <footer className="bg-white fixed bottom-0 text-center w-full z-50">
         <div className="mx-auto max-w-7xl px-2">
           <span className="footer-text text-xs">
-            Built by{" "}
+            На основі роботи{" "}
             <a
               href="https://bsky.app/profile/jaz.bsky.social"
               target="_blank"
@@ -721,21 +667,13 @@ const GraphContainer: React.FC<{}> = () => {
             <img src="/update-icon.svg" className="inline-block h-4 w-4" />
             {" | "}
             <a
-              href="https://github.com/ericvolp12/bsky-experiments"
+              href="https://github.com/uabluerail/atlas"
               target="_blank"
             >
               <img
                 src="/github.svg"
                 className="inline-block h-3.5 w-4 mb-0.5"
               />
-            </a>
-            {" | "}
-            <a
-              href="/opt_out"
-              target="_blank"
-              className="font-bold underline-offset-1 underline"
-            >
-              opt out
             </a>
           </span>
         </div>

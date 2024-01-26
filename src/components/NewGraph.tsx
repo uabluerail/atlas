@@ -11,7 +11,7 @@ const NewGraphContainer: React.FC<{}> = () => {
     async function fetchGraph() {
         let fetchURL = "https://s3.jazco.io/exported_graph_minified.json";
         if (isLocal) {
-            fetchURL = "https://s3.jazco.io/exported_graph_minified_test.json";
+            fetchURL = "/exporter/out/exported_graph_enriched.json";
         }
 
         const textGraph = await fetch(fetchURL);
