@@ -69,7 +69,7 @@ clusterRepresentatives.set("metronom.bsky.social", {
 });
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
-  displayName: "👁️🐸🐍🇺🇦",
+  displayName: "👁️🐸🐍 🇺🇦",
   prio: 3,
 });
 clusterRepresentatives.set("tinaarishina.bsky.social", {
