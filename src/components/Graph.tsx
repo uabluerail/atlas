@@ -2,7 +2,7 @@ import React, { FC, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MultiDirectedGraph } from "graphology";
 import { formatDistanceToNow, parseISO } from "date-fns";
-import getNodeProgramImage from "sigma/rendering/webgl/programs/node.image";
+import getNodeProgramImage from "sigma/rendering/programs/node-image";
 import {
   SigmaContainer,
   useRegisterEvents,
