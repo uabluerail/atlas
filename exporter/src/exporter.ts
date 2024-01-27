@@ -46,27 +46,27 @@ const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
 clusterRepresentatives.set("uabluerail.org", {
   label: "ua",
-  displayName: "Український вулик",
+  displayName: "Український вулик 🇺🇦",
   prio: 5,
 });
 clusterRepresentatives.set("metronom.bsky.social", {
   label: "be",
-  displayName: "Бєларускій мір",
+  displayName: "Бєларускій мір 🇧🇾",
   prio: 3,
 });
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
-  displayName: "25%",
+  displayName: "👁️🐸🐍🇺🇦",
   prio: 3,
 });
 clusterRepresentatives.set("tinaarishina.bsky.social", {
   label: "ru",
-  displayName: "Рускій мір",
+  displayName: "Рускій мір 🇷🇺",
   prio: 4,
 });
 clusterRepresentatives.set("alphyna.bsky.social", {
   label: "ru-other",
-  displayName: "Русня 1",
+  displayName: "Русня 1 🇷🇺",
   prio: 3,
 });
 
