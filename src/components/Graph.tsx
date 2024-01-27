@@ -431,10 +431,7 @@ const GraphContainer: React.FC<{}> = () => {
   };
 
   async function fetchGraph() {
-    let fetchURL = "https://s3.jazco.io/exported_graph_minified.json";
-    if (isLocal) {
-      fetchURL = "/exporter/out/exported_graph_enriched.json";
-    }
+    let fetchURL = "./exporter/out/exported_graph_enriched.json";
 
     const textGraph = await fetch(fetchURL);
     const responseJSON = await textGraph.json();
@@ -536,7 +533,7 @@ const GraphContainer: React.FC<{}> = () => {
                     <div className="flex items-center justify-between">
                       <div className="text-sm font-medium text-gray-900 truncate">
                         <a
-                          href={`https://bsky.app/profile/${moot.label}`}
+                          href={`https://bsky.app/profile/${moot.did}`}
                           target="_blank"
                         >
                           {moot.label}
