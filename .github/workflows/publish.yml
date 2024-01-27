@@ -21,6 +21,8 @@ jobs:
       - name: Install dependencies
         run: yarn install && yarn --cwd exporter install
       - name: Fetch graph data
+        env:
+          GRAPH_URL: "${{ vars.GRAPH_URL }}"
         run: wget -O exporter/graph.json "$GRAPH_URL"
       - name: Generate layout
         run: |
