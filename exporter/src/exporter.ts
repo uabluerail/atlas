@@ -3,6 +3,19 @@ import forceAtlas2 from "./graphology-layout-forceatlas2/index.js";
 import circular from "graphology-layout/circular";
 import * as fs from "fs";
 
+interface InputData {
+  nodes: {
+    did: string;
+    handle?: string;
+    community: number;
+  }[];
+  rels: {
+    source: string;
+    target: string;
+    weight: number;
+  }[];
+}
+
 interface Edge {
   source: string;
   target: string;
@@ -75,38 +88,15 @@ function log(msg: string) {
   console.log(`${new Date().toLocaleString()}: ${msg}`);
 }
 
-async function fetchGraph() {
+async function fetchGraph(filename?:string) {
   log("Loading graph...");
-  const data = fs.readFileSync("graph.tsv", "utf8");
-  const lines = data.split("\n").filter((line) => line.trim() !== "");
-
-  const nodesMap: Map<string, Node> = new Map();
-  const edges: Edge[] = [];
+  const data = JSON.parse(fs.readFileSync(filename || "graph.json", "utf8")) as InputData;
 
   log("Parsing graph file...");
-  lines.forEach((line, _) => {
-    const [source, sourceHandle, target, targetHandle, weight, sourceCommunity, targetCommunity] =
-      line.split("\t");
-    const parsedWeight = parseFloat(weight);
-    if (source == target) return;
-    if (source == "" || target == "") return;
-    if (isNaN(parsedWeight) || parsedWeight <= 0) return;
-
-    const sourceNode = { did: source, handle: sourceHandle || source, community: parseInt(sourceCommunity, 10) };
-    if (!nodesMap.has(source)) { nodesMap.set(source, sourceNode); }
-
-    const targetNode = { did: target, handle: targetHandle || target, community: parseInt(targetCommunity, 10) };
-    if (!nodesMap.has(target)) { nodesMap.set(target, targetNode); }
-
-    edges.push({
-      source,
-      target,
-      weight: parsedWeight,
-    });
-  });
-
   // Sort the nodes by did so that the order is consistent
-  const nodes: Node[] = Array.from(nodesMap.values()).sort((a, b) => {
+  const nodes = data.nodes.map((node): Node => {
+    return { ...node, handle: node.handle || node.did };
+  }).sort((a, b) => {
     if (a.did < b.did) {
       return -1;
     } else if (a.did > b.did) {
@@ -115,15 +105,20 @@ async function fetchGraph() {
       return 0;
     }
   });
+
+  const edges = data.rels.map((rel): Edge => {
+    return {...rel,};
+  });
+
   log("Done parsing graph response");
-  return { edges: edges, nodes };
+  return { edges, nodes };
 }
 
 // If "enriched" is set, leave DIDs in the node data
 
 log("Starting exporter...");
 
-fetchGraph().then((graphData: { edges: Edge[]; nodes: Node[] }) => {
+fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) => {
   const { edges, nodes } = graphData;
   // Create the graph
   const graph = new MultiDirectedGraph();
