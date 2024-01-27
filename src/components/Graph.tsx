@@ -40,11 +40,13 @@ interface Node {
   key: number;
   size: number;
   label: string;
+  did: string;
 }
 
 interface MootNode {
   node: string;
   label: string;
+  did: string;
   weight: number;
 }
 
@@ -89,6 +91,7 @@ function constructNodeMap(graph: MultiDirectedGraph): Map<string, Node> {
       key: attrs.key,
       size: attrs.size,
       label: attrs.label,
+      did: attrs.did,
     });
   });
   return nodeMap;
@@ -305,10 +308,13 @@ const GraphContainer: React.FC<{}> = () => {
                 source === selectedNode ? targetAttrs.key : sourceAttrs.key;
               const label =
                 source === selectedNode ? targetAttrs.label : sourceAttrs.label;
+              const did =
+                source === selectedNode ? targetAttrs.did : sourceAttrs.did;
               acc.push({
                 node: key,
                 weight: weight,
                 label: label,
+                did: did,
               });
             }
             return acc;
@@ -413,7 +419,7 @@ const GraphContainer: React.FC<{}> = () => {
           window.open(
             `https://bsky.app/profile/${graph?.getNodeAttribute(
               event.node,
-              "label"
+              "did"
             )}`,
             "_blank"
           );
@@ -513,7 +519,7 @@ const GraphContainer: React.FC<{}> = () => {
                     className="font-bold underline-offset-1 underline break-all"
                     href={`https://bsky.app/profile/${graph?.getNodeAttribute(
                       selectedNode,
-                      "label"
+                      "did"
                     )}`}
                     target="_blank"
                   >
