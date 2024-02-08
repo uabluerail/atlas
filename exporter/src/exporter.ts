@@ -59,17 +59,17 @@ const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
 clusterRepresentatives.set("uabluerail.org", {
   label: "ua",
-  displayName: "🇺🇦 Український вулик",
+  displayName: "🇺🇦🐝🍯 Вулик",
   prio: 5,
 });
 clusterRepresentatives.set("paperpllant.bsky.social", {
   label: "ua-kpop",
-  displayName: "🇺🇦 K-pop",
+  displayName: "🇺🇦🎤👯‍♂️ K-pop",
   prio: 5,
 });
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
-  displayName: "🇺🇦 👁️🐸🐍 Пекельні борошна",
+  displayName: "🇺🇦👁️🐸🐍 Пекельні борошна",
   prio: 3,
 });
 clusterRepresentatives.set("metronom.bsky.social", {
@@ -79,7 +79,7 @@ clusterRepresentatives.set("metronom.bsky.social", {
 });
 clusterRepresentatives.set("tinaarishina.bsky.social", {
   label: "ru-other",
-  displayName: "🇷🇺🤝🇺🇦🇧🇾🕊️ Дружби народів",
+  displayName: "⚒️🇷🇺🇧🇾+ Дружби народів",
   prio: 4,
 });
 clusterRepresentatives.set("alphyna.bsky.social", {
