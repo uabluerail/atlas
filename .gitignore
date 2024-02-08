@@ -28,3 +28,4 @@ out/
 
 .env
 graph.tsv
+graph*.json

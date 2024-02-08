@@ -63,11 +63,17 @@ interface Cluster {
 
 const knownClusterColorMappings: Map<string, string> = new Map();
 
-knownClusterColorMappings.set("ua", "#ffd700");
+knownClusterColorMappings.set("ua", "#ffd500");
 knownClusterColorMappings.set("ua-other", "#85B53C");
+knownClusterColorMappings.set("ua-kpop", "#005bbb");
 knownClusterColorMappings.set("be", "darkred");
 knownClusterColorMappings.set("ru", "#57372c");
 knownClusterColorMappings.set("ru-other", "red");
+knownClusterColorMappings.set("nafo", "#47044a");
+knownClusterColorMappings.set("furry", "#ea02de");
+knownClusterColorMappings.set("writers", "#02cbea");
+knownClusterColorMappings.set("artists", "#ea5b02");
+knownClusterColorMappings.set("it", "#8b0fff");
 
 function constructEdgeMap(graph: MultiDirectedGraph): Map<string, Edge> {
   const edgeMap = new Map<string, Edge>();
@@ -171,7 +177,7 @@ const GraphContainer: React.FC<{}> = () => {
         }
         const palette = iwanthue(
           Object.keys(communityClusters).length -
-            Object.keys(knownClusterColorMappings).length,
+          Object.keys(knownClusterColorMappings).length,
           {
             seed: "bskyCommunityClusters3",
             colorSpace: "intense",
@@ -663,9 +669,9 @@ const GraphContainer: React.FC<{}> = () => {
             {" | "}
             {graph
               ? formatDistanceToNow(
-                  parseISO(graph?.getAttribute("lastUpdated")),
-                  { addSuffix: true }
-                )
+                parseISO(graph?.getAttribute("lastUpdated")),
+                { addSuffix: true }
+              )
               : "loading..."}{" "}
             <img src="/update-icon.svg" className="inline-block h-4 w-4" />
             {" | "}

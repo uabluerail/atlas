@@ -59,27 +59,57 @@ const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
 clusterRepresentatives.set("uabluerail.org", {
   label: "ua",
-  displayName: "Український вулик 🇺🇦",
+  displayName: "🇺🇦 Український вулик",
   prio: 5,
 });
-clusterRepresentatives.set("metronom.bsky.social", {
-  label: "be",
-  displayName: "Бєларускій мір 🇧🇾",
-  prio: 3,
+clusterRepresentatives.set("paperpllant.bsky.social", {
+  label: "ua-kpop",
+  displayName: "🇺🇦 K-pop",
+  prio: 5,
 });
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
-  displayName: "👁️🐸🐍 🇺🇦",
+  displayName: "🇺🇦 👁️🐸🐍 Пекельні борошна",
+  prio: 3,
+});
+clusterRepresentatives.set("metronom.bsky.social", {
+  label: "be",
+  displayName: "🇧🇾 Бєларускій мір",
   prio: 3,
 });
 clusterRepresentatives.set("tinaarishina.bsky.social", {
-  label: "ru",
-  displayName: "Рускій мір 🇷🇺",
+  label: "ru-other",
+  displayName: "🇷🇺🤝🇺🇦🇧🇾🕊️ Дружби народів",
   prio: 4,
 });
 clusterRepresentatives.set("alphyna.bsky.social", {
-  label: "ru-other",
-  displayName: "Русня 1 🇷🇺",
+  label: "ru",
+  displayName: "🇷🇺 Рускій мір",
+  prio: 3,
+});
+clusterRepresentatives.set("hardrockfella.bsky.social", {
+  label: "nafo",
+  displayName: "🌍👩‍🚀👨‍🚀 NAFO 🚀",
+  prio: 3,
+});
+clusterRepresentatives.set("killustration.bsky.social", {
+  label: "artists",
+  displayName: "🌍🖌️🎨 Художники",
+  prio: 3,
+});
+clusterRepresentatives.set("jalpari.bsky.social", {
+  label: "writers",
+  displayName: "🌍✍️📖 Письменники",
+  prio: 3,
+});
+clusterRepresentatives.set("cactimutt.bsky.social", {
+  label: "furry",
+  displayName: "🌍🦊🐺 Фурі",
+  prio: 3,
+});
+clusterRepresentatives.set("edx.bsky.social", {
+  label: "it",
+  displayName: "🌍👩‍💻👨‍💻 Айтішники",
   prio: 3,
 });
 
@@ -88,7 +118,7 @@ function log(msg: string) {
   console.log(`${new Date().toLocaleString()}: ${msg}`);
 }
 
-async function fetchGraph(filename?:string) {
+async function fetchGraph(filename?: string) {
   log("Loading graph...");
   const data = JSON.parse(fs.readFileSync(filename || "graph.json", "utf8")) as InputData;
 
@@ -107,7 +137,7 @@ async function fetchGraph(filename?:string) {
   });
 
   const edges = data.rels.map((rel): Edge => {
-    return {...rel,};
+    return { ...rel, };
   });
 
   log("Done parsing graph response");
@@ -195,7 +225,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
     const size =
       minEdgeSize +
       ((Math.log(weight) - logMinWeight) / (logMaxWeight - logMinWeight)) *
-        (maxEdgeSize - minEdgeSize);
+      (maxEdgeSize - minEdgeSize);
 
     graph.addEdge(
       indexNodes.get(edge.source)?.key,
@@ -234,7 +264,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
     let newNodeSize =
       minSize +
       Math.sqrt((degree - minDegree) / (maxDegree - minDegree)) *
-        (maxSize - minSize);
+      (maxSize - minSize);
 
     // Calculate the radius of the circle based on the size
     let radius = newNodeSize / 2;
@@ -437,10 +467,8 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   for (const communityIdx in communityClusters) {
     const community = communityClusters[communityIdx];
     log(
-      `Cluster ${
-        community.label || community.idx
-      }, size: ${community.size.toLocaleString()}, representative: ${
-        community.representative || "N/A"
+      `Cluster ${community.label || community.idx
+      }, size: ${community.size.toLocaleString()}, representative: ${community.representative || "N/A"
       }`
     );
   }
