@@ -68,12 +68,16 @@ knownClusterColorMappings.set("ua-other", "#85B53C");
 knownClusterColorMappings.set("ua-kpop", "#005bbb");
 knownClusterColorMappings.set("be", "darkred");
 knownClusterColorMappings.set("ru", "#57372c");
-knownClusterColorMappings.set("ru-other", "red");
+knownClusterColorMappings.set("ru-other", "#c70202");
 knownClusterColorMappings.set("nafo", "#47044a");
 knownClusterColorMappings.set("furry", "#ea02de");
 knownClusterColorMappings.set("writers", "#02cbea");
-knownClusterColorMappings.set("artists", "#ea5b02");
-knownClusterColorMappings.set("it", "#8b0fff");
+knownClusterColorMappings.set("gamers", "#02e6a1");
+knownClusterColorMappings.set("artists", "#ff4902");
+knownClusterColorMappings.set("infosec", "#8b0fff");
+knownClusterColorMappings.set("frontend", "#9175ff");
+knownClusterColorMappings.set("it", "#bf75ff");
+knownClusterColorMappings.set("web3", "#759cff");
 
 function constructEdgeMap(graph: MultiDirectedGraph): Map<string, Edge> {
   const edgeMap = new Map<string, Edge>();
@@ -480,7 +484,7 @@ const GraphContainer: React.FC<{}> = () => {
           defaultEdgeType: "arrow",
           labelDensity: 0.07,
           labelGridCellSize: 60,
-          labelRenderedSizeThreshold: 5,
+          labelRenderedSizeThreshold: 9,
           labelFont: "Lato, sans-serif",
           zIndex: true,
         }}
@@ -590,8 +594,8 @@ const GraphContainer: React.FC<{}> = () => {
             <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
               <div className="flex flex-col items-baseline bg-white text-center">
                 <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-6">
-                  Users{" "}
-                  <span className="hidden lg:inline-block">Represented</span>
+                  Представлені{" "}
+                  <span className="hidden lg:inline-block">Користувачі</span>
                 </dt>
                 <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                   {selectedNodeCount >= 0
@@ -601,8 +605,8 @@ const GraphContainer: React.FC<{}> = () => {
               </div>
               <div className="flex flex-col items-baseline bg-white text-center">
                 <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-6">
-                  Connections{" "}
-                  <span className="hidden lg:inline-block">Represented</span>
+                  Представлені{" "}
+                  <span className="hidden lg:inline-block">Взаємодії</span>
                 </dt>
                 <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                   {selectedNodeEdges
@@ -628,6 +632,29 @@ const GraphContainer: React.FC<{}> = () => {
               </div>
               <div className="relative flex gap-x-3 ml-4 w-full flex-col">
                 <div className="flex flex-row">
+                  <div className="flex h-6 items-center mt-auto mb-auto">
+                    <input
+                      id="neighbors"
+                      name="neighbors"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      checked={showSecondDegreeNeighbors}
+                      onChange={() =>
+                        setShowSecondDegreeNeighbors(!showSecondDegreeNeighbors)
+                      }
+                    />
+                  </div>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                    <label
+                      htmlFor="neighbors"
+                      className="font-medium text-gray-900"
+                    >
+                      Показувати <span className="hidden md:inline"> зв'язки до 2х рукостискань</span>
+                      <span className="md:hidden">Друзі...</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex flex-row">
                   <div className="flex h-6 items-center">
                     <input
                       id="clusterLabels"
@@ -643,7 +670,7 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      <span className="hidden md:inline">Cluster </span>Labels
+                      <span className="hidden md:inline">Назви </span>Кластерів
                     </label>
                   </div>
                 </div>
@@ -655,7 +682,15 @@ const GraphContainer: React.FC<{}> = () => {
       <footer className="bg-white fixed bottom-0 text-center w-full z-50">
         <div className="mx-auto max-w-7xl px-2">
           <span className="footer-text text-xs">
-            На основі роботи{" "}
+            Алгоритм кластеризації від{" "}
+            <a
+              href="https://uabluerail.org"
+              target="_blank"
+              className="font-bold underline-offset-1 underline"
+            >
+              uabluerail.org
+            </a>
+            . Візуалізація на основі роботи{" "}
             <a
               href="https://bsky.app/profile/jaz.bsky.social"
               target="_blank"

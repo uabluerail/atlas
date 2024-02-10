@@ -1,6 +1,7 @@
 import { MultiDirectedGraph } from "graphology";
 import forceAtlas2 from "./graphology-layout-forceatlas2/index.js";
 import circular from "graphology-layout/circular";
+import rotation from 'graphology-layout/rotation';
 import * as fs from "fs";
 
 interface InputData {
@@ -59,7 +60,7 @@ const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
 clusterRepresentatives.set("uabluerail.org", {
   label: "ua",
-  displayName: "🇺🇦🐝🍯 Вулик",
+  displayName: "🇺🇦🐝🍯 Український Вулик",
   prio: 5,
 });
 clusterRepresentatives.set("paperpllant.bsky.social", {
@@ -69,7 +70,7 @@ clusterRepresentatives.set("paperpllant.bsky.social", {
 });
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
-  displayName: "🇺🇦👁️🐸🐍 Пекельні борошна",
+  displayName: "🇺🇦🐸🐍 Пекельні борошна",
   prio: 3,
 });
 clusterRepresentatives.set("metronom.bsky.social", {
@@ -89,7 +90,7 @@ clusterRepresentatives.set("alphyna.bsky.social", {
 });
 clusterRepresentatives.set("hardrockfella.bsky.social", {
   label: "nafo",
-  displayName: "🌍👩‍🚀👨‍🚀 NAFO 🚀",
+  displayName: "🌍👩‍🚀👨‍🚀 NAFO",
   prio: 3,
 });
 clusterRepresentatives.set("killustration.bsky.social", {
@@ -108,8 +109,28 @@ clusterRepresentatives.set("cactimutt.bsky.social", {
   prio: 3,
 });
 clusterRepresentatives.set("edx.bsky.social", {
+  label: "infosec",
+  displayName: "🌍🔐👩‍💻 Злі ITвці",
+  prio: 3,
+});
+clusterRepresentatives.set("lookitup.baby", {
   label: "it",
-  displayName: "🌍👩‍💻👨‍💻 Айтішники",
+  displayName: "🌍🚢🖥️ ITвці",
+  prio: 3,
+});
+clusterRepresentatives.set("pfrazee.com", {
+  label: "frontend",
+  displayName: "🌍💡💻 Стартапери",
+  prio: 3,
+});
+clusterRepresentatives.set("gamedevlist.bsky.social", {
+  label: "gamers",
+  displayName: "🌍👾🎮 Ігророби",
+  prio: 3,
+});
+clusterRepresentatives.set("onsu.re", {
+  label: "web3",
+  displayName: "🌍🤖🛸 Технофутуризм",
   prio: 3,
 });
 
@@ -295,14 +316,24 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   log("Assigning layout...");
   circular.assign(graph);
   const settings = forceAtlas2.inferSettings(graph);
-  const iterationCount = 500;
+  const iterationCount = 800;
+  // const edgeWeightInfluence = 5; //default 1
   //settings.linLogMode = true;
   //settings.adjustSizes = true;
   //settings.barnesHutOptimize=false;
   settings.deltaThreshold = graph.order * 0.001;
+
+  // const uablurailNode = graph.findNode((n) => (graph.getNodeAttribute(n, "label") == "uabluerail.org"));
+  // graph.setNodeAttribute(uablurailNode, "fixed", true);
+  // log(`Uabluerail node fixed in place.`);
+
   log(`Running ${iterationCount} Force Atlas simulations...`);
   forceAtlas2.assign(graph, { settings, iterations: iterationCount });
   log("Done running Force Atlas");
+
+  log(`Rotating Force Atlas...`);
+  rotation.assign(graph, - 7 * Math.PI / 7);
+  log("Successfully rotated Atlas");
 
   // initialize clusters from graph data
   const communityClusters: { [key: string]: Cluster } = {};
