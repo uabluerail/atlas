@@ -108,15 +108,15 @@ clusterRepresentatives.set("cactimutt.bsky.social", {
   displayName: "🌍🦊🐺 Фурі",
   prio: 3,
 });
-clusterRepresentatives.set("edx.bsky.social", {
+clusterRepresentatives.set("malwarejake.bsky.social", {
   label: "infosec",
   displayName: "🌍🔐👩‍💻 Злі ITвці",
-  prio: 3,
+  prio: 5,
 });
 clusterRepresentatives.set("lookitup.baby", {
   label: "it",
   displayName: "🌍🚢🖥️ ITвці",
-  prio: 3,
+  prio: 4,
 });
 clusterRepresentatives.set("pfrazee.com", {
   label: "frontend",
