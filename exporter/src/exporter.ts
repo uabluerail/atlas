@@ -111,7 +111,7 @@ clusterRepresentatives.set("cactimutt.bsky.social", {
 clusterRepresentatives.set("malwarejake.bsky.social", {
   label: "infosec",
   displayName: "🌍🔐👩‍💻 Злі ITвці",
-  prio: 5,
+  prio: 3,
 });
 clusterRepresentatives.set("lookitup.baby", {
   label: "it",
@@ -121,7 +121,7 @@ clusterRepresentatives.set("lookitup.baby", {
 clusterRepresentatives.set("pfrazee.com", {
   label: "frontend",
   displayName: "🌍💡💻 Стартапери",
-  prio: 3,
+  prio: 5,
 });
 clusterRepresentatives.set("gamedevlist.bsky.social", {
   label: "gamers",
@@ -314,13 +314,17 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   );
 
   log("Assigning layout...");
+  // about these settings:
+  // https://observablehq.com/@mef/forceatlas2-layout-settings-visualized
   circular.assign(graph);
   const settings = forceAtlas2.inferSettings(graph);
   const iterationCount = 800;
-  // const edgeWeightInfluence = 5; //default 1
-  //settings.linLogMode = true;
-  //settings.adjustSizes = true;
-  //settings.barnesHutOptimize=false;
+  settings.barnesHutOptimize = true;
+  settings.barnesHutTheta = 1;
+  // settings.outboundAttractionDistribution = true;
+  // settings.strongGravityMode = true;
+  // settings.gravity = 0;
+  // settings.scalingRatio = 1;
   settings.deltaThreshold = graph.order * 0.001;
 
   // const uablurailNode = graph.findNode((n) => (graph.getNodeAttribute(n, "label") == "uabluerail.org"));
@@ -332,7 +336,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   log("Done running Force Atlas");
 
   log(`Rotating Force Atlas...`);
-  rotation.assign(graph, - 7 * Math.PI / 7);
+  rotation.assign(graph, - 2 * Math.PI / 7);
   log("Successfully rotated Atlas");
 
   // initialize clusters from graph data
@@ -385,12 +389,12 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
         graph.getEdgeAttribute(a, "weight")
       );
     });
-    const topEdges = sortedEdges.slice(0, 5);
+    const topEdges = sortedEdges.slice(0, 3);
     topEdges.forEach((edge) => {
       graph.setEdgeAttribute(edge, 'stay', true);
     });
   });
-  // Reduce all edges to the top 10 outbound edges for each node
+  // Reduce all edges to the top 5 outbound edges for each node
   graph.forEachNode((node, attrs) => {
     const edges = graph.outEdges(node);
     const sortedEdges = edges.sort((a, b) => {
@@ -399,7 +403,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
         graph.getEdgeAttribute(a, "weight")
       );
     });
-    const topEdges = sortedEdges.slice(0, 10);
+    const topEdges = sortedEdges.slice(0, 5);
     const topEdgeSet = new Set(topEdges);
     edges.forEach((edge) => {
       if (graph.hasEdgeAttribute(edge, 'stay')) return;

@@ -649,7 +649,7 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="neighbors"
                       className="font-medium text-gray-900"
                     >
-                      Показувати <span className="hidden md:inline"> зв'язки до 2х рукостискань</span>
+                      Зв'язки <span className="hidden md:inline"> до 2х рукостискань</span>
                       <span className="md:hidden">Друзі...</span>
                     </label>
                   </div>
