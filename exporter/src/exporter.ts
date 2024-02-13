@@ -130,7 +130,7 @@ clusterRepresentatives.set("gamedevlist.bsky.social", {
 });
 clusterRepresentatives.set("onsu.re", {
   label: "web3",
-  displayName: "🌍🤖🛸 Технофутуризм",
+  displayName: "🌍🤖🛸 Футуризм",
   prio: 3,
 });
 
@@ -279,8 +279,14 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   const minSize = 1.5,
     maxSize = 15;
   log("Assigning attributes...");
+
   graph.forEachNode((node) => {
-    const degree = graph.inDegreeWithoutSelfLoops(node);
+    const inDegree = graph.inDegreeWithoutSelfLoops(node);
+    const outDegree = graph.outDegreeWithoutSelfLoops(node);
+
+    // harmonic average of in and out edges
+    // the bigger mutual edges you have - the bigger your circle is
+    const degree = inDegree + outDegree > 0 ? 2 * inDegree * outDegree / (inDegree + outDegree) : 0;
     // Set the size based on the degree of the node relative to the min and max degrees
     let newNodeSize =
       minSize +
@@ -314,17 +320,44 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   );
 
   log("Assigning layout...");
-  // about these settings:
-  // https://observablehq.com/@mef/forceatlas2-layout-settings-visualized
+
   circular.assign(graph);
   const settings = forceAtlas2.inferSettings(graph);
   const iterationCount = 800;
+
+  // about these settings:
+  // https://observablehq.com/@mef/forceatlas2-layout-settings-visualized
+
+  // -------------barnesHutOptimize----------------
+  // reduces exponential to nlogn complexity
+  // under 5 minutes generation vs. 10+ minutes
+
   settings.barnesHutOptimize = true;
-  settings.barnesHutTheta = 1;
+
+  // -------------barnesHutOptimize----------------
+
+
+  // -------------barnesHutTheta----------------
+  // controls centrifugal force
+
+  // beautiful circular layout, more centrifugal force, recommended
+  settings.barnesHutTheta = 1.5;
+
+  // clusters will be more round than with 1.5, but with less centrigugal force
+  // settings.barnesHutTheta = 1;
+
+  // more centrifugal force, clusters may get squished
+  // settings.barnesHutTheta = 2;
+
+  // -------------barnesHutOptimize----------------
+
+  // try these later
   // settings.outboundAttractionDistribution = true;
   // settings.strongGravityMode = true;
   // settings.gravity = 0;
   // settings.scalingRatio = 1;
+
+  // no idea what it does
   settings.deltaThreshold = graph.order * 0.001;
 
   // const uablurailNode = graph.findNode((n) => (graph.getNodeAttribute(n, "label") == "uabluerail.org"));
