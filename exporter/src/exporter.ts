@@ -261,9 +261,9 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
 
   log("Done adding edges");
 
-  const degrees = graph.nodes().map((node) => graph.degree(node));
-  const minDegree = degrees.reduce((a, b) => Math.min(a, b));
-  const maxDegree = degrees.reduce((a, b) => Math.max(a, b));
+  // const degrees = graph.nodes().map((node) => graph.degree(node));
+  // const minDegree = degrees.reduce((a, b) => Math.min(a, b));
+  // const maxDegree = degrees.reduce((a, b) => Math.max(a, b));
   const skyBluePalette = [
     "#009ACD", // DeepSkyBlue3
     "#5B9BD5", // CornflowerBlue
@@ -280,18 +280,75 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
     maxSize = 15;
   log("Assigning attributes...");
 
+  let minHarmonicWeight = Infinity;
+  let maxHarmonicWeight = -Infinity;
+
   graph.forEachNode((node) => {
-    const inDegree = graph.inDegreeWithoutSelfLoops(node);
-    const outDegree = graph.outDegreeWithoutSelfLoops(node);
+
+    const harmonicWeightMap = new Map<string, number>();
+
+    const inWeightMap = graph?.reduceInEdges<any>(
+      node,
+      (acc, _, edgeAttrs, source, target) => {
+        const inWeight = edgeAttrs.weight;
+        const existingMootEntry = acc.get(source);
+        if (existingMootEntry === undefined && source !== target) {
+          acc.set(source, inWeight);
+        }
+        return acc;
+      },
+      new Map()
+    );
+
+    const outWeightMap = graph?.reduceOutEdges<any>(
+      node,
+      (acc, _, edgeAttrs, source, target) => {
+        const outWeight = edgeAttrs.weight;
+        if (acc.get(target) === undefined && source !== target) {
+          acc.set(target, outWeight);
+          const inWeight = inWeightMap.get(target);
+          if (inWeight !== undefined && harmonicWeightMap.get(target) === undefined) {
+            const harmonicWeight = inWeight + outWeight > 0 ? 2 * inWeight * outWeight / (inWeight + outWeight) : 0;
+            harmonicWeightMap.set(target, harmonicWeight);
+          }
+        }
+        return acc;
+      },
+      new Map()
+    );
+
+    const sortedHarmonicMap: number[] = Array.from(harmonicWeightMap.values());
+
+    let harmonicWeightLogSum = 0;
+
+    sortedHarmonicMap
+      // .sort((a, b) => b - a)
+      // .slice(0, 100) //count only top 100 moots
+      .forEach((harmonicWeight) => {
+        harmonicWeightLogSum += Math.log(1 + harmonicWeight);
+      });
+
+    minHarmonicWeight = Math.min(minHarmonicWeight, harmonicWeightLogSum);
+    maxHarmonicWeight = Math.max(maxHarmonicWeight, harmonicWeightLogSum);
+
+    const maxHistoricHarmonicWeightLogSum = 20000;
+
+    let newNodeSize =
+      minSize +
+      Math.sqrt(harmonicWeightLogSum / maxHistoricHarmonicWeightLogSum) * //range from 0 to 1
+      (maxSize - minSize);
+
+    // const inDegree = graph.inDegreeWithoutSelfLoops(node);
+    // const outDegree = graph.outDegreeWithoutSelfLoops(node);
 
     // harmonic average of in and out edges
     // the bigger mutual edges you have - the bigger your circle is
-    const degree = inDegree + outDegree > 0 ? 2 * inDegree * outDegree / (inDegree + outDegree) : 0;
+    // const degree = inDegree + outDegree > 0 ? 2 * inDegree * outDegree / (inDegree + outDegree) : 0;
     // Set the size based on the degree of the node relative to the min and max degrees
-    let newNodeSize =
-      minSize +
-      Math.sqrt((degree - minDegree) / (maxDegree - minDegree)) *
-      (maxSize - minSize);
+    // let newNodeSize =
+    //   minSize +
+    //   Math.sqrt((degree - minDegree) / (maxDegree - minDegree)) *
+    //   (maxSize - minSize);
 
     // Calculate the radius of the circle based on the size
     let radius = newNodeSize / 2;
@@ -313,6 +370,11 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
       skyBluePalette[Math.floor(Math.random() * 10)]
     );
   });
+
+  log(`Min weight is ...${minWeight}`);
+  log(`Max weight is ...${maxWeight}`);
+  log(`Min harmonic weight is ...${minHarmonicWeight}`);
+  log(`Max harmonic weight is ...${maxHarmonicWeight}`);
 
   // Log total number of nodes, edges, and graph weight
   log(
