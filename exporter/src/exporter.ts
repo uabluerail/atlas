@@ -58,7 +58,30 @@ interface ClusterRepPrio {
 
 const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
-clusterRepresentatives.set("uabluerail.org", {
+const focusClusterLabel = "uabluerail.org";
+
+const topNonRemovableEdges = 3;
+const maxEdgesForFocusCluster = 10;
+const maxEdgesEveryone = 3;
+
+const modeSettings = {
+  classic: {
+    maxHistoricWeightSum: 10000,
+    iterationCount: 600,
+    blackHoleGravity: 0.5
+  },
+  harmonic: {
+    maxHistoricWeightSum: 20000,
+    iterationCount: 800,
+    blackHoleGravity: 1.5
+  }
+};
+
+//based on the algorithm used in input graph.json - choose the mode to run the Atlas on
+//switch the mode here with optimal settings for each mode
+const atlasMode = modeSettings.harmonic;
+
+clusterRepresentatives.set(focusClusterLabel, {
   label: "ua",
   displayName: "🇺🇦🐝🍯 Український Вулик",
   prio: 5,
@@ -66,11 +89,11 @@ clusterRepresentatives.set("uabluerail.org", {
 clusterRepresentatives.set("paperpllant.bsky.social", {
   label: "ua-kpop",
   displayName: "🇺🇦🎤👯‍♂️ K-pop",
-  prio: 5,
+  prio: 4,
 });
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
-  displayName: "🇺🇦🐸🐍 Пекельні борошна",
+  displayName: "🇺🇦👁️‍🗨️👽 ім. П. Борошна",
   prio: 3,
 });
 clusterRepresentatives.set("metronom.bsky.social", {
@@ -86,7 +109,7 @@ clusterRepresentatives.set("tinaarishina.bsky.social", {
 clusterRepresentatives.set("alphyna.bsky.social", {
   label: "ru",
   displayName: "🇷🇺 Рускій мір",
-  prio: 3,
+  prio: 4,
 });
 clusterRepresentatives.set("hardrockfella.bsky.social", {
   label: "nafo",
@@ -331,11 +354,9 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
     minHarmonicWeight = Math.min(minHarmonicWeight, harmonicWeightLogSum);
     maxHarmonicWeight = Math.max(maxHarmonicWeight, harmonicWeightLogSum);
 
-    const maxHistoricHarmonicWeightLogSum = 20000;
-
     let newNodeSize =
       minSize +
-      Math.sqrt(harmonicWeightLogSum / maxHistoricHarmonicWeightLogSum) * //range from 0 to 1
+      Math.sqrt(harmonicWeightLogSum / atlasMode.maxHistoricWeightSum) * //range from 0 to 1
       (maxSize - minSize);
 
     // const inDegree = graph.inDegreeWithoutSelfLoops(node);
@@ -385,7 +406,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
 
   circular.assign(graph);
   const settings = forceAtlas2.inferSettings(graph);
-  const iterationCount = 800;
+  const iterationCount = atlasMode.iterationCount;
 
   // about these settings:
   // https://observablehq.com/@mef/forceatlas2-layout-settings-visualized
@@ -402,8 +423,14 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   // -------------barnesHutTheta----------------
   // controls centrifugal force
 
+
+  // for harmonic atlas
+  settings.barnesHutTheta = atlasMode.blackHoleGravity;
+
+  // examples for harmonic atlas
+
   // beautiful circular layout, more centrifugal force, recommended
-  settings.barnesHutTheta = 1.5;
+  // settings.barnesHutTheta = 1.5;
 
   // clusters will be more round than with 1.5, but with less centrigugal force
   // settings.barnesHutTheta = 1;
@@ -475,7 +502,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   log("Done truncating node position assignments");
 
   log("Filtering edges...");
-  // Mark top 3 edges as non-removable.
+  // Mark top n edges as non-removable.
   graph.forEachNode((node, attrs) => {
     const edges = graph.edges(node);
     const sortedEdges = edges.sort((a, b) => {
@@ -484,12 +511,12 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
         graph.getEdgeAttribute(a, "weight")
       );
     });
-    const topEdges = sortedEdges.slice(0, 3);
+    const topEdges = sortedEdges.slice(0, topNonRemovableEdges);
     topEdges.forEach((edge) => {
       graph.setEdgeAttribute(edge, 'stay', true);
     });
   });
-  // Reduce all edges to the top 5 outbound edges for each node
+  // Reduce all edges to the top n outbound edges for each node (m for Ukrainians)
   graph.forEachNode((node, attrs) => {
     const edges = graph.outEdges(node);
     const sortedEdges = edges.sort((a, b) => {
@@ -498,7 +525,9 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
         graph.getEdgeAttribute(a, "weight")
       );
     });
-    const topEdges = sortedEdges.slice(0, 5);
+    const topEdges = attrs.label === focusClusterLabel
+      ? sortedEdges.slice(0, maxEdgesForFocusCluster)  // max edges for ukrainians
+      : sortedEdges.slice(0, maxEdgesEveryone); // max edges for everyone else
     const topEdgeSet = new Set(topEdges);
     edges.forEach((edge) => {
       if (graph.hasEdgeAttribute(edge, 'stay')) return;
