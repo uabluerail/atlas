@@ -63,15 +63,30 @@ const focusClusterLabel = "uabluerail.org";
 
 const topNonRemovableEdges = 3;
 const maxEdgesForFocusCluster = 10;
-const maxEdgesEveryone = 3;
+const maxEdgesEveryone = 5;
 
-const modeSettings = {
+//for maxHistoricWeightSum it is recommended to monitor logs and adjust to an appropriate value with every significant change
+const layoutSettings = {
   classic: {
-    maxHistoricWeightSum: 10000,
+    rotate: false,
+    angle: 12 * Math.PI / 7,
+    globusUkrajiny: true,
+    maxHistoricWeightSum: 1000,
     iterationCount: 600,
     blackHoleGravity: 0.5
   },
   harmonic: {
+    rotate: false,
+    angle: 12 * Math.PI / 7,
+    globusUkrajiny: true,
+    maxHistoricWeightSum: 20000,
+    iterationCount: 800,
+    blackHoleGravity: 1.5
+  },
+  dual: {
+    rotate: true,
+    angle: 22 * Math.PI / 13,
+    globusUkrajiny: false,
     maxHistoricWeightSum: 20000,
     iterationCount: 800,
     blackHoleGravity: 1.5
@@ -80,7 +95,7 @@ const modeSettings = {
 
 //based on the algorithm used in input graph.json - choose the mode to run the Atlas on
 //switch the mode here with optimal settings for each mode
-const atlasMode = modeSettings.harmonic;
+const atlasLayout = layoutSettings.dual;
 
 clusterRepresentatives.set(focusClusterLabel, {
   label: "ua",
@@ -111,6 +126,36 @@ clusterRepresentatives.set("alphyna.bsky.social", {
   label: "ru",
   displayName: "🇷🇺 Рускій мір",
   prio: 4,
+});
+//check representative every time
+clusterRepresentatives.set("hto-ya.bsky.social", {
+  label: "ua-extended",
+  displayName: "укр-розширений",
+  prio: 5,
+});
+//check representative every time
+clusterRepresentatives.set("ffuuugor.bsky.social", {
+  label: "ru-extended",
+  displayName: "ру-розширений",
+  prio: 4,
+});
+//check representative every time
+clusterRepresentatives.set("shurikidze.bsky.social", {
+  label: "be-extended",
+  displayName: "🇧🇾 Бєларускій мір",
+  prio: 3,
+});
+//check representative every time
+clusterRepresentatives.set("larsen256.bsky.social", {
+  label: "ua-other-extended",
+  displayName: "дн-розширений",
+  prio: 3,
+});
+//check representative every time
+clusterRepresentatives.set("kyrylowozniak.bsky.social", {
+  label: "nafo-extended",
+  displayName: "нафо-розширений",
+  prio: 3,
 });
 clusterRepresentatives.set("hardrockfella.bsky.social", {
   label: "nafo",
@@ -286,73 +331,74 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
 
   log("Done adding edges");
 
-
   const communitiesGraph = new MultiDirectedGraph();
-  const communities:Map<number,ClusterRepPrio> = new Map();
+  if (atlasLayout.globusUkrajiny) {
+    const communities: Map<number, ClusterRepPrio> = new Map();
 
-  for (let i = 0; i < totalNodes; i++) {
-    const node = nodes[i];
-    if (!communities.has(node.community)) {
-      communities.set(node.community, { label: "", prio: 0 });
-    }
-    const rep = clusterRepresentatives.get(node.handle);
-    if (rep !== undefined) {
-      if (!communities.has(node.community) || communities.get(node.community)!.prio < rep.prio) {
-        communities.set(node.community, rep)
+    for (let i = 0; i < totalNodes; i++) {
+      const node = nodes[i];
+      if (!communities.has(node.community)) {
+        communities.set(node.community, { label: "", prio: 0 });
+      }
+      const rep = clusterRepresentatives.get(node.handle);
+      if (rep !== undefined) {
+        if (!communities.has(node.community) || communities.get(node.community)!.prio < rep.prio) {
+          communities.set(node.community, rep)
+        }
       }
     }
-  }
 
-  for (const [community, rep] of communities) {
-    communitiesGraph.addNode(community, {
-      key: community,
-      label: rep.label,
-      community: community,
-    });
-  }
-
-  for (let i = 0; i < totalEdges; i++) {
-    const edge = edges[i];
-    const source = indexNodes.get(edge.source)?.community!;
-    const target = indexNodes.get(edge.target)?.community!;
-    if (source == target) continue;
-    const graphEdge = communitiesGraph.findEdge(source,target, ()=>true);
-    if (graphEdge) {
-      communitiesGraph.updateEdgeAttribute(graphEdge, 'weight', v => v + edge.weight);
-    } else {
-      communitiesGraph.addEdge(source, target, {weight: edge.weight});
+    for (const [community, rep] of communities) {
+      communitiesGraph.addNode(community, {
+        key: community,
+        label: rep.label,
+        community: community,
+      });
     }
-  }
 
-  communitiesGraph.forEachEdge((edge, attrs) => communitiesGraph.updateEdgeAttribute(edge, 'weight', v => Math.log(v)));
+    for (let i = 0; i < totalEdges; i++) {
+      const edge = edges[i];
+      const source = indexNodes.get(edge.source)?.community!;
+      const target = indexNodes.get(edge.target)?.community!;
+      if (source == target) continue;
+      const graphEdge = communitiesGraph.findEdge(source, target, () => true);
+      if (graphEdge) {
+        communitiesGraph.updateEdgeAttribute(graphEdge, 'weight', v => v + edge.weight);
+      } else {
+        communitiesGraph.addEdge(source, target, { weight: edge.weight });
+      }
+    }
 
-  circular.assign(communitiesGraph);
-  const uaNode = communitiesGraph.findNode((node, attrs) => attrs.label == "ua");
-  communitiesGraph.updateNode(uaNode, (attrs) => ({
-    ...attrs,
-    fixed: true,
-    x: 0,
-    y: 0,
-  }));
+    communitiesGraph.forEachEdge((edge, attrs) => communitiesGraph.updateEdgeAttribute(edge, 'weight', v => Math.log(v)));
 
-  forceAtlas2.assign(communitiesGraph, {
-    settings: {
-    ...forceAtlas2.inferSettings(communitiesGraph),
-    },
-    iterations: 1000,
-  });
+    circular.assign(communitiesGraph);
+    const uaNode = communitiesGraph.findNode((node, attrs) => attrs.label == "ua");
+    communitiesGraph.updateNode(uaNode, (attrs) => ({
+      ...attrs,
+      fixed: true,
+      x: 0,
+      y: 0,
+    }));
 
-  // Flip to true to export communities layout
-  if (false) {
-    communitiesGraph.setAttribute("clusters", Array.from(communities.keys()).map((c) => ({
-      label: communities.get(c)!.label,
-      idx: c,
-      size: 1,
-    })));
-    communitiesGraph.setAttribute("lastUpdated", new Date().toISOString());
+    forceAtlas2.assign(communitiesGraph, {
+      settings: {
+        ...forceAtlas2.inferSettings(communitiesGraph),
+      },
+      iterations: 1000,
+    });
 
-    fs.writeFileSync("./out/exported_graph_enriched.json", JSON.stringify(communitiesGraph.export()));
-    return;
+    // Flip to true to export communities layout
+    if (false) {
+      communitiesGraph.setAttribute("clusters", Array.from(communities.keys()).map((c) => ({
+        label: communities.get(c)!.label,
+        idx: c,
+        size: 1,
+      })));
+      communitiesGraph.setAttribute("lastUpdated", new Date().toISOString());
+
+      fs.writeFileSync("./out/exported_graph_enriched.json", JSON.stringify(communitiesGraph.export()));
+      return;
+    }
   }
 
   // const degrees = graph.nodes().map((node) => graph.degree(node));
@@ -374,8 +420,8 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
     maxSize = 15;
   log("Assigning attributes...");
 
-  let minHarmonicWeight = Infinity;
-  let maxHarmonicWeight = -Infinity;
+  let minHarmonicWeightSum = Infinity;
+  let maxHarmonicWeightSum = -Infinity;
 
   graph.forEachNode((node) => {
 
@@ -422,12 +468,12 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
         harmonicWeightLogSum += Math.log(1 + harmonicWeight);
       });
 
-    minHarmonicWeight = Math.min(minHarmonicWeight, harmonicWeightLogSum);
-    maxHarmonicWeight = Math.max(maxHarmonicWeight, harmonicWeightLogSum);
+    minHarmonicWeightSum = Math.min(minHarmonicWeightSum, harmonicWeightLogSum);
+    maxHarmonicWeightSum = Math.max(maxHarmonicWeightSum, harmonicWeightLogSum);
 
     let newNodeSize =
       minSize +
-      Math.sqrt(harmonicWeightLogSum / atlasMode.maxHistoricWeightSum) * //range from 0 to 1
+      Math.sqrt(harmonicWeightLogSum / atlasLayout.maxHistoricWeightSum) * //range from 0 to 1
       (maxSize - minSize);
 
     // const inDegree = graph.inDegreeWithoutSelfLoops(node);
@@ -463,10 +509,8 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
     );
   });
 
-  log(`Min weight is ...${minWeight}`);
-  log(`Max weight is ...${maxWeight}`);
-  log(`Min harmonic weight is ...${minHarmonicWeight}`);
-  log(`Max harmonic weight is ...${maxHarmonicWeight}`);
+  log(`Min harmonic weight sum is ...${minHarmonicWeightSum}`);
+  log(`Max harmonic weight sum is ...${maxHarmonicWeightSum}`);
 
   // Log total number of nodes, edges, and graph weight
   log(
@@ -476,23 +520,29 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   log("Assigning layout...");
 
   const communityLocation: Map<number, { x: number, y: number }> = new Map();
-  communitiesGraph.forEachNode((_, attrs) => {
-    communityLocation.set(attrs.key, { x: attrs.x, y: attrs.y });
-  });
+  if (atlasLayout.globusUkrajiny) {
+    communitiesGraph.forEachNode((_, attrs) => {
+      communityLocation.set(attrs.key, { x: attrs.x, y: attrs.y });
+    });
+  }
+
   circular.assign(graph);
-  graph.forEachNode((n, { community }) => {
-    if (community !== undefined) {
-      const loc = communityLocation.get(community);
-      if (loc) {
-        // Scale down and shift to cluster location.
-        graph.updateNodeAttribute(n, 'x', x => x/100 + loc.x);
-        graph.updateNodeAttribute(n, 'y', y => y/100 + loc.y);
+
+  if (atlasLayout.globusUkrajiny) {
+    graph.forEachNode((n, { community }) => {
+      if (community !== undefined) {
+        const loc = communityLocation.get(community);
+        if (loc) {
+          // Scale down and shift to cluster location.
+          graph.updateNodeAttribute(n, 'x', x => x / 100 + loc.x);
+          graph.updateNodeAttribute(n, 'y', y => y / 100 + loc.y);
+        }
       }
-    }
-  });
+    });
+  }
 
   const settings = forceAtlas2.inferSettings(graph);
-  const iterationCount = atlasMode.iterationCount;
+  const iterationCount = atlasLayout.iterationCount;
 
   // about these settings:
   // https://observablehq.com/@mef/forceatlas2-layout-settings-visualized
@@ -511,7 +561,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
 
 
   // for harmonic atlas
-  settings.barnesHutTheta = atlasMode.blackHoleGravity;
+  settings.barnesHutTheta = atlasLayout.blackHoleGravity;
 
   // examples for harmonic atlas
 
@@ -543,9 +593,11 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   forceAtlas2.assign(graph, { settings, iterations: iterationCount });
   log("Done running Force Atlas");
 
-  // log(`Rotating Force Atlas...`);
-  // rotation.assign(graph, - 2 * Math.PI / 7);
-  // log("Successfully rotated Atlas");
+  if (atlasLayout.rotate) {
+    log(`Rotating Force Atlas...`);
+    rotation.assign(graph, atlasLayout.angle);
+    log("Successfully rotated Atlas");
+  }
 
   // initialize clusters from graph data
   const communityClusters: { [key: string]: Cluster } = {};
