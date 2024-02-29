@@ -353,6 +353,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
         key: community,
         label: rep.label,
         community: community,
+        size: 25,
       });
     }
 
@@ -379,10 +380,37 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
       x: 0,
       y: 0,
     }));
+    communitiesGraph.forEachNode((node, attrs) => {
+      switch (attrs.label) {
+        case "ua":
+          communitiesGraph.updateNode(node, (attrs) => ({
+            ...attrs,
+            fixed: true,
+            x: 0, y: 0,
+          }));
+          break;
+        case "ru":
+          communitiesGraph.updateNode(node, (attrs) => ({
+            ...attrs,
+            fixed: true,
+            x: 100, y: 0,
+          }));
+          break;
+        case "nafo":
+          communitiesGraph.updateNode(node, (attrs) => ({
+            ...attrs,
+            fixed: true,
+            x: -100, y: 0,
+          }));
+          break;
+      }
+    });
 
     forceAtlas2.assign(communitiesGraph, {
       settings: {
         ...forceAtlas2.inferSettings(communitiesGraph),
+        outboundAttractionDistribution: true,
+        edgeWeightInfluence: 2,
       },
       iterations: 1000,
     });
@@ -533,8 +561,9 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
         const loc = communityLocation.get(community);
         if (loc) {
           // Scale down and shift to cluster location.
-          graph.updateNodeAttribute(n, 'x', x => x / 100 + loc.x);
-          graph.updateNodeAttribute(n, 'y', y => y / 100 + loc.y);
+          // `circular` generates coords in [-1, 1] range.
+          graph.updateNodeAttribute(n, 'x', x => x*2 + loc.x / 10);
+          graph.updateNodeAttribute(n, 'y', y => y*2 + loc.y / 10);
         }
       }
     });
@@ -550,7 +579,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
   // reduces exponential to nlogn complexity
   // under 5 minutes generation vs. 10+ minutes
 
-  settings.barnesHutOptimize = true;
+  settings.barnesHutOptimize = atlasLayout.blackHoleGravity > 0;
 
   // -------------barnesHutOptimize----------------
 
