@@ -85,7 +85,7 @@ const layoutSettings = {
   },
   dual: {
     rotate: true,
-    angle: 22 * Math.PI / 13,
+    angle: 8 * Math.PI / 7,
     globusUkrajiny: false,
     maxHistoricWeightSum: 20000,
     iterationCount: 800,
