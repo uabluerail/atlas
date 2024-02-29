@@ -15,6 +15,7 @@ interface InputData {
     target: string;
     weight: number;
   }[];
+  timestamp?: string;
 }
 
 interface Edge {
@@ -231,14 +232,14 @@ async function fetchGraph(filename?: string) {
   });
 
   log("Done parsing graph response");
-  return { edges, nodes };
+  return { edges, nodes, timestamp: data.timestamp };
 }
 
 // If "enriched" is set, leave DIDs in the node data
 
 log("Starting exporter...");
 
-fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) => {
+fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[], timestamp?: string }) => {
   const { edges, nodes } = graphData;
   // Create the graph
   const graph = new MultiDirectedGraph();
@@ -798,7 +799,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
     );
   }
 
-  graph.setAttribute("lastUpdated", new Date().toISOString());
+  graph.setAttribute("lastUpdated", graphData.timestamp || new Date().toISOString());
 
   log("Exporting enriched graph...");
   let outputPath = "./out/exported_graph_enriched.json";
