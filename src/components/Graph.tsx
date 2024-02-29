@@ -217,6 +217,10 @@ const GraphContainer: React.FC<{}> = () => {
           return attr;
         });
 
+        newGraph.forEachEdge((edge) => {
+          newGraph.setEdgeAttribute(edge, "hidden", true);
+        });
+
         newGraph.setAttribute("clusters", communityClusters);
 
         setUserCount(newGraph.order);
@@ -400,7 +404,7 @@ const GraphContainer: React.FC<{}> = () => {
         sigma.refresh();
       } else if (graph !== null && selectedNode === null) {
         graph?.edges().forEach((edge) => {
-          graph?.setEdgeAttribute(edge, "hidden", false);
+          graph?.setEdgeAttribute(edge, "hidden", true);
           graph?.setEdgeAttribute(edge, "color", "#e0e0e0");
         });
         graph?.nodes().forEach((node) => {
