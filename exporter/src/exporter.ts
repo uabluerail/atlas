@@ -519,16 +519,15 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[] }) =
 
   log("Assigning layout...");
 
-  const communityLocation: Map<number, { x: number, y: number }> = new Map();
-  if (atlasLayout.globusUkrajiny) {
-    communitiesGraph.forEachNode((_, attrs) => {
-      communityLocation.set(attrs.key, { x: attrs.x, y: attrs.y });
-    });
-  }
 
   circular.assign(graph);
 
   if (atlasLayout.globusUkrajiny) {
+    const communityLocation: Map<number, { x: number, y: number }> = new Map();
+    communitiesGraph.forEachNode((_, attrs) => {
+      communityLocation.set(attrs.key, { x: attrs.x, y: attrs.y });
+    });
+
     graph.forEachNode((n, { community }) => {
       if (community !== undefined) {
         const loc = communityLocation.get(community);
