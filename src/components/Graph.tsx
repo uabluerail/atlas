@@ -61,6 +61,35 @@ interface Cluster {
   positions: { x: number; y: number }[];
 }
 
+const hideClusterLabels: string[] = [
+  // extended clusters
+  'ru-extended',
+  'be-extended',
+  'ua-other-extended',
+  'ua-other-extended',
+  'nafo-extended',
+
+  //ua big subclusters
+  'ua-yellow',
+  'ua-blue',
+
+  //ua overlay subclusters
+  'ua-church',
+  'ua-fun',
+  'ua-art',
+  'ua-lgbtqa',
+  'ua-write', //+фандоми
+  'ua-gaming',
+  'ua-tech',
+  'ua-kpop',
+
+  //ua-fixes
+  'ua-1',
+  'ua-2',
+  'ua-3',
+  'ua-4',
+];
+
 const knownClusterColorMappings: Map<string, string> = new Map();
 
 knownClusterColorMappings.set("ua-yellow", "#ffd500");
@@ -85,6 +114,37 @@ knownClusterColorMappings.set("infosec", "#8b0fff");
 knownClusterColorMappings.set("frontend", "#9175ff");
 knownClusterColorMappings.set("it", "#bf75ff");
 knownClusterColorMappings.set("web3", "#759cff");
+
+const knownOverlayClusterColorMappings: Map<string, string> = new Map();
+//overlay subclusters
+
+knownOverlayClusterColorMappings.set("ua-church", "#ffd500");
+knownOverlayClusterColorMappings.set("ua-fun", "#005bbb");
+knownOverlayClusterColorMappings.set("ua-art", "#ff8000");
+knownOverlayClusterColorMappings.set("ua-lgbtqa", "#590099");
+knownOverlayClusterColorMappings.set("ua-write", "#00fbff");
+knownOverlayClusterColorMappings.set("ua-gaming", "#1eff00");
+knownOverlayClusterColorMappings.set("ua-tech", "#ff54f9");
+
+//fix overlay
+knownOverlayClusterColorMappings.set("ua-1", "#ffd500");
+knownOverlayClusterColorMappings.set("ua-2", "#ffd500");
+
+const knownOverlayClusterHideColorMappings: Map<string, string> = new Map();
+
+knownOverlayClusterHideColorMappings.set("ua-church", "#ffd500");
+knownOverlayClusterHideColorMappings.set("ua-fun", "#005bbb");
+knownOverlayClusterHideColorMappings.set("ua-art", "#ffd500");
+knownOverlayClusterHideColorMappings.set("ua-lgbtqa", "#005bbb");
+knownOverlayClusterHideColorMappings.set("ua-write", "#005bbb");
+knownOverlayClusterHideColorMappings.set("ua-gaming", "#005bbb");
+knownOverlayClusterHideColorMappings.set("ua-tech", "#005bbb");
+
+//fix overlay
+knownOverlayClusterHideColorMappings.set("ua-1", "#ffd500");
+knownOverlayClusterHideColorMappings.set("ua-2", "#ffd500");
+knownOverlayClusterHideColorMappings.set("ua-3", "#ffd500");
+knownOverlayClusterHideColorMappings.set("ua-4", "#ffd500");
 
 function constructEdgeMap(graph: MultiDirectedGraph): Map<string, Edge> {
   const edgeMap = new Map<string, Edge>();
@@ -162,6 +222,8 @@ const GraphContainer: React.FC<{}> = () => {
   const [clusters, setClusters] = React.useState<Cluster[]>([]);
   const [showClusterLabels, setShowClusterLabels] =
     React.useState<boolean>(true);
+  const [useSubclusterOverlay, setUseSubclusterOverlay] =
+    React.useState<boolean>(searchParams.get("withSubclusters") != null);
 
   const SocialGraph: React.FC = () => {
     const loadGraph = useLoadGraph();
@@ -188,7 +250,8 @@ const GraphContainer: React.FC<{}> = () => {
         }
         const palette = iwanthue(
           Object.keys(communityClusters).length -
-          Object.keys(knownClusterColorMappings).length,
+          Object.keys(knownClusterColorMappings).length -
+          Object.keys(knownOverlayClusterColorMappings).length,
           {
             seed: "bskyCommunityClusters3",
             colorSpace: "intense",
@@ -201,7 +264,12 @@ const GraphContainer: React.FC<{}> = () => {
           const cluster = communityClusters[community];
           if (cluster.label !== undefined) {
             cluster.color =
-              knownClusterColorMappings.get(cluster.label) ?? palette.pop();
+              // knownClusterColorMappings.get(cluster.label) ?? palette.pop();
+
+              knownOverlayClusterColorMappings.get(cluster.label)
+                ? useSubclusterOverlay ? knownOverlayClusterColorMappings.get(cluster.label) : knownOverlayClusterHideColorMappings.get(cluster.label)
+                : knownClusterColorMappings.get(cluster.label)
+                ?? palette.pop();
           } else {
             cluster.color = palette.pop();
           }
@@ -595,13 +663,7 @@ const GraphContainer: React.FC<{}> = () => {
                     zIndex: 3,
                   }}
                 >
-                  {cluster.label == 'ru-extended'
-                    // || cluster.label == 'ua-extended'
-                    || cluster.label == 'ua-yellow'
-                    || cluster.label == 'ua-blue'
-                    || cluster.label == 'be-extended'
-                    || cluster.label == 'ua-other-extended'
-                    || cluster.label == 'nafo-extended' ? "" : cluster.displayName || cluster.label}
+                  {hideClusterLabels.indexOf(cluster.label) > -1 ? "" : cluster.displayName || cluster.label}
                 </div>
               );
             }
@@ -693,6 +755,26 @@ const GraphContainer: React.FC<{}> = () => {
                     </label>
                   </div>
                 </div>
+                {/* <div className="flex flex-row">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="clusterLabels"
+                      name="clusterLabels"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      checked={useSubclusterOverlay}
+                      onChange={() => setUseSubclusterOverlay(!useSubclusterOverlay)}
+                    />
+                  </div>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                    <label
+                      htmlFor="clusterLabels"
+                      className="font-medium text-gray-900"
+                    >
+                      <span className="hidden md:inline">Показати </span>Субкластери
+                    </label>
+                  </div>
+                </div> */}
               </div>
             </div>
           </div>

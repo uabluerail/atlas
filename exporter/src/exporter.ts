@@ -61,7 +61,21 @@ interface ClusterRepPrio {
 const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
 //more edges will be shown for focus clusters
-const focusClusterLabels = ["ua-yellow", "ua-blue", "ua-kpop"];
+const focusClusterLabels = [
+  "ua-yellow",
+  "ua-blue",
+
+  "ua-extended",
+
+  "ua-church",
+  "ua-fun",
+  "ua-art",
+  "ua-lgbtqa",
+  "ua-write",
+  "ua-gaming",
+  "ua-tech",
+  "ua-kpop"
+];
 
 const topNonRemovableEdges = 3;
 const maxEdgesForFocusCluster = 10;
@@ -86,7 +100,7 @@ const layoutSettings = {
     blackHoleGravity: 1.5
   },
   dual: {
-    rotate: false,
+    rotate: true,
     angle: 8 * Math.PI / 7,
     globusUkrajiny: false,
     maxHistoricWeightSum: 20000,
@@ -109,17 +123,60 @@ clusterRepresentatives.set("wormwoodstar.bsky.social", {
   displayName: "🇺🇦📘 Сині",
   prio: 4,
 });
-clusterRepresentatives.set("paperpllant.bsky.social", {
-  label: "ua-kpop",
-  displayName: "🇺🇦🎤👯‍♂️ K-pop",
-  prio: 3,
-});
+
+//underlay
 //check representative every time
 clusterRepresentatives.set("hto-ya.bsky.social", {
   label: "ua-extended",
   displayName: "🇺🇦🐝🍯 Український Вулик",
   prio: 5,
 });
+
+//overlay
+//check representative every time
+clusterRepresentatives.set("bsky.church", {
+  label: "ua-church",
+  prio: 6,
+});
+clusterRepresentatives.set("mohican.tech", {
+  label: "ua-fun",
+  prio: 6,
+});
+clusterRepresentatives.set("gniv.bsky.social", {
+  label: "ua-art",
+  prio: 6,
+});
+clusterRepresentatives.set("takeawaynoise.bsky.social", {
+  label: "ua-lgbtqa",
+  prio: 6,
+});
+clusterRepresentatives.set("kanadenka.bsky.social", {
+  label: "ua-write",
+  prio: 6,
+});
+clusterRepresentatives.set("holyagnostic.bsky.social", {
+  label: "ua-gaming",
+  prio: 6,
+});
+clusterRepresentatives.set("isimon.bsky.social", {
+  label: "ua-tech",
+  prio: 6,
+});
+clusterRepresentatives.set("paperpllant.bsky.social", {
+  label: "ua-kpop",
+  prio: 6,
+});
+
+//fixes
+clusterRepresentatives.set("oyin.bo", {
+  label: "ua-1",
+  prio: 6,
+});
+clusterRepresentatives.set("tyrrrz.me", {
+  label: "ua-2",
+  prio: 6,
+});
+
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
   displayName: "🇺🇦👁️‍🗨️👽 ім. П. Борошна",
