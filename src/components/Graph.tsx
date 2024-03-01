@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from "react";
+import React, { useState, FC, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MultiDirectedGraph } from "graphology";
 import { formatDistanceToNow, parseISO } from "date-fns";
@@ -121,7 +121,7 @@ const knownOverlayClusterColorMappings: Map<string, string> = new Map();
 knownOverlayClusterColorMappings.set("ua-church", "#ffd500");
 knownOverlayClusterColorMappings.set("ua-fun", "#005bbb");
 knownOverlayClusterColorMappings.set("ua-art", "#ff8000");
-knownOverlayClusterColorMappings.set("ua-lgbtqa", "#590099");
+knownOverlayClusterColorMappings.set("ua-lgbtqa", "#7306c2");
 knownOverlayClusterColorMappings.set("ua-write", "#00fbff");
 knownOverlayClusterColorMappings.set("ua-gaming", "#1eff00");
 knownOverlayClusterColorMappings.set("ua-tech", "#ff54f9");
@@ -755,7 +755,17 @@ const GraphContainer: React.FC<{}> = () => {
                     </label>
                   </div>
                 </div>
-                {/* <div className="flex flex-row">
+                <div className="flex flex-row" style={{ marginTop: "10px" }}>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                    <label
+                      htmlFor="clusterLabels"
+                      className="font-medium text-gray-500"
+                    >
+                      <span className="hidden md:inline">Експериментально: </span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex flex-row">
                   <div className="flex h-6 items-center">
                     <input
                       id="clusterLabels"
@@ -763,7 +773,7 @@ const GraphContainer: React.FC<{}> = () => {
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       checked={useSubclusterOverlay}
-                      onChange={() => setUseSubclusterOverlay(!useSubclusterOverlay)}
+                      onChange={() => { setLoading(true); setUseSubclusterOverlay(!useSubclusterOverlay); setGraphShouldUpdate(true); }}
                     />
                   </div>
                   <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
@@ -771,10 +781,11 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      <span className="hidden md:inline">Показати </span>Субкластери
+                      <span className="hidden md:inline">Спільноти </span>(оновить граф)
+                      <span className="md:hidden">🔄 граф...</span>
                     </label>
                   </div>
-                </div> */}
+                </div>
               </div>
             </div>
           </div>
