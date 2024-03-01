@@ -781,6 +781,7 @@ const GraphContainer: React.FC<{}> = () => {
                       className="font-medium text-gray-900"
                     >
                       Спільноти <span className="hidden md:inline">(оновить граф)</span>
+                      <span className="md:hidden">(оновить граф)</span>
                     </label>
                   </div>
                 </div>
