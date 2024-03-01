@@ -760,8 +760,7 @@ const GraphContainer: React.FC<{}> = () => {
                     <label
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-500"
-                    >
-                      <span className="hidden md:inline">Експериментально: </span>
+                    >Експериментально:
                     </label>
                   </div>
                 </div>
@@ -781,8 +780,7 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      <span className="hidden md:inline">Спільноти </span>(оновить граф)
-                      <span className="md:hidden">🔄 граф...</span>
+                      Спільноти <span className="hidden md:inline">(оновить граф)</span>
                     </label>
                   </div>
                 </div>
