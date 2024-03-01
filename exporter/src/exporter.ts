@@ -60,7 +60,8 @@ interface ClusterRepPrio {
 
 const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
-const focusClusterLabel = "uabluerail.org";
+//more edges will be shown for focus clusters
+const focusClusterLabels = ["ua-yellow", "ua-blue", "ua-kpop"];
 
 const topNonRemovableEdges = 3;
 const maxEdgesForFocusCluster = 10;
@@ -85,7 +86,7 @@ const layoutSettings = {
     blackHoleGravity: 1.5
   },
   dual: {
-    rotate: true,
+    rotate: false,
     angle: 8 * Math.PI / 7,
     globusUkrajiny: false,
     maxHistoricWeightSum: 20000,
@@ -98,15 +99,26 @@ const layoutSettings = {
 //switch the mode here with optimal settings for each mode
 const atlasLayout = layoutSettings.dual;
 
-clusterRepresentatives.set(focusClusterLabel, {
-  label: "ua",
-  displayName: "🇺🇦🐝🍯 Український Вулик",
+clusterRepresentatives.set("uabluerail.org", {
+  label: "ua-yellow",
+  displayName: "🇺🇦🟡 Жовті",
   prio: 5,
+});
+clusterRepresentatives.set("wormwoodstar.bsky.social", {
+  label: "ua-blue",
+  displayName: "🇺🇦📘 Сині",
+  prio: 4,
 });
 clusterRepresentatives.set("paperpllant.bsky.social", {
   label: "ua-kpop",
   displayName: "🇺🇦🎤👯‍♂️ K-pop",
-  prio: 4,
+  prio: 3,
+});
+//check representative every time
+clusterRepresentatives.set("hto-ya.bsky.social", {
+  label: "ua-extended",
+  displayName: "🇺🇦🐝🍯 Український Вулик",
+  prio: 5,
 });
 clusterRepresentatives.set("publeecist.bsky.social", {
   label: "ua-other",
@@ -127,12 +139,6 @@ clusterRepresentatives.set("alphyna.bsky.social", {
   label: "ru",
   displayName: "🇷🇺 Рускій мір",
   prio: 4,
-});
-//check representative every time
-clusterRepresentatives.set("hto-ya.bsky.social", {
-  label: "ua-extended",
-  displayName: "укр-розширений",
-  prio: 5,
 });
 //check representative every time
 clusterRepresentatives.set("ffuuugor.bsky.social", {
@@ -563,8 +569,8 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[], tim
         if (loc) {
           // Scale down and shift to cluster location.
           // `circular` generates coords in [-1, 1] range.
-          graph.updateNodeAttribute(n, 'x', x => x*2 + loc.x / 10);
-          graph.updateNodeAttribute(n, 'y', y => y*2 + loc.y / 10);
+          graph.updateNodeAttribute(n, 'x', x => x * 2 + loc.x / 10);
+          graph.updateNodeAttribute(n, 'y', y => y * 2 + loc.y / 10);
         }
       }
     });
@@ -692,7 +698,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[], tim
         graph.getEdgeAttribute(a, "weight")
       );
     });
-    const topEdges = attrs.label === focusClusterLabel
+    const topEdges = focusClusterLabels.indexOf(attrs.label) > -1
       ? sortedEdges.slice(0, maxEdgesForFocusCluster)  // max edges for ukrainians
       : sortedEdges.slice(0, maxEdgesEveryone); // max edges for everyone else
     const topEdgeSet = new Set(topEdges);

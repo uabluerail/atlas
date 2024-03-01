@@ -63,17 +63,18 @@ interface Cluster {
 
 const knownClusterColorMappings: Map<string, string> = new Map();
 
-knownClusterColorMappings.set("ua", "#ffd500");
+knownClusterColorMappings.set("ua-yellow", "#ffd500");
+knownClusterColorMappings.set("ua-blue", "#005bbb");
 knownClusterColorMappings.set("ua-extended", "#ffe975");
 knownClusterColorMappings.set("ua-other", "#85B53C");
 knownClusterColorMappings.set("ua-other-extended", "#ff336d");
-knownClusterColorMappings.set("ua-kpop", "#005bbb");
+knownClusterColorMappings.set("ua-kpop", "#600075");
 knownClusterColorMappings.set("be", "darkred");
 knownClusterColorMappings.set("be-extended", "#d1606f");
 knownClusterColorMappings.set("ru", "#57372c");
 knownClusterColorMappings.set("ru-extended", "#876255");
 knownClusterColorMappings.set("ru-other", "#c70202");
-// knownClusterColorMappings.set("ru-other-extended", "#ff336d");
+knownClusterColorMappings.set("ru-other-extended", "#ff336d");
 knownClusterColorMappings.set("nafo", "#47044a");
 knownClusterColorMappings.set("nafo-extended", "#7e5080");
 knownClusterColorMappings.set("furry", "#ea02de");
@@ -589,13 +590,15 @@ const GraphContainer: React.FC<{}> = () => {
                     fontSize: 24,
                     fontWeight: "bolder",
                     color: `${cluster.color}`,
-                    top: `${cluster.y}px`,
-                    left: `${cluster.x}px`,
+                    top: cluster.label == 'ua-extended' ? `${cluster.y}px` : `${cluster.y}px`,
+                    left: cluster.label == 'ua-extended' ? `${cluster.x}px` : `${cluster.x}px`,
                     zIndex: 3,
                   }}
                 >
                   {cluster.label == 'ru-extended'
-                    || cluster.label == 'ua-extended'
+                    // || cluster.label == 'ua-extended'
+                    || cluster.label == 'ua-yellow'
+                    || cluster.label == 'ua-blue'
                     || cluster.label == 'be-extended'
                     || cluster.label == 'ua-other-extended'
                     || cluster.label == 'nafo-extended' ? "" : cluster.displayName || cluster.label}
