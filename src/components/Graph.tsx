@@ -731,7 +731,7 @@ const GraphContainer: React.FC<{}> = () => {
                       className="font-medium text-gray-900"
                     >
                       Зв'язки <span className="hidden md:inline"> до 2х рукостискань</span>
-                      <span className="md:hidden">Друзі...</span>
+                      <span className="md:hidden">Друзів</span>
                     </label>
                   </div>
                 </div>
@@ -751,7 +751,8 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      <span className="hidden md:inline">Назви </span>Кластерів
+                      Назви <span className="hidden md:inline">Кластерів</span>
+                      <span className="md:hidden">Кластерів</span>
                     </label>
                   </div>
                 </div>
@@ -801,7 +802,14 @@ const GraphContainer: React.FC<{}> = () => {
             >
               uabluerail.org
             </a>
-            . Візуалізація на основі роботи{" "}
+            . Візуалізація на основі {" "}
+            <a
+              href="https://bsky.jazco.dev/atlas"
+              target="_blank"
+              className="font-bold underline-offset-1 underline"
+            >
+              атласу
+            </a> від {" "}
             <a
               href="https://bsky.app/profile/jaz.bsky.social"
               target="_blank"
