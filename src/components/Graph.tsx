@@ -679,7 +679,7 @@ const GraphContainer: React.FC<{}> = () => {
           </div>
         )}
         {legend && (
-          <div className="overflow-scroll bg-white shadow sm:rounded-md absolute right-1/2 top-5 transform w-1/2 h-1/2 right-5 w-fit translate-x-0 mt-auto z-50">
+          <div className="overflow-scroll bg-white shadow sm:rounded-md absolute right-1/2 top-5 transform w-1/3 h-1/2 right-5 w-fit translate-x-0 mt-auto z-50">
             <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
               <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                 <div className="ml-4 mt-2">
