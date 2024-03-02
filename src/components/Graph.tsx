@@ -1000,7 +1000,7 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      Детальніше<span className="hidden md:inline"> про кластери</span>
+                      Детальніше <span className="hidden md:inline">про кластери</span>
                       <span className="md:hidden">про кластери</span>
                     </label>
                   </div>
