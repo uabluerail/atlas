@@ -679,7 +679,10 @@ const GraphContainer: React.FC<{}> = () => {
           </div>
         )}
         {legend && (
-          <div className="overflow-scroll bg-white shadow sm:rounded-md absolute right-1/2 top-5 transform w-1/3 h-1/2 right-5 w-fit translate-x-0 mt-auto z-50">
+          <div className="overflow-scroll bg-white shadow sm:rounded-md absolute transform
+          mobile:left-1/2 mobile:top-2 mobile:left-2 mobile:right-2 mobile:w-fit mobile:h-1/2
+          desktop:right-1/2 desktop:top-5 desktop:right-5 desktop:w-3/7 desktop:h-1/2
+          translate-x-0 mt-auto z-50">
             <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
               <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                 <div className="ml-4 mt-2">
@@ -687,16 +690,38 @@ const GraphContainer: React.FC<{}> = () => {
                     Детальніше про кластери
                   </h3>
                 </div>
+                <div className="ml-4 mt-2 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLegend(!legend);
+                    }}
+                    className={
+                      `relative inline-flex items-center rounded-md  px-3 py-2 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+                      (showMootList
+                        ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
+                        : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
+                    }
+                  >
+                    {legend ? "Приховати" : "Показати"}
+                  </button>
+                </div>
               </div>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
                 <h5 className="text-sm font-semibold leading-10 text-gray-600">
                   Загальні риси
                 </h5>
                 <p>
-                  Кластери з позначкою "🇺🇦" - частини українського інформаційного простору.
+                  На цій представлені акаунти і взаємодії між ними.
+                </p>
+                <p className="mt-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Сині стрілочки</span> - взаємодії ДО вас.
                 </p>
                 <p>
-                  Кластери з позначкою "🌍" - частини глобального (здебільшого - англомовного) інформаційного простору.
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Червоні стрілочки</span> - взаємодії ВІД вас.
+                </p>
+                <p className="mt-2">
+                  Всі стрілочки - це агреговані і зважені взаємодії: логарифмічна сумма лайків, реплаїв та підписок.
                 </p>
                 <h5 className="text-sm font-semibold leading-10 text-gray-600">
                   Українські кластери 🇺🇦
@@ -869,6 +894,29 @@ const GraphContainer: React.FC<{}> = () => {
                   </span> - кластер глобальної російськомовної спільноти. Населений переважно росіянами.
                   Також присутні акаунти з інших держав, що існують переважно в російському інфопросторі.
                 </p>
+                <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                  Детальніше про кластеризацію
+                </h5>
+                <p>
+                  Кластеризація (фарбування) - за допомогою алгоритму Leiden на 3х різних налаштуваннях: слабка, точна та над-точна (виявляє спільноти по-інтересам всередині більших кластерів).
+                </p>
+                <p>
+                  Візуалізація - за допомогою алгоритму Force Atlas 2. Саме він візуально симулює силу тяжіння на основі взаємодій та групує кульки докупи.
+                  Можна помітити, що візуальне групування та кластеризація перетинаються, але дуже важливо їх розрізняти,
+                  бо на цьому атласі ми бачимо роботу 4х алгоритмів:
+                </p>
+                <p className="mt-2">
+                  ForceAtlas2(iterations: 800, barnesHutTheta:1.5, aggregatedWeightedInteractionsAB: logWeight) - візуальне групування
+                </p>
+                <p>
+                  LeidenWeak(gamma: 30, likes: countPairsAB, replies: countPairsAB, follows: boolAB) - кульки блідого кольору (лише для 6ти кластерів з 14ти)
+                </p>
+                <p>
+                  LeidenMain(gamma: 50, aggregatedWeightedInteractionsAB: harmonicMeanUndirectedLogWeight)
+                </p>
+                <p>
+                  LeidenDetailed(gamma: 50, aggregatedWeightedInteractionsAB: harmonicMeanUndirectedLogWeight)
+                </p>
               </div>
             </div>
           </div>
@@ -898,7 +946,11 @@ const GraphContainer: React.FC<{}> = () => {
           })}
         </div>
         <SocialGraph />
-        <div className="left-1/2 bottom-10 lg:tall:bottom-20 transform -translate-x-1/2 w-5/6 lg:w-fit z-50 fixed">
+        {/* mobile:bottom-10 mobile:left-1 mobile:right-1 mobile:w-fit mobile:h-3/7 */}
+        <div className="
+        mobile:bottom-10 mobile:left-1 mobile:right-1 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
+        desktop:left-1/2 desktop:bottom-10 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
+         z-50 fixed">
           <div className="bg-white shadow sm:rounded-lg py-1">
             <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
               <div className="flex flex-col items-baseline bg-white text-center">
@@ -938,73 +990,6 @@ const GraphContainer: React.FC<{}> = () => {
                     setSearchParams(newParams);
                   }}
                 />
-              </div>
-              <div className="relative flex gap-x-3 ml-4 w-full flex-col">
-                <div className="flex flex-row">
-                  <div className="flex h-6 items-center mt-auto mb-auto">
-                    <input
-                      id="neighbors"
-                      name="neighbors"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={showSecondDegreeNeighbors}
-                      onChange={() =>
-                        setShowSecondDegreeNeighbors(!showSecondDegreeNeighbors)
-                      }
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="neighbors"
-                      className="font-medium text-gray-900"
-                    >
-                      Зв'язки<span className="hidden md:inline"> Друзів</span>
-                      <span className="md:hidden">Друзів</span>
-                    </label>
-                  </div>
-                </div>
-                <div className="flex flex-row">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="clusterLabels"
-                      name="clusterLabels"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={showClusterLabels}
-                      onChange={() => setShowClusterLabels(!showClusterLabels)}
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-900"
-                    >
-                      Назви <span className="hidden md:inline">Кластерів</span>
-                      <span className="md:hidden">Кластерів</span>
-                    </label>
-                  </div>
-                </div>
-                <div className="flex flex-row">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="clusterLabels"
-                      name="clusterLabels"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={legend}
-                      onChange={() => setLegend(!legend)}
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-900"
-                    >
-                      Детальніше <span className="hidden md:inline">про кластери</span>
-                      <span className="md:hidden">про кластери</span>
-                    </label>
-                  </div>
-                </div>
                 <div className="flex flex-row" style={{ marginTop: "10px" }}>
                   <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
                     <label
@@ -1031,8 +1016,74 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      Спільноти
-
+                      Показати спільноти
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="relative flex gap-x-3 ml-4 w-full flex-col">
+                <div className="flex flex-row">
+                  <div className="flex h-6 items-center mt-auto mb-auto">
+                    <input
+                      id="neighbors"
+                      name="neighbors"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      checked={showSecondDegreeNeighbors}
+                      onChange={() =>
+                        setShowSecondDegreeNeighbors(!showSecondDegreeNeighbors)
+                      }
+                    />
+                  </div>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
+                    <label
+                      htmlFor="neighbors"
+                      className="font-medium text-gray-900"
+                    >
+                      Зв'язки <span className="hidden md:inline">друзів</span>
+                      <span className="md:hidden">друзів</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex flex-row">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="clusterLabels"
+                      name="clusterLabels"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      checked={showClusterLabels}
+                      onChange={() => setShowClusterLabels(!showClusterLabels)}
+                    />
+                  </div>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
+                    <label
+                      htmlFor="clusterLabels"
+                      className="font-medium text-gray-900"
+                    >
+                      Назви <span className="hidden md:inline">кластерів</span>
+                      <span className="md:hidden">кластерів</span>
+                    </label>
+                  </div>
+                </div>
+                <div className="flex flex-row mt-2">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="clusterLabels"
+                      name="clusterLabels"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      checked={legend}
+                      onChange={() => setLegend(!legend)}
+                    />
+                  </div>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
+                    <label
+                      htmlFor="clusterLabels"
+                      className="font-medium text-gray-900"
+                    >
+                      Детальніше <span className="hidden md:inline">про кластери</span>
+                      <span className="md:hidden">про кластери</span>
                     </label>
                   </div>
                 </div>
@@ -1065,7 +1116,7 @@ const GraphContainer: React.FC<{}> = () => {
               target="_blank"
               className="font-bold underline-offset-1 underline"
             >
-              jaz
+              Jaz
             </a>
             {" 🏳️‍⚧️"}
           </span>

@@ -8,8 +8,10 @@ export default {
         '144': '36rem',
       },
       screens: {
-        tall: { raw: "(min-height: 800px)" },
+        desktop: { raw: "(min-height: 800px)" },
         // => @media (min-height: 800px) { ... }
+        mobile: { 'max': '600px' }
+        // => @media (max-width: 600px) { ... }
       },
     },
   },
