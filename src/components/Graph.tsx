@@ -91,33 +91,60 @@ const hideClusterLabels: string[] = [
 ];
 
 const knownClusterColorMappings: Map<string, string> = new Map();
+const knownClusterNames: Map<string, string> = new Map();
 
+knownClusterNames.set("ua-extended", "🇺🇦🐝🍯 Український Вулик");
 knownClusterColorMappings.set("ua-yellow", "#ffd500");
 knownClusterColorMappings.set("ua-blue", "#005bbb");
 knownClusterColorMappings.set("ua-extended", "#ffe975");
-knownClusterColorMappings.set("ua-other", "#85B53C");
-knownClusterColorMappings.set("ua-other-extended", "#ff336d");
-knownClusterColorMappings.set("ua-kpop", "#600075");
-knownClusterColorMappings.set("be", "darkred");
-knownClusterColorMappings.set("be-extended", "#d1606f");
-knownClusterColorMappings.set("ru", "#57372c");
-knownClusterColorMappings.set("ru-extended", "#876255");
+
+knownClusterNames.set("ua-boroshno", "🇺🇦👁️‍🗨️👽 ім. П. Борошна");
+knownClusterColorMappings.set("ua-boroshno", "#85B53C");
+knownClusterColorMappings.set("ua-boroshno-extended", "#ff336d");
+
+knownClusterNames.set("ru-other", "🇷🇺⚒️ Дружби Народів");
 knownClusterColorMappings.set("ru-other", "#c70202");
 knownClusterColorMappings.set("ru-other-extended", "#ff336d");
+
+knownClusterNames.set("be", "🇧🇾 Бєларускій Мір");
+knownClusterColorMappings.set("be", "darkred");
+knownClusterColorMappings.set("be-extended", "#d1606f");
+
+knownClusterNames.set("ru", "🇷🇺 Рускій Мір");
+knownClusterColorMappings.set("ru", "#57372c");
+knownClusterColorMappings.set("ru-extended", "#876255");
+
+knownClusterNames.set("nafo", "🌍👩‍🚀👨‍🚀 NAFO");
 knownClusterColorMappings.set("nafo", "#47044a");
 knownClusterColorMappings.set("nafo-extended", "#7e5080");
-knownClusterColorMappings.set("furry", "#ea02de");
-knownClusterColorMappings.set("writers", "#02cbea");
-knownClusterColorMappings.set("gamers", "#02e6a1");
+
+knownClusterNames.set("artists", "🌍🖌️🎨 Художники");
 knownClusterColorMappings.set("artists", "#ff4902");
+
+knownClusterNames.set("furry", "🌍🦊🐺 Фурі");
+knownClusterColorMappings.set("furry", "#ea02de");
+
+knownClusterNames.set("writers", "🌍✍️📖 Письменники");
+knownClusterColorMappings.set("writers", "#02cbea");
+
+knownClusterNames.set("gamers", "🌍👾🎮 Ігророби");
+knownClusterColorMappings.set("gamers", "#02e6a1");
+
+knownClusterNames.set("infosec", "🌍🔐👩‍💻 Злі ITвці");
 knownClusterColorMappings.set("infosec", "#8b0fff");
-knownClusterColorMappings.set("frontend", "#9175ff");
-knownClusterColorMappings.set("it", "#bf75ff");
+
+knownClusterNames.set("startup", "🌍💡💻 Стартапери");
+knownClusterColorMappings.set("startup", "#9175ff");
+
+knownClusterNames.set("tech", "🌍🚢🖥️ ITвці");
+knownClusterColorMappings.set("tech", "#bf75ff");
+
+knownClusterNames.set("web3", "🌍🤖🛸 Футуризм");
 knownClusterColorMappings.set("web3", "#759cff");
 
 const knownOverlayClusterColorMappings: Map<string, string> = new Map();
-//overlay subclusters
 
+//overlay subclusters when on
 knownOverlayClusterColorMappings.set("ua-church", "#ffd500");
 knownOverlayClusterColorMappings.set("ua-fun", "#005bbb");
 knownOverlayClusterColorMappings.set("ua-art", "#ff8000");
@@ -125,26 +152,31 @@ knownOverlayClusterColorMappings.set("ua-lgbtqa", "#7306c2");
 knownOverlayClusterColorMappings.set("ua-write", "#00fbff");
 knownOverlayClusterColorMappings.set("ua-gaming", "#1eff00");
 knownOverlayClusterColorMappings.set("ua-tech", "#ff54f9");
+//not detected anymore
+knownOverlayClusterColorMappings.set("ua-kpop", "#600075");
 
-//fix overlay
+//overlay subclusters when hidden
+const knownOverlayClusterHideCustomColorMappings: Map<string, string> = new Map();
+
+knownOverlayClusterHideCustomColorMappings.set("ua-church", "#ffd500");
+knownOverlayClusterHideCustomColorMappings.set("ua-fun", "#005bbb");
+knownOverlayClusterHideCustomColorMappings.set("ua-art", "#ffd500");
+knownOverlayClusterHideCustomColorMappings.set("ua-lgbtqa", "#005bbb");
+knownOverlayClusterHideCustomColorMappings.set("ua-write", "#005bbb");
+knownOverlayClusterHideCustomColorMappings.set("ua-gaming", "#005bbb");
+knownOverlayClusterHideCustomColorMappings.set("ua-tech", "#005bbb");
+//not detected anymore
+knownOverlayClusterHideCustomColorMappings.set("ua-kpop", "#005bbb");
+
+//fix overlay (small subclusters not included in overlay, but affecting the visuals)
 knownOverlayClusterColorMappings.set("ua-1", "#ffd500");
 knownOverlayClusterColorMappings.set("ua-2", "#ffd500");
-
-const knownOverlayClusterHideColorMappings: Map<string, string> = new Map();
-
-knownOverlayClusterHideColorMappings.set("ua-church", "#ffd500");
-knownOverlayClusterHideColorMappings.set("ua-fun", "#005bbb");
-knownOverlayClusterHideColorMappings.set("ua-art", "#ffd500");
-knownOverlayClusterHideColorMappings.set("ua-lgbtqa", "#005bbb");
-knownOverlayClusterHideColorMappings.set("ua-write", "#005bbb");
-knownOverlayClusterHideColorMappings.set("ua-gaming", "#005bbb");
-knownOverlayClusterHideColorMappings.set("ua-tech", "#005bbb");
-
-//fix overlay
-knownOverlayClusterHideColorMappings.set("ua-1", "#ffd500");
-knownOverlayClusterHideColorMappings.set("ua-2", "#ffd500");
-knownOverlayClusterHideColorMappings.set("ua-3", "#ffd500");
-knownOverlayClusterHideColorMappings.set("ua-4", "#ffd500");
+knownOverlayClusterColorMappings.set("ua-3", "#ffd500");
+knownOverlayClusterColorMappings.set("ua-4", "#ffd500");
+knownOverlayClusterHideCustomColorMappings.set("ua-1", "#ffd500");
+knownOverlayClusterHideCustomColorMappings.set("ua-2", "#ffd500");
+knownOverlayClusterHideCustomColorMappings.set("ua-3", "#ffd500");
+knownOverlayClusterHideCustomColorMappings.set("ua-4", "#ffd500");
 
 function constructEdgeMap(graph: MultiDirectedGraph): Map<string, Edge> {
   const edgeMap = new Map<string, Edge>();
@@ -190,6 +222,7 @@ const GraphContainer: React.FC<{}> = () => {
 
   // Selected Node properties
   const [selectedNode, setSelectedNode] = React.useState<string | null>(null);
+  const [legend, setLegend] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
   const [outWeight, setOutWeight] = React.useState<number>(-1);
@@ -267,7 +300,7 @@ const GraphContainer: React.FC<{}> = () => {
               // knownClusterColorMappings.get(cluster.label) ?? palette.pop();
 
               knownOverlayClusterColorMappings.get(cluster.label)
-                ? useSubclusterOverlay ? knownOverlayClusterColorMappings.get(cluster.label) : knownOverlayClusterHideColorMappings.get(cluster.label)
+                ? useSubclusterOverlay ? knownOverlayClusterColorMappings.get(cluster.label) : knownOverlayClusterHideCustomColorMappings.get(cluster.label)
                 : knownClusterColorMappings.get(cluster.label)
                 ?? palette.pop();
           } else {
@@ -569,12 +602,12 @@ const GraphContainer: React.FC<{}> = () => {
         }}
       >
         {selectedNode !== null && mootList.length > 0 && (
-          <div className="overflow-hidden bg-white shadow sm:rounded-md absolute left-1/2 top-5 transform -translate-x-1/2 w-5/6 lg:tall:w-fit lg:tall:left-12 lg:tall:translate-x-0 lg:tall:mt-auto lg:tall-mb:auto z-50">
+          <div className="overflow-hidden bg-white shadow sm:rounded-md absolute left-1/2 top-5 transform w-1/3 left-5 w-fit translate-x-0 mt-auto z-50">
             <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
               <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                 <div className="ml-4 mt-2">
                   <h3 className="text-base font-semibold leading-6 text-gray-900">
-                    Moot List
+                    Список топ 10 взаємодій (за весь час)
                   </h3>
                 </div>
                 <div className="ml-4 mt-2 flex-shrink-0">
@@ -597,13 +630,13 @@ const GraphContainer: React.FC<{}> = () => {
                         : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
                     }
                   >
-                    {showMootList ? "Hide" : "Show"}
+                    {showMootList ? "Приховати" : "Показати"}
                   </button>
                 </div>
               </div>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
                 <p>
-                  These are the top 10 moots that{" "}
+                  Це топ користувачів, з якими {" "}
                   <a
                     className="font-bold underline-offset-1 underline break-all"
                     href={`https://bsky.app/profile/${graph?.getNodeAttribute(
@@ -614,7 +647,7 @@ const GraphContainer: React.FC<{}> = () => {
                   >
                     {graph?.getNodeAttribute(selectedNode, "label")}
                   </a>{" "}
-                  has interacted with.
+                  взаємодіяли.
                 </p>
               </div>
             </div>
@@ -645,6 +678,201 @@ const GraphContainer: React.FC<{}> = () => {
             </ul>
           </div>
         )}
+        {legend && (
+          <div className="overflow-scroll bg-white shadow sm:rounded-md absolute right-1/2 top-5 transform w-1/2 h-1/2 right-5 w-fit translate-x-0 mt-auto z-50">
+            <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
+              <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
+                <div className="ml-4 mt-2">
+                  <h3 className="text-base font-semibold leading-6 text-gray-900">
+                    Детальніше про кластери
+                  </h3>
+                </div>
+              </div>
+              <div className="mt-2 max-w-xl text-sm text-gray-500">
+                <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                  Загальні риси
+                </h5>
+                <p>
+                  Кластери з позначкою "🇺🇦" - частини українського інформаційного простору.
+                </p>
+                <p>
+                  Кластери з позначкою "🌍" - частини глобального (здебільшого - англомовного) інформаційного простору.
+                </p>
+                <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                  Українські кластери 🇺🇦
+                </h5>
+                <p className="mb-5">
+                  Українські кластери на цій мапі представлені максимально деталізовано.
+                  Максимальна кількість вихідних (червоних) стрілочок від кожної кульки - 10.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('ua-extended')}
+                  </span> - Український мета-кластер. Тут зосереджена більшість української спільноти Bluesky.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('ua-boroshno')}
+                  </span> - Український кластер. Осередок інформаційно-психологічних операцій.
+                  Тут проживають як ботоферми і ботоводи, так і просто одурені українці, які легко ведуться та поширюють ІПСО,
+                  конспірологію, біолабораторії Єрмака, та розмінування Чонгару інопланетянами.
+                </p>
+                {useSubclusterOverlay && (
+                  <div>
+                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                      Українські cпільноти 🇺🇦
+                    </h5>
+                    <p className="mb-1">
+                      Українські спільноти - це експериментальний поділ мета-кластеру <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {knownClusterNames.get('ua-extended')}
+                      </span> на менші групи.
+                    </p>
+                    <p className="mb-5">
+                      Поділ відбувається виключно за взаємодіями.
+                      Наприклад, багато Українських художників можна знайти в кластері шитпосту, а не в кластері художників.
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                        style={{ color: knownOverlayClusterColorMappings.get('ua-church') }}>
+                        ■■■■
+                      </span> - Спільнота Церкви Святого Інвайту ⛪🟡📘.
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                        style={{ color: knownOverlayClusterColorMappings.get('ua-fun') }}>
+                        ■■■■
+                      </span> - Шитпост спільнота 💃💅.
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                        style={{ color: knownOverlayClusterColorMappings.get('ua-art') }}>
+                        ■■■■
+                      </span> - Cпільнота митців: художників, крафтерів, косплеєрів.
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                        style={{ color: knownOverlayClusterColorMappings.get('ua-write') }}>
+                        ■■■■
+                      </span> - Cпільнота укррайт, к-поп та фандомів.
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                        style={{ color: knownOverlayClusterColorMappings.get('ua-lgbtqa') }}>
+                        ■■■■
+                      </span> - Олди з твіттера?
+                      Цей опис потребує доповнення, якщо ви знайшли себе тут - зверніться до нас з пропозиціями опису!
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                        style={{ color: knownOverlayClusterColorMappings.get('ua-gaming') }}>
+                        ■■■■
+                      </span> - Ютубери, ґеймери
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                        style={{ color: knownOverlayClusterColorMappings.get('ua-tech') }}>
+                        ■■■■
+                      </span> - Українська tech-спільнота
+                    </p>
+                  </div>
+                )}
+                <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                  Глобальні кластери 🌍
+                </h5>
+                <p className="mb-5">
+                  Увага! Глобальні кластери на цій мапі представлені частково в цілях оптимізації. Максимальна кількість вихідних (червоних) стрілочок - 5. Повну мапу блускай можна знайти {" "}
+                  <a
+                    href="https://bsky.jazco.dev/atlas"
+                    target="_blank"
+                    className="font-bold underline-offset-1 underline"
+                  > тут
+                  </a>
+                  {" "} (Atlas від Jaz, більше не оновлюється) a також  {" "}
+                  <a
+                    href="https://aurora.ndimensional.xyz"
+                    target="_blank"
+                    className="font-bold underline-offset-1 underline"
+                  > тут
+                  </a>
+                  {" "} (Aurora від syntacrobat)
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('nafo')}
+                  </span> - [REDACTED].
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('gamers')}
+                  </span> - Розробники ігор, геймери з усього світу.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('artists')}
+                  </span> - Художники, митці з усього світу.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('writers')}
+                  </span> - Глобальна спільнота письменників, фікрайтерів.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('furry')}
+                  </span> - Глобальна спільнота фурі.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('tech')}
+                  </span> - Глобальна IT-спільнота.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('infosec')}
+                  </span> - Глобальна InfoSec-спільнота.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('startup')}
+                  </span> - Стартапери з усього світу.
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('web3')}
+                  </span> - Футуризм, web3.
+                </p>
+                <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                  Кластери країн-агресорів
+                </h5>
+                <p className="mb-5">
+                  Увага! Бойкотуйте контент країн агресорів: {" "}
+                  <a
+                    href="https://mobik.zip"
+                    target="_blank"
+                    className="font-bold underline-offset-1 underline"
+                  > mobik.zip
+                  </a>
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('ru')}
+                  </span> - російські акаунти
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('be')}
+                  </span> - білоруські акаунти
+                </p>
+                <p className="mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    {knownClusterNames.get('ru-other')}
+                  </span> - кластер глобальної російськомовної спільноти. Населений переважно росіянами.
+                  Також присутні акаунти з інших держав, що існують переважно в російському інфопросторі.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="overflow-hidden w-screen h-screen absolute top-0 left-0">
           {clusters.map((cluster) => {
             if (cluster.label !== undefined) {
@@ -663,7 +891,7 @@ const GraphContainer: React.FC<{}> = () => {
                     zIndex: 3,
                   }}
                 >
-                  {hideClusterLabels.indexOf(cluster.label) > -1 ? "" : cluster.displayName || cluster.label}
+                  {hideClusterLabels.indexOf(cluster.label) > -1 ? "" : knownClusterNames.get(cluster.label) ?? (cluster.displayName || cluster.label)}
                 </div>
               );
             }
@@ -730,7 +958,7 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="neighbors"
                       className="font-medium text-gray-900"
                     >
-                      Зв'язки <span className="hidden md:inline"> до 2х рукостискань</span>
+                      Зв'язки<span className="hidden md:inline"> Друзів</span>
                       <span className="md:hidden">Друзів</span>
                     </label>
                   </div>
@@ -756,12 +984,34 @@ const GraphContainer: React.FC<{}> = () => {
                     </label>
                   </div>
                 </div>
+                <div className="flex flex-row">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="clusterLabels"
+                      name="clusterLabels"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      checked={legend}
+                      onChange={() => setLegend(!legend)}
+                    />
+                  </div>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                    <label
+                      htmlFor="clusterLabels"
+                      className="font-medium text-gray-900"
+                    >
+                      Детальніше<span className="hidden md:inline"> про кластери</span>
+                      <span className="md:hidden">про кластери</span>
+                    </label>
+                  </div>
+                </div>
                 <div className="flex flex-row" style={{ marginTop: "10px" }}>
                   <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
                     <label
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-500"
-                    >Експериментально:
+                    >Експериментально: <span className="hidden md:inline">(граф оновиться)</span>
+                      <span className="md:hidden">(граф оновиться)</span>
                     </label>
                   </div>
                 </div>
@@ -781,8 +1031,8 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      Спільноти <span className="hidden md:inline">(оновить граф)</span>
-                      <span className="md:hidden">(оновить граф)</span>
+                      Спільноти
+
                     </label>
                   </div>
                 </div>

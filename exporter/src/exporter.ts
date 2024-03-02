@@ -128,7 +128,6 @@ clusterRepresentatives.set("wormwoodstar.bsky.social", {
 //check representative every time
 clusterRepresentatives.set("hto-ya.bsky.social", {
   label: "ua-extended",
-  displayName: "🇺🇦🐝🍯 Український Вулик",
   prio: 5,
 });
 
@@ -178,92 +177,83 @@ clusterRepresentatives.set("tyrrrz.me", {
 });
 
 clusterRepresentatives.set("publeecist.bsky.social", {
-  label: "ua-other",
-  displayName: "🇺🇦👁️‍🗨️👽 ім. П. Борошна",
+  label: "ua-boroshno",
   prio: 3,
 });
 clusterRepresentatives.set("metronom.bsky.social", {
   label: "be",
-  displayName: "🇧🇾 Бєларускій мір",
   prio: 3,
 });
 clusterRepresentatives.set("tinaarishina.bsky.social", {
   label: "ru-other",
-  displayName: "⚒️🇷🇺🇧🇾+ Дружби народів",
   prio: 4,
 });
 clusterRepresentatives.set("alphyna.bsky.social", {
   label: "ru",
-  displayName: "🇷🇺 Рускій мір",
   prio: 4,
 });
+clusterRepresentatives.set("hardrockfella.bsky.social", {
+  label: "nafo",
+  prio: 3,
+});
+
+//underlay clusters
 //check representative every time
 clusterRepresentatives.set("ffuuugor.bsky.social", {
   label: "ru-extended",
-  displayName: "ру-розширений",
   prio: 4,
 });
 //check representative every time
 clusterRepresentatives.set("shurikidze.bsky.social", {
   label: "be-extended",
-  displayName: "🇧🇾 Бєларускій мір",
   prio: 3,
 });
 //check representative every time
 clusterRepresentatives.set("larsen256.bsky.social", {
-  label: "ua-other-extended",
-  displayName: "дн-розширений",
+  label: "ua-boroshno-extended",
   prio: 3,
 });
 //check representative every time
 clusterRepresentatives.set("kyrylowozniak.bsky.social", {
   label: "nafo-extended",
-  displayName: "нафо-розширений",
   prio: 3,
 });
-clusterRepresentatives.set("hardrockfella.bsky.social", {
-  label: "nafo",
-  displayName: "🌍👩‍🚀👨‍🚀 NAFO",
-  prio: 3,
-});
+
+//control clusters
 clusterRepresentatives.set("killustration.bsky.social", {
   label: "artists",
-  displayName: "🌍🖌️🎨 Художники",
   prio: 3,
 });
 clusterRepresentatives.set("jalpari.bsky.social", {
   label: "writers",
-  displayName: "🌍✍️📖 Письменники",
   prio: 3,
 });
 clusterRepresentatives.set("cactimutt.bsky.social", {
   label: "furry",
-  displayName: "🌍🦊🐺 Фурі",
   prio: 3,
 });
 clusterRepresentatives.set("malwarejake.bsky.social", {
   label: "infosec",
-  displayName: "🌍🔐👩‍💻 Злі ITвці",
   prio: 3,
 });
 clusterRepresentatives.set("lookitup.baby", {
-  label: "it",
-  displayName: "🌍🚢🖥️ ITвці",
+  label: "tech",
   prio: 4,
 });
 clusterRepresentatives.set("pfrazee.com", {
-  label: "frontend",
-  displayName: "🌍💡💻 Стартапери",
+  label: "startup",
+  prio: 5,
+});
+clusterRepresentatives.set("bsky.app", {
+  label: "en-meta",
   prio: 5,
 });
 clusterRepresentatives.set("gamedevlist.bsky.social", {
   label: "gamers",
-  displayName: "🌍👾🎮 Ігророби",
   prio: 3,
 });
 clusterRepresentatives.set("onsu.re", {
   label: "web3",
-  displayName: "🌍🤖🛸 Футуризм",
   prio: 3,
 });
 
