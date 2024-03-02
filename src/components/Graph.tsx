@@ -92,6 +92,7 @@ const hideClusterLabels: string[] = [
 
 const knownClusterColorMappings: Map<string, string> = new Map();
 const knownClusterNames: Map<string, string> = new Map();
+const moderationClusters: Map<string, boolean> = new Map();
 
 knownClusterNames.set("ua-extended", "🇺🇦🐝🍯 Український Вулик");
 knownClusterColorMappings.set("ua-yellow", "#ffd500");
@@ -101,18 +102,26 @@ knownClusterColorMappings.set("ua-extended", "#ffe975");
 knownClusterNames.set("ua-boroshno", "🇺🇦👁️‍🗨️👽 ім. П. Борошна");
 knownClusterColorMappings.set("ua-boroshno", "#85B53C");
 knownClusterColorMappings.set("ua-boroshno-extended", "#ff336d");
+moderationClusters.set("ua-boroshno", true);
+moderationClusters.set("ua-boroshno-extended", true);
 
 knownClusterNames.set("ru-other", "🇷🇺⚒️ Дружби Народів");
 knownClusterColorMappings.set("ru-other", "#c70202");
 knownClusterColorMappings.set("ru-other-extended", "#ff336d");
+moderationClusters.set("ru-other", true);
+moderationClusters.set("ru-other-extended", true);
 
 knownClusterNames.set("be", "🇧🇾 Бєларускій Мір");
 knownClusterColorMappings.set("be", "darkred");
 knownClusterColorMappings.set("be-extended", "#d1606f");
+moderationClusters.set("be", true);
+moderationClusters.set("be-extended", true);
 
 knownClusterNames.set("ru", "🇷🇺 Рускій Мір");
 knownClusterColorMappings.set("ru", "#57372c");
 knownClusterColorMappings.set("ru-extended", "#876255");
+moderationClusters.set("ru", true);
+moderationClusters.set("ru-extended", true);
 
 knownClusterNames.set("nafo", "🌍👩‍🚀👨‍🚀 NAFO");
 knownClusterColorMappings.set("nafo", "#47044a");
@@ -223,6 +232,8 @@ const GraphContainer: React.FC<{}> = () => {
   // Selected Node properties
   const [selectedNode, setSelectedNode] = React.useState<string | null>(null);
   const [legend, setLegend] = React.useState<boolean>(false);
+  const [moderation, setModeration] = React.useState<boolean>(false);
+  const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
   const [outWeight, setOutWeight] = React.useState<number>(-1);
@@ -314,7 +325,12 @@ const GraphContainer: React.FC<{}> = () => {
             attr.community !== undefined &&
             attr.community in communityClusters
           ) {
-            attr.color = communityClusters[attr.community].color;
+            if (moderation || !moderationClusters.get(communityClusters[attr.community].label)) {
+              attr.color = communityClusters[attr.community].color;
+            } else {
+              //todo remove completely and use different layout
+              attr.color = "#eeeeee";
+            }
           }
           return attr;
         });
@@ -344,16 +360,18 @@ const GraphContainer: React.FC<{}> = () => {
           const cluster = communityClusters[community];
           // adapt the position to viewport coordinates
           const viewportPos = sigma.graphToViewport(cluster as Coordinates);
-          newClusters.push({
-            label: cluster.label,
-            displayName: cluster.displayName,
-            idx: cluster.idx,
-            x: viewportPos.x,
-            y: viewportPos.y,
-            color: cluster.color,
-            size: cluster.size,
-            positions: cluster.positions,
-          });
+          if (moderation || !moderationClusters.get(cluster.label)) {
+            newClusters.push({
+              label: cluster.label,
+              displayName: cluster.displayName,
+              idx: cluster.idx,
+              x: viewportPos.x,
+              y: viewportPos.y,
+              color: cluster.color,
+              size: cluster.size,
+              positions: cluster.positions,
+            });
+          }
         }
         setClusters(newClusters);
         setGraph(newGraph);
@@ -602,7 +620,10 @@ const GraphContainer: React.FC<{}> = () => {
         }}
       >
         {selectedNode !== null && mootList.length > 0 && (
-          <div className="overflow-hidden bg-white shadow sm:rounded-md absolute left-1/2 top-5 transform w-1/3 left-5 w-fit translate-x-0 mt-auto z-50">
+          <div className="bg-white shadow rounded-md absolute
+          mobile:overflow-scroll mobile:left-1/2 mobile:top-2 mobile:transform mobile:left-2 mobile:right-2 mobile:w-fit mobile:translate-x-0
+          desktop:overflow-hidden desktop:left-1/2 desktop:top-5 desktop:transform desktop:w-1/3 desktop:left-5 desktop:translate-x-0
+          mt-auto z-50">
             <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
               <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                 <div className="ml-4 mt-2">
@@ -653,7 +674,7 @@ const GraphContainer: React.FC<{}> = () => {
             </div>
             <ul
               role="list"
-              className="divide-y divide-gray-200 max-h-96 md:max-h-screen overflow-auto"
+              className="divide-y divide-gray-200 mobile:max-h-40 desktop:max-h-96 md:max-h-screen overflow-auto"
             >
               {showMootList &&
                 mootList.slice(0, 10).map((moot) => (
@@ -717,17 +738,18 @@ const GraphContainer: React.FC<{}> = () => {
                 <p className="mt-2">
                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Сині стрілочки</span> - взаємодії ДО вас.
                 </p>
-                <p>
+                <p className="mt-2">
                   <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Червоні стрілочки</span> - взаємодії ВІД вас.
                 </p>
                 <p className="mt-2">
-                  Всі стрілочки - це агреговані і зважені взаємодії: логарифмічна сумма лайків, реплаїв та підписок.
+                  Всі стрілочки - це агреговані і зважені взаємодії: логарифмічна сума лайків, реплаїв та підписок.
                 </p>
                 <h5 className="text-sm font-semibold leading-10 text-gray-600">
                   Українські кластери 🇺🇦
                 </h5>
                 <p className="mb-5">
                   Українські кластери на цій мапі представлені максимально деталізовано.
+                  Також додано можливість увімкнути деталізацію по спільнотам.
                   Максимальна кількість вихідних (червоних) стрілочок від кожної кульки - 10.
                 </p>
                 <p className="mb-2">
@@ -735,72 +757,66 @@ const GraphContainer: React.FC<{}> = () => {
                     {knownClusterNames.get('ua-extended')}
                   </span> - Український мета-кластер. Тут зосереджена більшість української спільноти Bluesky.
                 </p>
-                <p className="mb-2">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {knownClusterNames.get('ua-boroshno')}
-                  </span> - Український кластер. Осередок інформаційно-психологічних операцій.
-                  Тут проживають як ботоферми і ботоводи, так і просто одурені українці, які легко ведуться та поширюють ІПСО,
-                  конспірологію, біолабораторії Єрмака, та розмінування Чонгару інопланетянами.
-                </p>
-                {useSubclusterOverlay && (
-                  <div>
-                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                      Українські cпільноти 🇺🇦
-                    </h5>
-                    <p className="mb-1">
-                      Українські спільноти - це експериментальний поділ мета-кластеру <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        {knownClusterNames.get('ua-extended')}
-                      </span> на менші групи.
-                    </p>
-                    <p className="mb-5">
-                      Поділ відбувається виключно за взаємодіями.
-                      Наприклад, багато Українських художників можна знайти в кластері шитпосту, а не в кластері художників.
-                    </p>
-                    <p className="mb-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                        style={{ color: knownOverlayClusterColorMappings.get('ua-church') }}>
-                        ■■■■
-                      </span> - Спільнота Церкви Святого Інвайту ⛪🟡📘.
-                    </p>
-                    <p className="mb-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                        style={{ color: knownOverlayClusterColorMappings.get('ua-fun') }}>
-                        ■■■■
-                      </span> - Шитпост спільнота 💃💅.
-                    </p>
-                    <p className="mb-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                        style={{ color: knownOverlayClusterColorMappings.get('ua-art') }}>
-                        ■■■■
-                      </span> - Cпільнота митців: художників, крафтерів, косплеєрів.
-                    </p>
-                    <p className="mb-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                        style={{ color: knownOverlayClusterColorMappings.get('ua-write') }}>
-                        ■■■■
-                      </span> - Cпільнота укррайт, к-поп та фандомів.
-                    </p>
-                    <p className="mb-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                        style={{ color: knownOverlayClusterColorMappings.get('ua-lgbtqa') }}>
-                        ■■■■
-                      </span> - Олди з твіттера?
-                      Цей опис потребує доповнення, якщо ви знайшли себе тут - зверніться до нас з пропозиціями опису!
-                    </p>
-                    <p className="mb-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                        style={{ color: knownOverlayClusterColorMappings.get('ua-gaming') }}>
-                        ■■■■
-                      </span> - Ютубери, ґеймери
-                    </p>
-                    <p className="mb-2">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                        style={{ color: knownOverlayClusterColorMappings.get('ua-tech') }}>
-                        ■■■■
-                      </span> - Українська tech-спільнота
-                    </p>
-                  </div>
-                )}
+                <div>
+                  <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                    Українські cпільноти 🇺🇦
+                  </h5>
+                  <p>
+                    Українські спільноти - це експериментальний поділ мета-кластеру <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      {knownClusterNames.get('ua-extended')}
+                    </span> на менші групи.
+                  </p>
+                  <p className="mt-2">
+                    Увімкнути спільноти можна в меню відміти "Показати спільноти"
+                  </p>
+                  <p className="mt-2">
+                    Поділ відбувається виключно за взаємодіями.
+                    Наприклад, багато Українських художників можна знайти в кластері шитпосту, а не в кластері художників.
+                  </p>
+                  <p className="mt-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                      style={{ color: knownOverlayClusterColorMappings.get('ua-church') }}>
+                      ■■■■
+                    </span> - Спільнота Церкви Святого Інвайту ⛪🟡📘.
+                  </p>
+                  <p className="mb-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                      style={{ color: knownOverlayClusterColorMappings.get('ua-fun') }}>
+                      ■■■■
+                    </span> - Шитпост спільнота 💃💅.
+                  </p>
+                  <p className="mb-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                      style={{ color: knownOverlayClusterColorMappings.get('ua-art') }}>
+                      ■■■■
+                    </span> - Cпільнота митців: художників, крафтерів, косплеєрів.
+                  </p>
+                  <p className="mb-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                      style={{ color: knownOverlayClusterColorMappings.get('ua-write') }}>
+                      ■■■■
+                    </span> - Cпільнота укррайт, к-поп та фандомів.
+                  </p>
+                  <p className="mb-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                      style={{ color: knownOverlayClusterColorMappings.get('ua-lgbtqa') }}>
+                      ■■■■
+                    </span> - Олди з твіттера?
+                    Цей опис потребує доповнення, якщо ви знайшли себе тут - зверніться до нас з пропозиціями опису!
+                  </p>
+                  <p className="mb-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                      style={{ color: knownOverlayClusterColorMappings.get('ua-gaming') }}>
+                      ■■■■
+                    </span> - Ютубери, ґеймери
+                  </p>
+                  <p className="mb-2">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
+                      style={{ color: knownOverlayClusterColorMappings.get('ua-tech') }}>
+                      ■■■■
+                    </span> - Українська tech-спільнота
+                  </p>
+                </div>
                 <h5 className="text-sm font-semibold leading-10 text-gray-600">
                   Глобальні кластери 🌍
                 </h5>
@@ -866,57 +882,200 @@ const GraphContainer: React.FC<{}> = () => {
                     {knownClusterNames.get('web3')}
                   </span> - Футуризм, web3.
                 </p>
-                <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                  Кластери країн-агресорів
-                </h5>
-                <p className="mb-5">
-                  Увага! Бойкотуйте контент країн агресорів: {" "}
-                  <a
-                    href="https://mobik.zip"
-                    target="_blank"
-                    className="font-bold underline-offset-1 underline"
-                  > mobik.zip
-                  </a>
-                </p>
-                <p className="mb-2">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {knownClusterNames.get('ru')}
-                  </span> - російські акаунти
-                </p>
-                <p className="mb-2">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {knownClusterNames.get('be')}
-                  </span> - білоруські акаунти
-                </p>
-                <p className="mb-2">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    {knownClusterNames.get('ru-other')}
-                  </span> - кластер глобальної російськомовної спільноти. Населений переважно росіянами.
-                  Також присутні акаунти з інших держав, що існують переважно в російському інфопросторі.
-                </p>
+                {moderation && (
+                  <div>
+                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                      Модераційні кластери
+                    </h5>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {knownClusterNames.get('ua-boroshno')}
+                      </span> - Осередок російських інформаційно-психологічних операцій за допомогою ботоферм на території України.
+                      Тут проживають як ботоферми і ботоводи, так і просто одурені українці, які легко ведуться та поширюють ІПСО,
+                      конспірологію, біолабораторії Єрмака, та розмінування Чонгару інопланетянами.
+                    </p>
+                    <p className="mb-5">
+                      Увага! Бойкотуйте контент країн агресорів: {" "}
+                      <a
+                        href="https://mobik.zip"
+                        target="_blank"
+                        className="font-bold underline-offset-1 underline"
+                      > mobik.zip
+                      </a>
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {knownClusterNames.get('ru')}
+                      </span> - російські акаунти
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {knownClusterNames.get('be')}
+                      </span> - білоруські акаунти
+                    </p>
+                    <p className="mb-2">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        {knownClusterNames.get('ru-other')}
+                      </span> - кластер глобальної російськомовної спільноти. Населений переважно росіянами.
+                      Також присутні акаунти з інших держав, що існують переважно в російському інфопросторі.
+                    </p>
+                  </div>
+                )}
                 <h5 className="text-sm font-semibold leading-10 text-gray-600">
                   Детальніше про кластеризацію
                 </h5>
                 <p>
-                  Кластеризація (фарбування) - за допомогою алгоритму Leiden на 3х різних налаштуваннях: слабка, точна та над-точна (виявляє спільноти по-інтересам всередині більших кластерів).
-                </p>
-                <p>
-                  Візуалізація - за допомогою алгоритму Force Atlas 2. Саме він візуально симулює силу тяжіння на основі взаємодій та групує кульки докупи.
-                  Можна помітити, що візуальне групування та кластеризація перетинаються, але дуже важливо їх розрізняти,
-                  бо на цьому атласі ми бачимо роботу 4х алгоритмів:
+                  Важливо розрізняти візуалізацію та кластеризацію, хоч вони і пов'язані, але будуються на різних алгоритмах.
                 </p>
                 <p className="mt-2">
-                  ForceAtlas2(iterations: 800, barnesHutTheta:1.5, aggregatedWeightedInteractionsAB: logWeight) - візуальне групування
+                  Кластеризація (фарбування) - реалізується за допомогою алгоритму Leiden на 3х різних налаштуваннях:
                 </p>
                 <p>
-                  LeidenWeak(gamma: 30, likes: countPairsAB, replies: countPairsAB, follows: boolAB) - кульки блідого кольору (лише для 6ти кластерів з 14ти)
+                  слабка (розрізняє великі мета-кластери та виявляє найбільшу кількість кульок, але не враховує взаємність взаємодій),
                 </p>
                 <p>
-                  LeidenMain(gamma: 50, aggregatedWeightedInteractionsAB: harmonicMeanUndirectedLogWeight)
+                  точна (розрізняє середні та великі кластери, має більшу точність бо враховує взаємніть) та
                 </p>
                 <p>
-                  LeidenDetailed(gamma: 50, aggregatedWeightedInteractionsAB: harmonicMeanUndirectedLogWeight)
+                  детальна (виявляє спільноти по-інтересам всередині більших кластерів).
                 </p>
+                <p className="mt-2">
+                  Візуалізація - реалізується за допомогою алгоритму Force Atlas 2. Саме він візуально симулює силу тяжіння на основі взаємодій та групує кульки докупи.
+                  Можна помітити, що візуальне групування та кластеризація перетинаються, але дуже важливо їх розрізняти,
+                  бо на цьому атласі ми бачимо роботу 4х алгоритмів: 1 для візуалізації (гравітаційне групування), 3 інших - для багатошарової кластеризації.
+                </p>
+                {/* <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                  Детальніше про алгоритми
+                </h5>
+                <p className="mt-2">
+                  Force Atlas 2 (візуалізація: гравітаційне групування):
+                </p>
+                <p className="mt-2">
+                  <pre>
+                    ForceAtlas2(
+                  </pre>
+                  <pre>
+                    iterations: 800,
+                  </pre>
+                  <pre>
+                    barnesHutTheta:1.5,
+                  </pre>
+                  <pre>
+                    weight: leidenUndirectedMax
+                  </pre>
+                  <pre>
+                    )
+                  </pre>
+                  - візуальне групування
+                </p>
+                <p className="mt-2">
+                  Слабкий Leiden (кластеризація: кульки блідого кольору):
+                </p>
+                <p className="mt-2">
+                  <pre>
+                    Leiden(
+                  </pre>
+                  <pre>
+                    gamma: 30,
+                  </pre>
+                  <pre>
+                    edges: ['likes', 'replies', 'follows'],
+                  </pre>
+                  <pre>
+                    edgeAggregation: undirectedSum,
+                  </pre>
+                  <pre>
+                    aggregatedWeight: sumCount,
+                  </pre>
+                  <pre>
+                    calculateSignificance: false
+                  </pre>
+                  <pre>
+                    )
+                  </pre>
+                  - цей алгоритм рахується лише для деяких кластерів. Кульки позначаються блідішим кольором, ніж основний колір кластеру.
+                  Цей алгоритм захоплює найбільшу кількість акаунтів, навіть малоактивних,
+                  добре підходить для перепису населення, але менш точний, бо не враховує взаємність
+                </p>
+                <p className="mt-2">
+                  Гармонічний Leiden (кластеризація: основні кольори):
+                </p>
+                <p className="mt-2">
+                  <pre>
+                    Leiden(
+                  </pre>
+                  <pre>
+                    gamma: 50,
+                  </pre>
+                  <pre>
+                    edges: ['likes', 'replies', 'follows'],
+                  </pre>
+                  <pre>
+                    undirectedAggregation: MAX,
+                  </pre>
+                  <pre>
+                    edgeAggregation: harmonicMeanSumLog,
+                  </pre>
+                  <pre>
+                    calculateSignificance: true
+                  </pre>
+                  <pre>
+                    )
+                  </pre>
+                  - враховує взаємність інтеракцій за допомогою проєкції ненаправленого графу в направлений через Harmonic Mean:
+                  для кожних двох акаунтів А, B рахується гармонійне середнє взаємодій aggregatedEdgeWeight(A,B) та aggregatedEdgeWeight(B, A)
+                  і саме вона передається як результуюча вага в ненаправлений граф.
+                  Сам aggregatedEdgeWeight рахується із урахуванням глобальних і індивідуальних ваг взаємодій.
+                  Охоплює на 20% менше акаунтів ніж слабкий Leiden, але є набагато більш точним і має вищу confidense.
+                </p>
+                <p className="mt-2">
+                  Детальний Leiden (кластеризація: додаткові кольори спільнот):
+                </p>
+                <p className="mt-2">
+                  <pre>
+                    Leiden(
+                  </pre>
+                  <pre>
+                    gamma: 100,
+                  </pre>
+                  <pre>
+                    edges: ['likes', 'replies', 'follows'],
+                  </pre>
+                  <pre>
+                    undirectedAggregation: MAX,
+                  </pre>
+                  <pre>
+                    edgeAggregation: harmonicMeanSumLog,
+                  </pre>
+                  <pre>
+                    calculateSignificance: true
+                  </pre>
+                  <pre>
+                    )
+                  </pre>
+                  - всі параметри співпадають із Гармонійним Leiden, але прораховуються на більшій гаммі для виявлення детальніших спільнот
+                </p>
+                <p className="mt-2">
+                  Глобальні значення ваг:
+                </p>
+                <pre>
+                  [ likes: 31, replies: 62, follows: 7]
+                </pre>
+                <p className="mt-2">
+                  Персональні значення ваг:
+                </p>
+                <pre>
+                  personalSignificanceFollows = 1 - 1/totalInteractions
+                </pre>
+                <pre>
+                  personalSignificanceReplies = 1 - userTotalReplies/totalInteractions
+                </pre>
+                <pre>
+                  personalSignificanceLikes   = 1 - userTotalLikes/totalInteractions
+                </pre>
+                <p className="mt-2">
+                  Алгоритм охоплює таку саму кількість акаунтів як і гармонійний Leiden, але розбиває на більшу кількість спільнот.
+                </p> */}
               </div>
             </div>
           </div>
@@ -948,15 +1107,14 @@ const GraphContainer: React.FC<{}> = () => {
         <SocialGraph />
         {/* mobile:bottom-10 mobile:left-1 mobile:right-1 mobile:w-fit mobile:h-3/7 */}
         <div className="
-        mobile:bottom-10 mobile:left-1 mobile:right-1 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
+        mobile:bottom-10 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
         desktop:left-1/2 desktop:bottom-10 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
          z-50 fixed">
           <div className="bg-white shadow sm:rounded-lg py-1">
             <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
               <div className="flex flex-col items-baseline bg-white text-center">
-                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-6">
-                  Представлені{" "}
-                  <span className="hidden lg:inline-block">Користувачі</span>
+                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
+                  <span className="hidden lg:inline-block">Представлені{" "}</span>{" "}Користувачі
                 </dt>
                 <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                   {selectedNodeCount >= 0
@@ -965,9 +1123,8 @@ const GraphContainer: React.FC<{}> = () => {
                 </dd>
               </div>
               <div className="flex flex-col items-baseline bg-white text-center">
-                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-6">
-                  Представлені{" "}
-                  <span className="hidden lg:inline-block">Взаємодії</span>
+                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
+                  <span className="hidden lg:inline-block">Представлені{" "}</span>{" "}Взаємодії
                 </dt>
                 <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                   {selectedNodeEdges
@@ -976,7 +1133,7 @@ const GraphContainer: React.FC<{}> = () => {
                 </dd>
               </div>
             </dl>
-            <div className="px-2 py-2 sm:p-2 w-fit ml-auto mr-auto mt-2 grid grid-flow-row-dense grid-cols-3 ">
+            <div className="px-2 py-2 sm:p-2 w-fit ml-auto mr-auto mt-0 grid grid-flow-row-dense grid-cols-3 ">
               <div className="col-span-2 mt-auto mb-auto ">
                 <CustomSearch
                   onLocate={(node) => {
@@ -990,17 +1147,7 @@ const GraphContainer: React.FC<{}> = () => {
                     setSearchParams(newParams);
                   }}
                 />
-                <div className="flex flex-row" style={{ marginTop: "10px" }}>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-500"
-                    >Експериментально: <span className="hidden md:inline">(граф оновиться)</span>
-                      <span className="md:hidden">(граф оновиться)</span>
-                    </label>
-                  </div>
-                </div>
-                <div className="flex flex-row">
+                <div className="flex flex-row mt-1">
                   <div className="flex h-6 items-center">
                     <input
                       id="clusterLabels"
@@ -1016,10 +1163,53 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      Показати спільноти
+                      Показати спільноти <span className="hidden md:inline">(граф оновиться)</span>
+                      <span className="md:hidden">(граф оновиться)</span>
                     </label>
                   </div>
                 </div>
+                <div className="flex flex-row">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="clusterLabels"
+                      name="clusterLabels"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      checked={showExperimental}
+                      onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && moderation) { setLoading(true); setModeration(false); setGraphShouldUpdate(true); } }}
+                    />
+                  </div>
+                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                    <label
+                      htmlFor="clusterLabels"
+                      className="font-medium text-gray-500"
+                    >Експериментальні опції
+                    </label>
+                  </div>
+                </div>
+                {showExperimental && (<div>
+                  <div className="flex flex-row">
+                    <div className="flex h-6 items-center">
+                      <input
+                        id="clusterLabels"
+                        name="clusterLabels"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                        checked={moderation}
+                        onChange={() => { setLoading(true); setModeration(!moderation); setGraphShouldUpdate(true); }}
+                      />
+                    </div>
+                    <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                      <label
+                        htmlFor="clusterLabels"
+                        className="font-medium text-gray-900"
+                      >
+                        Режим модерації <span className="hidden md:inline">(граф оновиться)</span>
+                        <span className="md:hidden">(граф оновиться)</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>)}
               </div>
               <div className="relative flex gap-x-3 ml-4 w-full flex-col">
                 <div className="flex flex-row">
@@ -1066,7 +1256,7 @@ const GraphContainer: React.FC<{}> = () => {
                     </label>
                   </div>
                 </div>
-                <div className="flex flex-row mt-2">
+                <div className="flex flex-row">
                   <div className="flex h-6 items-center">
                     <input
                       id="clusterLabels"
