@@ -2,7 +2,7 @@ import { FC, Dispatch, SetStateAction } from "react";
 import {
     knownClusterNames,
     knownOverlayClusterColorMappings
-} from "../staticData/clusterInfo"
+} from "../static/clustersVisuals"
 
 interface LegendProps {
     legend: boolean;

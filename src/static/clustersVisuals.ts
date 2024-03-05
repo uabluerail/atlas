@@ -6,11 +6,11 @@ const hideClusterLabels: string[] = [
     'ua-other-extended',
     'nafo-extended',
 
-    //ua big subclusters
+    //ua harmonic subclusters
     'ua-yellow',
     'ua-blue',
 
-    //ua overlay subclusters
+    //ua detail subclusters
     'ua-church',
     'ua-fun',
     'ua-art',
@@ -20,7 +20,7 @@ const hideClusterLabels: string[] = [
     'ua-tech',
     'ua-kpop',
 
-    //ua-fixes
+    //ua detail fixes
     'ua-1',
     'ua-2',
     'ua-3',
@@ -124,4 +124,22 @@ knownOverlayClusterHideCustomColorMappings.set("ua-2", "#ffd500");
 knownOverlayClusterHideCustomColorMappings.set("ua-3", "#ffd500");
 knownOverlayClusterHideCustomColorMappings.set("ua-4", "#ffd500");
 
-export { hideClusterLabels, knownClusterNames, moderationClusters, knownClusterColorMappings, knownOverlayClusterColorMappings, knownOverlayClusterHideCustomColorMappings }
+const clusterVisualConfig = {
+    hideClusterLabels: hideClusterLabels,
+    knownClusterNames: knownClusterNames,
+    moderationClusters: moderationClusters,
+    knownClusterColorMappings: knownClusterColorMappings,
+    knownOverlayClusterColorMappings: knownOverlayClusterColorMappings,
+    knownOverlayClusterHideCustomColorMappings: knownOverlayClusterHideCustomColorMappings
+
+}
+
+export {
+    clusterVisualConfig,
+    hideClusterLabels,
+    knownClusterNames,
+    moderationClusters,
+    knownClusterColorMappings,
+    knownOverlayClusterColorMappings,
+    knownOverlayClusterHideCustomColorMappings
+}

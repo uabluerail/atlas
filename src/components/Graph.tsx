@@ -16,14 +16,7 @@ import { CustomSearch } from "./CustomSearch";
 import iwanthue from "iwanthue";
 import Loading from "./Loading";
 import Legend from "./Legend";
-import {
-  hideClusterLabels,
-  knownClusterNames,
-  moderationClusters,
-  knownClusterColorMappings,
-  knownOverlayClusterColorMappings,
-  knownOverlayClusterHideCustomColorMappings
-} from "../staticData/clusterInfo"
+import { clusterVisualConfig } from "../static/clustersVisuals"
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -177,8 +170,8 @@ const GraphContainer: React.FC<{}> = () => {
         }
         const palette = iwanthue(
           Object.keys(communityClusters).length -
-          Object.keys(knownClusterColorMappings).length -
-          Object.keys(knownOverlayClusterColorMappings).length,
+          Object.keys(clusterVisualConfig.knownClusterColorMappings).length -
+          Object.keys(clusterVisualConfig.knownOverlayClusterColorMappings).length,
           {
             seed: "bskyCommunityClusters3",
             colorSpace: "intense",
@@ -193,9 +186,11 @@ const GraphContainer: React.FC<{}> = () => {
             cluster.color =
               // knownClusterColorMappings.get(cluster.label) ?? palette.pop();
 
-              knownOverlayClusterColorMappings.get(cluster.label)
-                ? useSubclusterOverlay ? knownOverlayClusterColorMappings.get(cluster.label) : knownOverlayClusterHideCustomColorMappings.get(cluster.label)
-                : knownClusterColorMappings.get(cluster.label)
+              clusterVisualConfig.knownOverlayClusterColorMappings.get(cluster.label)
+                ? useSubclusterOverlay
+                  ? clusterVisualConfig.knownOverlayClusterColorMappings.get(cluster.label)
+                  : clusterVisualConfig.knownOverlayClusterHideCustomColorMappings.get(cluster.label)
+                : clusterVisualConfig.knownClusterColorMappings.get(cluster.label)
                 ?? palette.pop();
           } else {
             cluster.color = palette.pop();
@@ -208,7 +203,7 @@ const GraphContainer: React.FC<{}> = () => {
             attr.community !== undefined &&
             attr.community in communityClusters
           ) {
-            if (moderation || !moderationClusters.get(communityClusters[attr.community].label)) {
+            if (moderation || !clusterVisualConfig.moderationClusters.get(communityClusters[attr.community].label)) {
               attr.color = communityClusters[attr.community].color;
             } else {
               //todo remove completely and use different layout
@@ -243,7 +238,7 @@ const GraphContainer: React.FC<{}> = () => {
           const cluster = communityClusters[community];
           // adapt the position to viewport coordinates
           const viewportPos = sigma.graphToViewport(cluster as Coordinates);
-          if (moderation || !moderationClusters.get(cluster.label)) {
+          if (moderation || !clusterVisualConfig.moderationClusters.get(cluster.label)) {
             newClusters.push({
               label: cluster.label,
               displayName: cluster.displayName,
@@ -601,14 +596,13 @@ const GraphContainer: React.FC<{}> = () => {
                     zIndex: 3,
                   }}
                 >
-                  {hideClusterLabels.indexOf(cluster.label) > -1 ? "" : knownClusterNames.get(cluster.label) ?? (cluster.displayName || cluster.label)}
+                  {clusterVisualConfig.hideClusterLabels.indexOf(cluster.label) > -1 ? "" : clusterVisualConfig.knownClusterNames.get(cluster.label) ?? (cluster.displayName || cluster.label)}
                 </div>
               );
             }
           })}
         </div>
         <SocialGraph />
-        {/* mobile:bottom-10 mobile:left-1 mobile:right-1 mobile:w-fit mobile:h-3/7 */}
         <div className="
         mobile:bottom-10 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
         desktop:left-1/2 desktop:bottom-10 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
