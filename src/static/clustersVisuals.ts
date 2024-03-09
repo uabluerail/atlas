@@ -43,7 +43,7 @@ knownClusterColorMappings.set("ua-boroshno-extended", "#ff336d");
 moderationClusters.set("ua-boroshno", false);
 moderationClusters.set("ua-boroshno-extended", false);
 
-knownClusterNames.set("ru-other", "🇷🇺⚒️ Дружби Народів");
+knownClusterNames.set("ru-other", "🇷🇺⚒️ СССР");
 knownClusterColorMappings.set("ru-other", "#c70202");
 knownClusterColorMappings.set("ru-other-extended", "#ff336d");
 moderationClusters.set("ru-other", true);
