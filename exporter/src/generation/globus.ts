@@ -1,5 +1,5 @@
 import { MultiDirectedGraph } from "graphology";
-import { clusterConfig } from "../common/clusterConfig.js";
+import { legacyClusterConfig } from "../common/legacyClusterConfig.js";
 import { IndexNode, Layer, ClusterRepPrio } from "../common/model.js";
 import forceAtlas2 from "../graphology-layout-forceatlas2/index.js";
 import circular from "graphology-layout/circular";
@@ -28,7 +28,7 @@ function nailGlobus(
     if (!communities.has(node.community)) {
       communities.set(node.community, { label: "", layer: Layer.NONE, prio: 0 });
     }
-    const rep = clusterConfig.clusterRepresentatives.get(node.handle);
+    const rep = legacyClusterConfig.clusterRepresentatives.get(node.handle);
     if (rep !== undefined) {
       if (!communities.has(node.community) || communities.get(node.community)!.prio < rep.prio) {
         communities.set(node.community, rep)

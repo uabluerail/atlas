@@ -1,6 +1,6 @@
 import { MultiDirectedGraph } from "graphology";
 import { atlasConfig } from "../common/atlasConfig"
-import { clusterConfig } from "../common/clusterConfig";
+import { legacyClusterConfig } from "../common/legacyClusterConfig";
 
 function filterEdges(graph: MultiDirectedGraph) {
 
@@ -27,7 +27,7 @@ function filterEdges(graph: MultiDirectedGraph) {
                 graph.getEdgeAttribute(a, "weight")
             );
         });
-        const topEdges = clusterConfig.focusClusters.indexOf(attrs.label) > -1
+        const topEdges = legacyClusterConfig.focusClusters.indexOf(attrs.label) > -1
             ? sortedEdges.slice(0, atlasConfig.maxEdgesForFocusCluster)  // max edges for ukrainians
             : sortedEdges.slice(0, atlasConfig.maxEdgesEveryone); // max edges for everyone else
         const topEdgeSet = new Set(topEdges);

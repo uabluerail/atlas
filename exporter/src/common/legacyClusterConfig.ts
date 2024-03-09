@@ -191,9 +191,9 @@ clusterRepresentatives.set("onsu.re", {
     prio: 3,
 });
 
-const clusterConfig = {
+const legacyClusterConfig = {
     focusClusters: focusClusterLabels,
     clusterRepresentatives: clusterRepresentatives,
 }
 
-export { clusterConfig, Layer, ClusterRepPrio }
+export { legacyClusterConfig, Layer, ClusterRepPrio }

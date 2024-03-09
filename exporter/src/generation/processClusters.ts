@@ -1,6 +1,6 @@
 import { MultiDirectedGraph } from "graphology";
 import { Cluster } from "../common/model"
-import { clusterConfig } from "../common/clusterConfig";
+import { legacyClusterConfig } from "../common/legacyClusterConfig";
 
 const communityClusters: { [key: string]: Cluster } = {};
 
@@ -8,7 +8,7 @@ function log(msg: string) {
     console.log(`${new Date().toLocaleString()}: ${msg}`);
 }
 
-function initializeClusters(graph: MultiDirectedGraph) {
+function initializeClusters(version: number | undefined, graph: MultiDirectedGraph) {
     // initialize clusters from graph data
 
     graph.forEachNode((_, atts) => {
@@ -24,17 +24,21 @@ function initializeClusters(graph: MultiDirectedGraph) {
             // Otherwise, increment the size of the cluster
             communityClusters[idx].size++;
         }
-        const repClusterPrio = clusterConfig.clusterRepresentatives.get(atts.label);
-        // If this node is the representative of its cluster, set the cluster representative
-        if (repClusterPrio !== undefined) {
-            // If the cluster already has a representative, check if this rep's cluster has a higher priority
-            const currentPrio = communityClusters[idx].prio;
-            if (currentPrio === undefined || repClusterPrio.prio > currentPrio) {
-                communityClusters[idx].representative = atts.label;
-                communityClusters[idx].prio = repClusterPrio.prio;
-                communityClusters[idx].label = repClusterPrio.label;
-                communityClusters[idx].dbIndex = repClusterPrio.dbIndex;
-                communityClusters[idx].displayName = repClusterPrio.displayName;
+
+        //assign representatives through clusterConfig (legacy generation)
+        if (version === -1) {
+            const repClusterPrio = legacyClusterConfig.clusterRepresentatives.get(atts.label);
+            // If this node is the representative of its cluster, set the cluster representative
+            if (repClusterPrio !== undefined) {
+                // If the cluster already has a representative, check if this rep's cluster has a higher priority
+                const currentPrio = communityClusters[idx].prio;
+                if (currentPrio === undefined || repClusterPrio.prio > currentPrio) {
+                    communityClusters[idx].representative = atts.label;
+                    communityClusters[idx].prio = repClusterPrio.prio;
+                    communityClusters[idx].label = repClusterPrio.label;
+                    communityClusters[idx].dbIndex = repClusterPrio.dbIndex;
+                    communityClusters[idx].displayName = repClusterPrio.displayName;
+                }
             }
         }
     });

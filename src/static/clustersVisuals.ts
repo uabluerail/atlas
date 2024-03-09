@@ -1,4 +1,5 @@
 const hideClusterLabels: string[] = [
+
     // extended clusters
     'ru-extended',
     'be-extended',
@@ -36,11 +37,11 @@ knownClusterColorMappings.set("ua-yellow", "#ffd500");
 knownClusterColorMappings.set("ua-blue", "#005bbb");
 knownClusterColorMappings.set("ua-extended", "#ffe975");
 
-knownClusterNames.set("ua-boroshno", "🇺🇦👁️‍🗨️👽 ім. П. Борошна");
+knownClusterNames.set("ua-boroshno", "🇺🇦👁️‍🗨️ Публіцист & Co.");
 knownClusterColorMappings.set("ua-boroshno", "#85B53C");
 knownClusterColorMappings.set("ua-boroshno-extended", "#ff336d");
-moderationClusters.set("ua-boroshno", true);
-moderationClusters.set("ua-boroshno-extended", true);
+moderationClusters.set("ua-boroshno", false);
+moderationClusters.set("ua-boroshno-extended", false);
 
 knownClusterNames.set("ru-other", "🇷🇺⚒️ Дружби Народів");
 knownClusterColorMappings.set("ru-other", "#c70202");

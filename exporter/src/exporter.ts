@@ -2,12 +2,14 @@ import { MultiDirectedGraph } from "graphology";
 import forceAtlas2 from "./graphology-layout-forceatlas2/index.js";
 import circular from "graphology-layout/circular";
 import rotation from 'graphology-layout/rotation';
-import { Node, IndexNode, Edge, InputData, Cluster } from "./common/model"
+import { Node, IndexNode, Edge, InputGraphData, InputCommunitiesData } from "./common/model"
 import { nailGlobus, globusForceCoordinates } from "./generation/globus"
 import { atlasConfig } from "./common/atlasConfig"
 import * as fs from "fs";
 import { filterEdges } from "./generation/filterEdges";
 import { assignClusters, processCommunities } from "./generation/processClusters.js";
+
+var graphVersion: number = -1;
 
 // log logs a message with a timestamp in human-readale format
 function log(msg: string) {
@@ -16,7 +18,25 @@ function log(msg: string) {
 
 async function fetchGraph(filename?: string) {
   log("Loading graph...");
-  const data = JSON.parse(fs.readFileSync(filename || "graph.json", "utf8")) as InputData;
+
+  var communities;
+  try {
+    communities = JSON.parse(fs.readFileSync(filename || "communities.json", "utf8")) as InputCommunitiesData;
+  }
+  catch (err) {
+    log("No communities file, falling back to legacy generation...");
+  }
+  var data = JSON.parse(fs.readFileSync(filename || "graph.json", "utf8")) as InputGraphData;
+
+  //if graph version matches - parse community names, leaders, etc. from the json
+  //otherwise - use legacy cluster representative logic
+  if (communities && communities.graphVersion && data.graphVersion) {
+    if (communities.graphVersion == data.graphVersion) {
+      graphVersion = data.graphVersion;
+    } else {
+      //todo throw error
+    }
+  }
 
   log("Parsing graph file...");
   // Sort the nodes by did so that the order is consistent
@@ -325,7 +345,7 @@ fetchGraph(process.argv[2]).then((graphData: { edges: Edge[]; nodes: Node[], tim
     log("Successfully rotated Atlas");
   }
 
-  assignClusters(graph);
+  assignClusters(graphVersion, graph);
 
   log("Truncating node position assignments...");
   // Reduce precision on node x and y coordinates to conserve bits in the exported graph

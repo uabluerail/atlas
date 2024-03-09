@@ -1,4 +1,5 @@
-interface InputData {
+interface InputGraphData {
+    graphVersion?: number;
     nodes: {
         did: string;
         handle?: string;
@@ -10,6 +11,26 @@ interface InputData {
         weight: number;
     }[];
     timestamp?: string;
+}
+
+interface InputCommunitiesData {
+    graphVersion?: number;
+    timestamp?: string;
+    weakCommunities: {
+        leader: string;
+        name?: string;
+        id: number;
+    }[];
+    harmonicCommunities: {
+        leader: string;
+        name?: string;
+        id: number;
+    }[];
+    detailCommunities: {
+        leader: string;
+        name?: string;
+        id: number;
+    }[];
 }
 
 interface Edge {
@@ -69,4 +90,4 @@ interface ClusterRepPrio {
     dbIndex?: number;
 }
 
-export { InputData, Edge, Node, IndexNode, Cluster, Layer, AtlasSettings, ClusterRepPrio };
+export { InputGraphData, InputCommunitiesData, Edge, Node, IndexNode, Cluster, Layer, AtlasSettings, ClusterRepPrio };
