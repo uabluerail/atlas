@@ -36,6 +36,9 @@ knownClusterNames.set("ua-extended", "🇺🇦🐝🍯 Український В
 knownClusterColorMappings.set("ua-yellow", "#ffd500");
 knownClusterColorMappings.set("ua-blue", "#005bbb");
 knownClusterColorMappings.set("ua-extended", "#ffe975");
+moderationClusters.set("ua-yellow", false);
+moderationClusters.set("ua-blue", false);
+moderationClusters.set("ua-extended", false);
 
 knownClusterNames.set("ua-boroshno", "🇺🇦👁️‍🗨️ Публіцист & Co.");
 knownClusterColorMappings.set("ua-boroshno", "#85B53C");
@@ -64,30 +67,40 @@ moderationClusters.set("ru-extended", true);
 knownClusterNames.set("nafo", "🌍👩‍🚀👨‍🚀 NAFO");
 knownClusterColorMappings.set("nafo", "#47044a");
 knownClusterColorMappings.set("nafo-extended", "#7e5080");
+moderationClusters.set("nafo", false);
+moderationClusters.set("nafo-extended", false);
 
 knownClusterNames.set("artists", "🌍🖌️🎨 Художники");
 knownClusterColorMappings.set("artists", "#ff4902");
+moderationClusters.set("artists", false);
 
 knownClusterNames.set("furry", "🌍🦊🐺 Фурі");
 knownClusterColorMappings.set("furry", "#ea02de");
+moderationClusters.set("furry", false);
 
 knownClusterNames.set("writers", "🌍✍️📖 Письменники");
 knownClusterColorMappings.set("writers", "#02cbea");
+moderationClusters.set("writers", false);
 
 knownClusterNames.set("gamers", "🌍👾🎮 Ігророби");
 knownClusterColorMappings.set("gamers", "#02e6a1");
+moderationClusters.set("gamers", false);
 
 knownClusterNames.set("infosec", "🌍🔐👩‍💻 Злі ITвці");
 knownClusterColorMappings.set("infosec", "#8b0fff");
+moderationClusters.set("infosec", false);
 
 knownClusterNames.set("startup", "🌍💡💻 Стартапери");
 knownClusterColorMappings.set("startup", "#9175ff");
+moderationClusters.set("startup", false);
 
 knownClusterNames.set("tech", "🌍🚢🖥️ ITвці");
 knownClusterColorMappings.set("tech", "#bf75ff");
+moderationClusters.set("tech", false);
 
 knownClusterNames.set("web3", "🌍🤖🛸 Футуризм");
 knownClusterColorMappings.set("web3", "#759cff");
+moderationClusters.set("web3", false);
 
 const knownOverlayClusterColorMappings: Map<string, string> = new Map();
 
@@ -129,10 +142,10 @@ const clusterVisualConfig = {
     hideClusterLabels: hideClusterLabels,
     knownClusterNames: knownClusterNames,
     moderationClusters: moderationClusters,
+    moderationClusterColor: "#efefef",
     knownClusterColorMappings: knownClusterColorMappings,
     knownOverlayClusterColorMappings: knownOverlayClusterColorMappings,
     knownOverlayClusterHideCustomColorMappings: knownOverlayClusterHideCustomColorMappings
-
 }
 
 export {

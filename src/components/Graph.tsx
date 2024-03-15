@@ -207,7 +207,7 @@ const GraphContainer: React.FC<{}> = () => {
               attr.color = communityClusters[attr.community].color;
             } else {
               //todo remove completely and use different layout
-              attr.color = "#eeeeee";
+              attr.color = clusterVisualConfig.moderationClusterColor;
             }
           }
           return attr;
