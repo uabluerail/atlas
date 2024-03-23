@@ -35,7 +35,7 @@ const moderationClusters: Map<string, boolean> = new Map();
 knownClusterNames.set("ua-extended", "🇺🇦🐝🍯 Український Вулик");
 knownClusterColorMappings.set("ua-yellow", "#ffd500");
 knownClusterColorMappings.set("ua-blue", "#005bbb");
-knownClusterColorMappings.set("ua-extended", "#ffe975");
+knownClusterColorMappings.set("ua-extended", "#fae996");
 moderationClusters.set("ua-yellow", false);
 moderationClusters.set("ua-blue", false);
 moderationClusters.set("ua-extended", false);
@@ -106,12 +106,19 @@ const knownOverlayClusterColorMappings: Map<string, string> = new Map();
 
 //overlay subclusters when on
 knownOverlayClusterColorMappings.set("ua-church", "#ffd500");
+moderationClusters.set("ua-church", false);
 knownOverlayClusterColorMappings.set("ua-fun", "#005bbb");
+moderationClusters.set("ua-fun", false);
 knownOverlayClusterColorMappings.set("ua-art", "#ff8000");
+moderationClusters.set("ua-art", false);
 knownOverlayClusterColorMappings.set("ua-lgbtqa", "#7306c2");
+moderationClusters.set("ua-lgbtqa", false);
 knownOverlayClusterColorMappings.set("ua-write", "#00fbff");
+moderationClusters.set("ua-write", false);
 knownOverlayClusterColorMappings.set("ua-gaming", "#1eff00");
+moderationClusters.set("ua-gaming", false);
 knownOverlayClusterColorMappings.set("ua-tech", "#ff54f9");
+moderationClusters.set("ua-tech", false);
 //not detected anymore
 knownOverlayClusterColorMappings.set("ua-kpop", "#600075");
 
