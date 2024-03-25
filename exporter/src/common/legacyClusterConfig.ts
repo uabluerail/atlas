@@ -48,7 +48,7 @@ clusterRepresentatives.set("hardrockfella.bsky.social", {
 //check representative every time
 clusterRepresentatives.set("kyrylowozniak.bsky.social", {
     label: "nafo-extended",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 3,
 });
 
@@ -107,31 +107,31 @@ clusterRepresentatives.set("tyrrrz.me", {
     prio: 6,
 });
 
-//moderation clusters
+//hidden clusters
 clusterRepresentatives.set("publeecist.bsky.social", {
     label: "ua-boroshno",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 3,
 });
 //check representative every time
 clusterRepresentatives.set("larsen256.bsky.social", {
     label: "ua-boroshno-extended",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 3,
 });
 clusterRepresentatives.set("metronom.bsky.social", {
     label: "be",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 3,
 });
 clusterRepresentatives.set("tinaarishina.bsky.social", {
     label: "ru-other",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 4,
 });
 clusterRepresentatives.set("alphyna.bsky.social", {
     label: "ru",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 4,
 });
 
@@ -139,13 +139,13 @@ clusterRepresentatives.set("alphyna.bsky.social", {
 //check representative every time
 clusterRepresentatives.set("ffuuugor.bsky.social", {
     label: "ru-extended",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 4,
 });
 //check representative every time
 clusterRepresentatives.set("shurikidze.bsky.social", {
     label: "be-extended",
-    layer: Layer.MODERATION,
+    layer: Layer.HIDDEN,
     prio: 3,
 });
 

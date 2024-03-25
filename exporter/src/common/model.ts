@@ -67,7 +67,7 @@ interface Cluster {
 }
 
 enum Layer {
-    MAIN, MODERATION, NONE
+    MAIN, HIDDEN, NONE
 }
 
 interface AtlasSettings {

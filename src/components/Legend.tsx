@@ -7,10 +7,10 @@ import {
 interface LegendProps {
     legend: boolean;
     setLegend: Dispatch<SetStateAction<boolean>>;
-    moderation: boolean;
+    hiddenClusters: boolean;
 }
 
-const Legend: FC<LegendProps> = ({ legend, setLegend, moderation }) => {
+const Legend: FC<LegendProps> = ({ legend, setLegend, hiddenClusters }) => {
     return (
         <div className="overflow-scroll bg-white shadow sm:rounded-md absolute transform
     mobile:left-1/2 mobile:top-2 mobile:left-2 mobile:right-2 mobile:w-fit mobile:h-1/2
@@ -59,7 +59,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, moderation }) => {
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         Українські кластери 🇺🇦
                     </h5>
-                    <p className="mt-5">
+                    <p>
                         Українські кластери на цій мапі представлені максимально деталізовано.
                         Також додано можливість увімкнути деталізацію по спільнотам.
                         Максимальна кількість вихідних (червоних) стрілочок від кожної кульки - 10.
@@ -148,8 +148,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, moderation }) => {
                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
                                 style={{ color: knownOverlayClusterColorMappings.get('ua-lgbtqa') }}>
                                 ■■■■
-                            </span> - Олди з твіттера?
-                            Цей опис потребує доповнення, якщо ви знайшли себе тут - зверніться до нас з пропозиціями опису!
+                            </span> - Друзі з твіттера - цей опис потребує доповнення, якщо ви знайшли себе тут - зверніться до нас з пропозиціями назви/опису
                         </p>
                         <p className="mb-2">
                             <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
@@ -229,10 +228,10 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, moderation }) => {
                             {knownClusterNames.get('web3')}
                         </span> - Футуризм, web3.
                     </p>
-                    {moderation && (
+                    {hiddenClusters && (
                         <div>
                             <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                                Модераційні кластери
+                                Приховані кластери
                             </h5>
                             <p className="mb-5">
                                 ⚠️ Увага! Бойкотуйте контент країн агресорів: {" "}
@@ -246,18 +245,17 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, moderation }) => {
                             <p className="mb-2">
                                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     {knownClusterNames.get('ru')}
-                                </span> - російські акаунти
+                                </span> - російський кластер
                             </p>
                             <p className="mb-2">
                                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     {knownClusterNames.get('be')}
-                                </span> - білоруські акаунти
+                                </span> - білоруський кластер
                             </p>
                             <p className="mb-2">
                                 <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     {knownClusterNames.get('ru-other')}
-                                </span> - кластер глобального руского міра. Населений переважно росіянами.
-                                Також присутні акаунти з інших держав, що існують переважно в російському інфопросторі.
+                                </span> - кластер глобального руского міра. Населений переважно росіянами але також присутні акаунти з інших держав, що існують переважно в російському інфопросторі.
                             </p>
                         </div>
                     )}

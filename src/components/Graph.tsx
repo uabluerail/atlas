@@ -108,7 +108,7 @@ const GraphContainer: React.FC<{}> = () => {
   // Selected Node properties
   const [selectedNode, setSelectedNode] = React.useState<string | null>(null);
   const [legend, setLegend] = React.useState<boolean>(false);
-  const [moderation, setModeration] = React.useState<boolean>(false);
+  const [hiddenClusters, setHiddenClusters] = React.useState<boolean>(false);
   const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
@@ -203,11 +203,11 @@ const GraphContainer: React.FC<{}> = () => {
             attr.community !== undefined &&
             attr.community in communityClusters
           ) {
-            if (moderation || !clusterVisualConfig.moderationClusters.get(communityClusters[attr.community].label)) {
+            if (hiddenClusters || !clusterVisualConfig.hiddenClusters.get(communityClusters[attr.community].label)) {
               attr.color = communityClusters[attr.community].color;
             } else {
               //todo remove completely and use different layout
-              attr.color = clusterVisualConfig.moderationClusterColor;
+              attr.color = clusterVisualConfig.hiddenClusterColor;
             }
           }
           return attr;
@@ -238,7 +238,7 @@ const GraphContainer: React.FC<{}> = () => {
           const cluster = communityClusters[community];
           // adapt the position to viewport coordinates
           const viewportPos = sigma.graphToViewport(cluster as Coordinates);
-          if (moderation || !clusterVisualConfig.moderationClusters.get(cluster.label)) {
+          if (hiddenClusters || !clusterVisualConfig.hiddenClusters.get(cluster.label)) {
             newClusters.push({
               label: cluster.label,
               displayName: cluster.displayName,
@@ -577,7 +577,7 @@ const GraphContainer: React.FC<{}> = () => {
             </ul>
           </div>
         )}
-        {legend && (<Legend legend={legend} setLegend={setLegend} moderation={moderation} />)}
+        {legend && (<Legend legend={legend} setLegend={setLegend} hiddenClusters={hiddenClusters} />)}
         <div className="overflow-hidden w-screen h-screen absolute top-0 left-0">
           {clusters.map((cluster) => {
             if (cluster.label !== undefined) {
@@ -673,7 +673,7 @@ const GraphContainer: React.FC<{}> = () => {
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       checked={showExperimental}
-                      onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && moderation) { setLoading(true); setModeration(false); setGraphShouldUpdate(true); } }}
+                      onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && hiddenClusters) { setLoading(true); setHiddenClusters(false); setGraphShouldUpdate(true); } }}
                     />
                   </div>
                   <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
@@ -692,8 +692,8 @@ const GraphContainer: React.FC<{}> = () => {
                         name="clusterLabels"
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                        checked={moderation}
-                        onChange={() => { setLoading(true); setModeration(!moderation); setGraphShouldUpdate(true); }}
+                        checked={hiddenClusters}
+                        onChange={() => { setLoading(true); setHiddenClusters(!hiddenClusters); setGraphShouldUpdate(true); }}
                       />
                     </div>
                     <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
@@ -701,7 +701,7 @@ const GraphContainer: React.FC<{}> = () => {
                         htmlFor="clusterLabels"
                         className="font-medium text-gray-900"
                       >
-                        Режим модерації <span className="hidden md:inline">(граф оновиться)</span>
+                        Показати приховані кластери <span className="hidden md:inline">(граф оновиться)</span>
                         <span className="md:hidden">(граф оновиться)</span>
                       </label>
                     </div>
