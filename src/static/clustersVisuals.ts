@@ -32,7 +32,7 @@ const knownClusterColorMappings: Map<string, string> = new Map();
 const knownClusterNames: Map<string, string> = new Map();
 const hiddenClusters: Map<string, boolean> = new Map();
 
-knownClusterNames.set("ua-extended", "🇺🇦🐝🍯 Український Вулик");
+knownClusterNames.set("ua-extended", "🇺🇦🐝🍯 Вулик");
 knownClusterColorMappings.set("ua-yellow", "#ffd500");
 knownClusterColorMappings.set("ua-blue", "#005bbb");
 knownClusterColorMappings.set("ua-extended", "#fae996");
@@ -46,19 +46,23 @@ knownClusterColorMappings.set("ua-boroshno-extended", "#ff336d");
 hiddenClusters.set("ua-boroshno", false);
 hiddenClusters.set("ua-boroshno-extended", false);
 
-knownClusterNames.set("ru-other", "🇷🇺⚒️🌎 рускій мір");
+knownClusterNames.set("ua-buffer", "🇺🇦⚒️ Дружби Народів");
+knownClusterColorMappings.set("ua-buffer", "#ff646e");
+hiddenClusters.set("ua-buffer", true);
+
+knownClusterNames.set("ru-other", "🇷🇺🌎 рускій мір");
 knownClusterColorMappings.set("ru-other", "#c70202");
 knownClusterColorMappings.set("ru-other-extended", "#ff336d");
 hiddenClusters.set("ru-other", true);
 hiddenClusters.set("ru-other-extended", true);
 
-knownClusterNames.set("be", "🇧🇾 білорусь");
+knownClusterNames.set("be", "🇧🇾 білоруси");
 knownClusterColorMappings.set("be", "darkred");
 knownClusterColorMappings.set("be-extended", "#d1606f");
 hiddenClusters.set("be", true);
 hiddenClusters.set("be-extended", true);
 
-knownClusterNames.set("ru", "🇷🇺 росія");
+knownClusterNames.set("ru", "🇷🇺 росіяни");
 knownClusterColorMappings.set("ru", "#57372c");
 knownClusterColorMappings.set("ru-extended", "#876255");
 hiddenClusters.set("ru", true);

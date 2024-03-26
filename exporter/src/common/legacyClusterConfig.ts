@@ -39,6 +39,13 @@ clusterRepresentatives.set("wormwoodstar.bsky.social", {
     prio: 4,
 });
 
+//detail (buffer zone)
+clusterRepresentatives.set("ukrspawacz.bsky.social", {
+    label: "ua-buffer",
+    layer: Layer.MAIN,
+    prio: 4,
+});
+
 //friends
 clusterRepresentatives.set("hardrockfella.bsky.social", {
     label: "nafo",
@@ -124,7 +131,7 @@ clusterRepresentatives.set("metronom.bsky.social", {
     layer: Layer.HIDDEN,
     prio: 3,
 });
-clusterRepresentatives.set("tinaarishina.bsky.social", {
+clusterRepresentatives.set("begoniya.bsky.social", {
     label: "ru-other",
     layer: Layer.HIDDEN,
     prio: 4,
