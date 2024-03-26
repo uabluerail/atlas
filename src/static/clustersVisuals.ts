@@ -46,11 +46,11 @@ knownClusterColorMappings.set("ua-boroshno-extended", "#ff336d");
 hiddenClusters.set("ua-boroshno", false);
 hiddenClusters.set("ua-boroshno-extended", false);
 
-knownClusterNames.set("ua-buffer", "🇺🇦⚒️ Дружби Народів");
+knownClusterNames.set("ua-buffer", "🇺🇦🕊️ Дружби Народів");
 knownClusterColorMappings.set("ua-buffer", "#ff646e");
 hiddenClusters.set("ua-buffer", true);
 
-knownClusterNames.set("ru-other", "🇷🇺🌎 рускій мір");
+knownClusterNames.set("ru-other", "🇷🇺🌎⚒️ рускій мір");
 knownClusterColorMappings.set("ru-other", "#c70202");
 knownClusterColorMappings.set("ru-other-extended", "#ff336d");
 hiddenClusters.set("ru-other", true);
@@ -68,7 +68,7 @@ knownClusterColorMappings.set("ru-extended", "#876255");
 hiddenClusters.set("ru", true);
 hiddenClusters.set("ru-extended", true);
 
-knownClusterNames.set("nafo", "🌍👩‍🚀👨‍🚀 NAFO");
+knownClusterNames.set("nafo", "🇺🇦🌍🚀 NAFO");
 knownClusterColorMappings.set("nafo", "#47044a");
 knownClusterColorMappings.set("nafo-extended", "#7e5080");
 hiddenClusters.set("nafo", false);

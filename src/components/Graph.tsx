@@ -596,7 +596,10 @@ const GraphContainer: React.FC<{}> = () => {
                     zIndex: 3,
                   }}
                 >
-                  {clusterVisualConfig.hideClusterLabels.indexOf(cluster.label) > -1 ? "" : clusterVisualConfig.knownClusterNames.get(cluster.label) ?? (cluster.displayName || cluster.label)}
+                  {clusterVisualConfig.hideClusterLabels.indexOf(cluster.label) > -1
+                    ? ""
+                    : clusterVisualConfig.knownClusterNames.get(cluster.label)
+                    ?? (cluster.displayName || cluster.label)}
                 </div>
               );
             }
