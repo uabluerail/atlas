@@ -7,20 +7,10 @@ const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 //more edges will be shown for focus clusters
 var groupMaxEdgeOverrides: Map<string, number> = new Map();
 var maxEdgesOverrides: Map<string, number> = new Map();
-// var groupHideValues: Map<string, boolean> = new Map();
 const toBeExcludedCommunities: Map<string, Map<number, boolean>> = new Map();
 const includedClusters: Map<string, Map<string, boolean>> = new Map();
 const hiddenClusters: Map<string, Map<string, boolean>> = new Map();
 const overlayLayouts: Map<string, boolean> = new Map();
-
-// for (var group of configJson.legend_groups) {
-//     if (group.maxEdges) {
-//         groupMaxEdgeOverrides.set(group.name, group.maxEdges);
-//     }
-//     // if (group.hide) {
-//     // groupHideValues.set(group.name, group.hide);
-//     // }
-// }
 
 var allLayouts: Layout[] = [configJson.layout.default];
 if (configJson.layout.layouts) allLayouts = allLayouts.concat(configJson.layout.layouts);

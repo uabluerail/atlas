@@ -28,10 +28,17 @@ for (var cluster of config.clusters) {
     }
 }
 
+function getAllLayouts(): Layout[] {
+    var defaultLayout: Layout = config.layout.default;
+    var allLayouts: Layout[] = [defaultLayout];
+    if (config.layout.layouts) allLayouts = allLayouts.concat(config.layout.layouts);
+    return allLayouts;
+}
+
+
 function getLayout(layoutName: string | null): Layout {
-    var defaultLayout = config.layout.default;
-    var searchForLayout = config.layout.layouts.filter(layout => layout.name === layoutName)[0];
-    return searchForLayout || defaultLayout;
+    var searchForLayout = getAllLayouts().filter(layout => layout.name === layoutName)[0];
+    return searchForLayout || config.layout.default;;
 }
 
 function getLayoutName(layoutName: string | null): string {
@@ -44,6 +51,7 @@ function getCluster(clusterName: string): ClusterConfig {
 
 const clusterVisualConfig = {
     ...config,
+    getAllLayouts,
     getLayout,
     getLayoutName,
     getCluster,

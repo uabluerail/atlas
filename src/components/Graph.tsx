@@ -2,6 +2,7 @@ import React, { useState, FC, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MultiDirectedGraph } from "graphology";
 import { formatDistanceToNow, parseISO } from "date-fns";
+import LayoutMenu from "./LayoutMenu";
 import getNodeProgramImage from "sigma/rendering/programs/node-image";
 import {
   SigmaContainer,
@@ -18,6 +19,10 @@ import Loading from "./Loading";
 import Legend from "./Legend";
 import { config } from "../common/visualConfig"
 import { getTranslation } from "../common/translation";
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -112,7 +117,7 @@ const GraphContainer: React.FC<{}> = () => {
   const [selectedNode, setSelectedNode] = React.useState<string | null>(null);
   const [legend, setLegend] = React.useState<boolean>(false);
   const [showHiddenClusters, setShowHiddenClusters] = React.useState<boolean>(false);
-  const [currentLayoutName] = React.useState<string>(config.getLayoutName(searchParams.get("layout")));
+  const [currentLayoutName, setCurrentLayoutName] = React.useState<string>(config.getLayoutName(searchParams.get("layout")));
   // const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
@@ -782,6 +787,9 @@ const GraphContainer: React.FC<{}> = () => {
                       <span className="md:hidden">{getTranslation('on_clusters')}</span>
                     </label>
                   </div>
+                </div>
+                <div className="flex flex-row">
+                  <LayoutMenu setLoading={setLoading} setCurrentLayoutName={setCurrentLayoutName} setGraphShouldUpdate={setGraphShouldUpdate} />
                 </div>
               </div>
             </div>
