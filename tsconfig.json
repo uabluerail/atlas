@@ -21,6 +21,7 @@
       "@types",
       "node_modules/@types"
     ],
+    "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true

@@ -1,56 +1,18 @@
 import { MultiDirectedGraph } from "graphology";
 import { Cluster } from "../common/model"
-import { legacyClusterConfig } from "../common/legacyClusterConfig";
 
-const communityClusters: { [key: string]: Cluster } = {};
-
-function log(msg: string) {
-    console.log(`${new Date().toLocaleString()}: ${msg}`);
-}
-
-function initializeClusters(version: number | undefined, graph: MultiDirectedGraph) {
-    // initialize clusters from graph data
-
-    graph.forEachNode((_, atts) => {
-        const idx = atts.community;
-        // If this node is in a community that hasn't been seen yet, create a new cluster
-        if (!communityClusters[idx]) {
-            communityClusters[idx] = {
-                idx: idx,
-                positions: [],
-                size: 1,
-            };
-        } else {
-            // Otherwise, increment the size of the cluster
-            communityClusters[idx].size++;
-        }
-
-        //assign representatives through clusterConfig (legacy generation)
-        if (version === -1) {
-            const repClusterPrio = legacyClusterConfig.clusterRepresentatives.get(atts.label);
-            // If this node is the representative of its cluster, set the cluster representative
-            if (repClusterPrio !== undefined) {
-                // If the cluster already has a representative, check if this rep's cluster has a higher priority
-                const currentPrio = communityClusters[idx].prio;
-                if (currentPrio === undefined || repClusterPrio.prio > currentPrio) {
-                    communityClusters[idx].representative = atts.label;
-                    communityClusters[idx].prio = repClusterPrio.prio;
-                    communityClusters[idx].label = repClusterPrio.label;
-                    communityClusters[idx].dbIndex = repClusterPrio.dbIndex;
-                    communityClusters[idx].displayName = repClusterPrio.displayName;
-                }
-            }
-        }
-    });
-}
-
-function assignClusterPositions(graph: MultiDirectedGraph) {
+function assignClusterPositions(
+    log: (msg: string) => void,
+    communityClusters: { [key: string]: Cluster },
+    graph: MultiDirectedGraph) {
     graph.forEachNode((_, atts) => {
         if (atts.community === undefined || atts.community === null) return;
         const cluster = communityClusters[atts.community];
         if (cluster === undefined) return;
         cluster.positions.push({ x: atts.x, y: atts.y });
     });
+
+    log("Assigning communities...");
 
     // Filter positions that are 2 standard deviations away from the mean and compute the barycenter of each cluster
     for (const community in communityClusters) {
@@ -137,6 +99,8 @@ function assignClusterPositions(graph: MultiDirectedGraph) {
             }`
         );
     }
+
+    log("Communities processed...");
 }
 
-export { initializeClusters as assignClusters, assignClusterPositions as processCommunities }
+export { assignClusterPositions }

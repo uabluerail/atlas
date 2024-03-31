@@ -1,16 +1,91 @@
 import { FC, Dispatch, SetStateAction } from "react";
-import {
-    knownClusterNames,
-    knownOverlayClusterColorMappings
-} from "../static/clustersVisuals"
+import { config } from "../common/visualConfig"
+import { getTranslation } from "../common/translation";
+import { GroupLegend, ClusterConfig } from "../../exporter/src/common/model";
 
 interface LegendProps {
     legend: boolean;
     setLegend: Dispatch<SetStateAction<boolean>>;
-    hiddenClusters: boolean;
+    layoutName: string;
+    showHiddenClusters: boolean;
 }
 
-const Legend: FC<LegendProps> = ({ legend, setLegend, hiddenClusters }) => {
+const buildLinks = (links: {
+    title: string;
+    url: string;
+}[]) => {
+    const compiledLinks: any[] = [];
+    links.forEach(link => compiledLinks.push(<p className="mt-2">
+        <a
+            href={link.url}
+            target="_blank"
+            className="font-bold text-xs underline-offset-1 underline"
+        > {link.title}
+        </a>
+    </p>))
+    return <div>{compiledLinks}</div>;
+}
+
+const buildExtras = (extras: string[]) => {
+    const compiledExtras: any[] = [];
+    extras.forEach(extra => compiledExtras.push(<p className="mt-2">
+        {extra}
+    </p>))
+    return <div>{compiledExtras}</div>;
+}
+
+const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClusters }) => {
+    const buildLegend = (legendGroup: GroupLegend) => {
+        const clusterLegends: any[] = [];
+        legendGroup.clusters.forEach(clusterName => {
+            const cluster: ClusterConfig = config.getCluster(clusterName);
+            const hideCluster = !includedClusters.get(clusterName) //not included in the graph
+                || (hiddenClusters.get(clusterName) && !showHiddenClusters); //hidden when option show all clusters is off
+            if (cluster && cluster.legend && !hideCluster) {
+                const newLegend = <div>
+                    {cluster.legend.description && <p className="mt-2">
+                        <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: cluster.color }}>
+                            {cluster.label}
+                        </span> - {cluster.legend.description}
+                    </p>}
+                    {cluster.legend.extra && <p className="mt-2">
+                        {cluster.legend.extra}
+                    </p>}
+                    {cluster.legend.links && <p className="mt-2 mb-5">
+                        {buildLinks(cluster.legend.links)}
+                    </p>}
+                </div>;
+                clusterLegends.push(newLegend);
+            }
+        });
+        return <div>
+            <h5 className="text-sm font-semibold leading-10 text-gray-600 mt-2">{legendGroup.label}</h5>
+            <p className="mt-2">
+                {legendGroup.description}
+            </p>
+            {legendGroup.extras && <p className="mt-2">
+                {buildExtras(legendGroup.extras)}
+            </p>}
+            {legendGroup.links && <p className="mt-2 mb-5">
+                {buildLinks(legendGroup.links)}
+            </p>}
+            {clusterLegends}
+        </div>
+    }
+
+    const legendGroups: any[] = [];
+    const includedClusters: Map<string, boolean> = config.includedClusters.get(layoutName) ?? new Map();
+    const hiddenClusters: Map<string, boolean> = config.hiddenClusters.get(layoutName) ?? new Map();
+    const currentLayoutLegends: GroupLegend[] = (config.getLayout(layoutName) && config.getLayout(layoutName).legend) ?? [];
+
+    currentLayoutLegends.forEach(group => {
+        const hasIncludedClusters = group.clusters.filter(clusterName => includedClusters.get(clusterName)).length > 0;
+        const shouldShowGroup = hasIncludedClusters && group.hide !== true;
+        if (shouldShowGroup) {
+            legendGroups.push(buildLegend(group));
+        }
+    });
+
     return (
         <div className="overflow-scroll bg-white shadow sm:rounded-md absolute transform
     mobile:left-1/2 mobile:top-2 mobile:left-2 mobile:right-2 mobile:w-fit mobile:h-1/2
@@ -20,7 +95,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, hiddenClusters }) => {
                 <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                     <div className="ml-4 mt-2">
                         <h3 className="text-base font-semibold leading-6 text-gray-900">
-                            Детальніше про кластери
+                            {getTranslation('clusters_legend')}
                         </h3>
                     </div>
                     <div className="ml-4 mt-2 flex-shrink-0">
@@ -36,384 +111,33 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, hiddenClusters }) => {
                                     : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
                             }
                         >
-                            {legend ? "Приховати" : "Показати"}
+                            {legend ? getTranslation('hide') : getTranslation('show')}
                         </button>
                     </div>
                 </div>
                 <div className="mt-2 max-w-xl text-sm text-gray-500">
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        Загальні риси
+                        {getTranslation('overview_title')}
                     </h5>
                     <p>
-                        На цій представлені акаунти і взаємодії між ними.
+                        {getTranslation('overview_part1')}
                     </p>
                     <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Сині стрілочки</span> - взаємодії ДО вас.
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{getTranslation('red_arrows')}</span> - {getTranslation('interactions_from_you')}.
                     </p>
                     <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Червоні стрілочки</span> - взаємодії ВІД вас.
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{getTranslation('blue_arrows')}</span> - {getTranslation('interactions_to_you')}.
                     </p>
-                    <p className="mt-2">
-                        Всі стрілочки - це агреговані і зважені взаємодії: логарифмічна сума лайків, реплаїв та підписок.
-                    </p>
+                    {config.legend.arrows && <p className="mt-2">
+                        {config.legend.arrows}
+                    </p>}
+                    {config.legend.algo && <p className="mt-2">
+                        {config.legend.algo}
+                    </p>}
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        Українські кластери 🇺🇦
+                        {getTranslation('overview_clusters')}
                     </h5>
-                    <p>
-                        Українські кластери на цій мапі представлені максимально деталізовано.
-                        Також додано можливість увімкнути деталізацію по спільнотам.
-                        Максимальна кількість вихідних (червоних) стрілочок від кожної кульки - 10.
-                    </p>
-                    <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('ua-extended')}
-                        </span> - Український мета-кластер. Тут зосереджена більшість української спільноти Bluesky.
-                    </p>
-                    <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('ua-boroshno')}
-                        </span> - Український кластер, спільнота так званого Публіциста.
-                    </p>
-                    <p className="mt-2">
-                        ⚠️ Обережно, ІПСО: Серед спільноти панує поширення теорій змов, що створюють сприятливу атмосферу для ворожих ІПСО.
-                        Також в цьому кластері було виявлено найбільший осередок фейкових акаунтів державних високопосадовців, президента України
-                        а також очільників благодійних фоднів.
-                        За нашими даними саме з цієї спільноти було поширено непропорційно велику кількість інформаційно-психологічних вкидів.
-                    </p>
-                    <p className="mt-2">
-                        <a
-                            href="https://suspilne.media/culture/260991-botofermi-bavovna-kiselov-so-take-ipso-abo-informacijno-psihologicni-operacii/"
-                            target="_blank"
-                            className="font-bold text-xs underline-offset-1 underline"
-                        > Що таке ІПСО?
-                        </a>
-                    </p>
-                    <p className="mt-2">
-                        <a
-                            href="https://blogs.pravda.com.ua/authors/matvijchuk/654d0321e68cb/"
-                            target="_blank"
-                            className="font-bold text-xs underline-offset-1 underline"
-                        > Як працює ІПСО направлене проти волонтерів
-                        </a>
-                    </p>
-                    <p className="mt-2">
-                        <a
-                            href="https://sprotyvg7.com.ua/wp-content/uploads/2023/04/IPSO-Textbook.pdf"
-                            target="_blank"
-                            className="font-bold text-xs underline-offset-1 underline"
-                        > Хто розмінував Чонгар?
-                        </a>
-                    </p>
-                    <div>
-                        <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                            Українські cпільноти 🇺🇦
-                        </h5>
-                        <p>
-                            Українські спільноти - це експериментальний поділ мета-кластеру <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                {knownClusterNames.get('ua-extended')}
-                            </span> на менші групи.
-                        </p>
-                        <p className="mt-2">
-                            Увімкнути спільноти можна в меню відміти "Показати спільноти"
-                        </p>
-                        <p className="mt-2">
-                            Поділ відбувається виключно за взаємодіями.
-                            Наприклад, багато Українських художників можна знайти в кластері шитпосту, а не в кластері художників.
-                        </p>
-                        <p className="mt-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                                style={{ color: knownOverlayClusterColorMappings.get('ua-church') }}>
-                                ■■■■
-                            </span> - Спільнота Церкви Святого Інвайту ⛪🟡📘.
-                        </p>
-                        <p className="mb-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                                style={{ color: knownOverlayClusterColorMappings.get('ua-fun') }}>
-                                ■■■■
-                            </span> - Шитпост спільнота 💃💅.
-                        </p>
-                        <p className="mb-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                                style={{ color: knownOverlayClusterColorMappings.get('ua-art') }}>
-                                ■■■■
-                            </span> - Cпільнота митців: художників, крафтерів, косплеєрів.
-                        </p>
-                        <p className="mb-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                                style={{ color: knownOverlayClusterColorMappings.get('ua-write') }}>
-                                ■■■■
-                            </span> - Cпільнота укррайт, к-поп та фандомів.
-                        </p>
-                        <p className="mb-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                                style={{ color: knownOverlayClusterColorMappings.get('ua-lgbtqa') }}>
-                                ■■■■
-                            </span> - Друзі з твіттера - цей опис потребує доповнення, якщо ви знайшли себе тут - зверніться до нас з пропозиціями назви/опису
-                        </p>
-                        <p className="mb-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                                style={{ color: knownOverlayClusterColorMappings.get('ua-gaming') }}>
-                                ■■■■
-                            </span> - Ютубери, ґеймери
-                        </p>
-                        <p className="mb-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100"
-                                style={{ color: knownOverlayClusterColorMappings.get('ua-tech') }}>
-                                ■■■■
-                            </span> - Українська tech-спільнота
-                        </p>
-                    </div>
-                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        Глобальні кластери 🌍
-                    </h5>
-                    <p className="mb-5">
-                        Увага! Глобальні кластери на цій мапі представлені частково в цілях оптимізації. Максимальна кількість вихідних (червоних) стрілочок - 5. Повну мапу блускай можна знайти {" "}
-                        <a
-                            href="https://bsky.jazco.dev/atlas"
-                            target="_blank"
-                            className="font-bold underline-offset-1 underline"
-                        > тут
-                        </a>
-                        {" "} (Atlas від Jaz, більше не оновлюється) a також  {" "}
-                        <a
-                            href="https://aurora.ndimensional.xyz"
-                            target="_blank"
-                            className="font-bold underline-offset-1 underline"
-                        > тут
-                        </a>
-                        {" "} (Aurora від syntacrobat)
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('nafo')}
-                        </span> - [REDACTED].
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('gamers')}
-                        </span> - Розробники ігор, геймери з усього світу.
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('artists')}
-                        </span> - Художники, митці з усього світу.
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('writers')}
-                        </span> - Глобальна спільнота письменників, фікрайтерів.
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('furry')}
-                        </span> - Глобальна спільнота фурі.
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('tech')}
-                        </span> - Глобальна IT-спільнота.
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('infosec')}
-                        </span> - Глобальна InfoSec-спільнота.
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('startup')}
-                        </span> - Стартапери з усього світу.
-                    </p>
-                    <p className="mb-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            {knownClusterNames.get('web3')}
-                        </span> - Футуризм, web3.
-                    </p>
-                    {hiddenClusters && (
-                        <div>
-                            <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                                Приховані кластери
-                            </h5>
-                            <p className="mb-5">
-                                ⚠️ Увага! Бойкотуйте контент країн агресорів: {" "}
-                                <a
-                                    href="https://mobik.zip"
-                                    target="_blank"
-                                    className="font-bold underline-offset-1 underline"
-                                > mobik.zip
-                                </a>
-                            </p>
-                            <p className="mb-2">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    {knownClusterNames.get('ru')}
-                                </span> - російський кластер
-                            </p>
-                            <p className="mb-2">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    {knownClusterNames.get('be')}
-                                </span> - білоруський кластер
-                            </p>
-                            <p className="mb-2">
-                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    {knownClusterNames.get('ru-other')}
-                                </span> - кластер глобального руского міра. Населений переважно росіянами але також присутні акаунти з інших держав, що існують переважно в російському інфопросторі.
-                            </p>
-                        </div>
-                    )}
-                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        Детальніше про кластеризацію
-                    </h5>
-                    <p>
-                        Важливо розрізняти візуалізацію та кластеризацію, хоч вони і пов'язані, але будуються на різних алгоритмах.
-                    </p>
-                    <p className="mt-2">
-                        Кластеризація (фарбування) - реалізується за допомогою алгоритму Leiden на 3х різних налаштуваннях:
-                    </p>
-                    <p>
-                        слабка (розрізняє великі мета-кластери та виявляє найбільшу кількість кульок, але не враховує взаємність взаємодій),
-                    </p>
-                    <p>
-                        точна (розрізняє середні та великі кластери, має більшу точність бо враховує взаємніть) та
-                    </p>
-                    <p>
-                        детальна (виявляє спільноти по-інтересам всередині більших кластерів).
-                    </p>
-                    <p className="mt-2">
-                        Візуалізація - реалізується за допомогою алгоритму Force Atlas 2. Саме він візуально симулює силу тяжіння на основі взаємодій та групує кульки докупи.
-                        Можна помітити, що візуальне групування та кластеризація перетинаються, але дуже важливо їх розрізняти,
-                        бо на цьому атласі ми бачимо роботу 4х алгоритмів: 1 для візуалізації (гравітаційне групування), 3 інших - для багатошарової кластеризації.
-                    </p>
-                    {/* <h5 className="text-sm font-semibold leading-10 text-gray-600">
-            Детальніше про алгоритми
-          </h5>
-          <p className="mt-2">
-            Force Atlas 2 (візуалізація: гравітаційне групування):
-          </p>
-          <p className="mt-2">
-            <pre>
-              ForceAtlas2(
-            </pre>
-            <pre>
-              iterations: 800,
-            </pre>
-            <pre>
-              barnesHutTheta:1.5,
-            </pre>
-            <pre>
-              weight: leidenUndirectedMax
-            </pre>
-            <pre>
-              )
-            </pre>
-            - візуальне групування
-          </p>
-          <p className="mt-2">
-            Слабкий Leiden (кластеризація: кульки блідого кольору):
-          </p>
-          <p className="mt-2">
-            <pre>
-              Leiden(
-            </pre>
-            <pre>
-              gamma: 30,
-            </pre>
-            <pre>
-              edges: ['likes', 'replies', 'follows'],
-            </pre>
-            <pre>
-              edgeAggregation: undirectedSum,
-            </pre>
-            <pre>
-              aggregatedWeight: sumCount,
-            </pre>
-            <pre>
-              calculateSignificance: false
-            </pre>
-            <pre>
-              )
-            </pre>
-            - цей алгоритм рахується лише для деяких кластерів. Кульки позначаються блідішим кольором, ніж основний колір кластеру.
-            Цей алгоритм захоплює найбільшу кількість акаунтів, навіть малоактивних,
-            добре підходить для перепису населення, але менш точний, бо не враховує взаємність
-          </p>
-          <p className="mt-2">
-            Гармонічний Leiden (кластеризація: основні кольори):
-          </p>
-          <p className="mt-2">
-            <pre>
-              Leiden(
-            </pre>
-            <pre>
-              gamma: 50,
-            </pre>
-            <pre>
-              edges: ['likes', 'replies', 'follows'],
-            </pre>
-            <pre>
-              undirectedAggregation: MAX,
-            </pre>
-            <pre>
-              edgeAggregation: harmonicMeanSumLog,
-            </pre>
-            <pre>
-              calculateSignificance: true
-            </pre>
-            <pre>
-              )
-            </pre>
-            - враховує взаємність інтеракцій за допомогою проєкції ненаправленого графу в направлений через Harmonic Mean:
-            для кожних двох акаунтів А, B рахується гармонійне середнє взаємодій aggregatedEdgeWeight(A,B) та aggregatedEdgeWeight(B, A)
-            і саме вона передається як результуюча вага в ненаправлений граф.
-            Сам aggregatedEdgeWeight рахується із урахуванням глобальних і індивідуальних ваг взаємодій.
-            Охоплює на 20% менше акаунтів ніж слабкий Leiden, але є набагато більш точним і має вищу confidense.
-          </p>
-          <p className="mt-2">
-            Детальний Leiden (кластеризація: додаткові кольори спільнот):
-          </p>
-          <p className="mt-2">
-            <pre>
-              Leiden(
-            </pre>
-            <pre>
-              gamma: 100,
-            </pre>
-            <pre>
-              edges: ['likes', 'replies', 'follows'],
-            </pre>
-            <pre>
-              undirectedAggregation: MAX,
-            </pre>
-            <pre>
-              edgeAggregation: harmonicMeanSumLog,
-            </pre>
-            <pre>
-              calculateSignificance: true
-            </pre>
-            <pre>
-              )
-            </pre>
-            - всі параметри співпадають із Гармонійним Leiden, але прораховуються на більшій гаммі для виявлення детальніших спільнот
-          </p>
-          <p className="mt-2">
-            Глобальні значення ваг:
-          </p>
-          <pre>
-            [ likes: 31, replies: 62, follows: 7]
-          </pre>
-          <p className="mt-2">
-            Персональні значення ваг:
-          </p>
-          <pre>
-            personalSignificanceFollows = 1 - 1/totalInteractions
-          </pre>
-          <pre>
-            personalSignificanceReplies = 1 - userTotalReplies/totalInteractions
-          </pre>
-          <pre>
-            personalSignificanceLikes   = 1 - userTotalLikes/totalInteractions
-          </pre>
-          <p className="mt-2">
-            Алгоритм охоплює таку саму кількість акаунтів як і гармонійний Leiden, але розбиває на більшу кількість спільнот.
-          </p> */}
+                    {legendGroups}
                 </div>
             </div>
         </div>

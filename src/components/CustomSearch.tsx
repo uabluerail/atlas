@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useEffect, useState, CSSProperties } from "react";
 import { Attributes } from "graphology-types";
-
+import { getTranslation } from "../common/translation";
 import { useRegisterEvents, useCamera, useSigma } from "@react-sigma/core";
 
 type SearchLabelKeys = "text" | "placeholder";
@@ -178,7 +178,7 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
         id={inputId}
         type="text"
         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 pl-3"
-        placeholder={labels["placeholder"] || "Шукати за ім'ям"}
+        placeholder={labels["placeholder"] || getTranslation('search_for_a_handle')}
         list={`${inputId}-datalist`}
         value={search}
         onChange={onInputChange}

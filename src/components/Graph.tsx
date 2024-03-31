@@ -16,7 +16,8 @@ import { CustomSearch } from "./CustomSearch";
 import iwanthue from "iwanthue";
 import Loading from "./Loading";
 import Legend from "./Legend";
-import { clusterVisualConfig } from "../static/clustersVisuals"
+import { config } from "../common/visualConfig"
+import { getTranslation } from "../common/translation";
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -91,6 +92,8 @@ function constructNodeMap(graph: MultiDirectedGraph): Map<string, Node> {
   return nodeMap;
 }
 
+
+
 const isLocal = document.location.hostname === "localhost";
 
 const GraphContainer: React.FC<{}> = () => {
@@ -108,8 +111,9 @@ const GraphContainer: React.FC<{}> = () => {
   // Selected Node properties
   const [selectedNode, setSelectedNode] = React.useState<string | null>(null);
   const [legend, setLegend] = React.useState<boolean>(false);
-  const [hiddenClusters, setHiddenClusters] = React.useState<boolean>(false);
-  const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
+  const [showHiddenClusters, setShowHiddenClusters] = React.useState<boolean>(false);
+  const [currentLayoutName] = React.useState<string>(config.getLayoutName(searchParams.get("layout")));
+  // const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
   const [outWeight, setOutWeight] = React.useState<number>(-1);
@@ -153,6 +157,8 @@ const GraphContainer: React.FC<{}> = () => {
     useEffect(() => {
       // Create the graph
       const newGraph = new MultiDirectedGraph();
+
+      const hiddenClusters = config.hiddenClusters.get(currentLayoutName) ?? new Map();
       if (graphDump !== null && (graph === null || graphShouldUpdate)) {
         setGraphShouldUpdate(false);
         newGraph.import(graphDump);
@@ -170,8 +176,8 @@ const GraphContainer: React.FC<{}> = () => {
         }
         const palette = iwanthue(
           Object.keys(communityClusters).length -
-          Object.keys(clusterVisualConfig.knownClusterColorMappings).length -
-          Object.keys(clusterVisualConfig.knownOverlayClusterColorMappings).length,
+          Object.keys(config.knownClusterColorMappings).length -
+          Object.keys(config.knownOverlayClusterColorMappings).length,
           {
             seed: "bskyCommunityClusters3",
             colorSpace: "intense",
@@ -186,11 +192,11 @@ const GraphContainer: React.FC<{}> = () => {
             cluster.color =
               // knownClusterColorMappings.get(cluster.label) ?? palette.pop();
 
-              clusterVisualConfig.knownOverlayClusterColorMappings.get(cluster.label)
+              config.knownOverlayClusterColorMappings.get(cluster.label)
                 ? useSubclusterOverlay
-                  ? clusterVisualConfig.knownOverlayClusterColorMappings.get(cluster.label)
-                  : clusterVisualConfig.knownOverlayClusterHideCustomColorMappings.get(cluster.label)
-                : clusterVisualConfig.knownClusterColorMappings.get(cluster.label)
+                  ? config.knownOverlayClusterColorMappings.get(cluster.label)
+                  : config.knownOverlayClusterHideCustomColorMappings.get(cluster.label)
+                : config.knownClusterColorMappings.get(cluster.label)
                 ?? palette.pop();
           } else {
             cluster.color = palette.pop();
@@ -203,11 +209,11 @@ const GraphContainer: React.FC<{}> = () => {
             attr.community !== undefined &&
             attr.community in communityClusters
           ) {
-            if (hiddenClusters || !clusterVisualConfig.hiddenClusters.get(communityClusters[attr.community].label)) {
+            if (showHiddenClusters || !hiddenClusters.get(communityClusters[attr.community].label)) {
               attr.color = communityClusters[attr.community].color;
             } else {
               //todo remove completely and use different layout
-              attr.color = clusterVisualConfig.hiddenClusterColor;
+              attr.color = config.settings.hiddenClusterColor;
             }
           }
           return attr;
@@ -238,7 +244,7 @@ const GraphContainer: React.FC<{}> = () => {
           const cluster = communityClusters[community];
           // adapt the position to viewport coordinates
           const viewportPos = sigma.graphToViewport(cluster as Coordinates);
-          if (hiddenClusters || !clusterVisualConfig.hiddenClusters.get(cluster.label)) {
+          if (showHiddenClusters || !hiddenClusters.get(cluster.label)) {
             newClusters.push({
               label: cluster.label,
               displayName: cluster.displayName,
@@ -455,7 +461,7 @@ const GraphContainer: React.FC<{}> = () => {
   };
 
   async function fetchGraph() {
-    let fetchURL = "./exporter/out/exported_graph_enriched.json";
+    let fetchURL = `./exporter/out/${currentLayoutName}_layout.json`;
 
     const textGraph = await fetch(fetchURL);
     const responseJSON = await textGraph.json();
@@ -506,7 +512,7 @@ const GraphContainer: React.FC<{}> = () => {
               <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                 <div className="ml-4 mt-2">
                   <h3 className="text-base font-semibold leading-6 text-gray-900">
-                    Список топ 10 взаємодій (за весь час)
+                    {getTranslation('top_moots')}
                   </h3>
                 </div>
                 <div className="ml-4 mt-2 flex-shrink-0">
@@ -529,13 +535,13 @@ const GraphContainer: React.FC<{}> = () => {
                         : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
                     }
                   >
-                    {showMootList ? "Приховати" : "Показати"}
+                    {showMootList ? getTranslation('hide') : getTranslation('show')}
                   </button>
                 </div>
               </div>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
                 <p>
-                  Це топ користувачів, з якими {" "}
+                  {getTranslation('these_are_top_moots_that')}{" "}
                   <a
                     className="font-bold underline-offset-1 underline break-all"
                     href={`https://bsky.app/profile/${graph?.getNodeAttribute(
@@ -546,7 +552,7 @@ const GraphContainer: React.FC<{}> = () => {
                   >
                     {graph?.getNodeAttribute(selectedNode, "label")}
                   </a>{" "}
-                  взаємодіяли.
+                  {getTranslation('has_interacted_with')}.
                 </p>
               </div>
             </div>
@@ -577,7 +583,7 @@ const GraphContainer: React.FC<{}> = () => {
             </ul>
           </div>
         )}
-        {legend && (<Legend legend={legend} setLegend={setLegend} hiddenClusters={hiddenClusters} />)}
+        {legend && (<Legend legend={legend} setLegend={setLegend} layoutName={currentLayoutName} showHiddenClusters={showHiddenClusters} />)}
         <div className="overflow-hidden w-screen h-screen absolute top-0 left-0">
           {clusters.map((cluster) => {
             if (cluster.label !== undefined) {
@@ -591,14 +597,14 @@ const GraphContainer: React.FC<{}> = () => {
                     fontSize: 24,
                     fontWeight: "bolder",
                     color: `${cluster.color}`,
-                    top: cluster.label == 'ua-extended' ? `${cluster.y}px` : `${cluster.y}px`,
-                    left: cluster.label == 'ua-extended' ? `${cluster.x}px` : `${cluster.x}px`,
+                    top: `${cluster.y}px`,
+                    left: `${cluster.x}px`,
                     zIndex: 3,
                   }}
                 >
-                  {clusterVisualConfig.hideClusterLabels.indexOf(cluster.label) > -1
+                  {config.hideClusterLabels.indexOf(cluster.label) > -1
                     ? ""
-                    : clusterVisualConfig.knownClusterNames.get(cluster.label)
+                    : config.knownClusterNames.get(cluster.label)
                     ?? (cluster.displayName || cluster.label)}
                 </div>
               );
@@ -607,14 +613,14 @@ const GraphContainer: React.FC<{}> = () => {
         </div>
         <SocialGraph />
         <div className="
-        mobile:bottom-10 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
-        desktop:left-1/2 desktop:bottom-10 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
+        mobile:bottom-12 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
+        desktop:left-1/2 desktop:bottom-12 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
          z-50 fixed">
           <div className="bg-white shadow sm:rounded-lg py-1">
             <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
               <div className="flex flex-col items-baseline bg-white text-center">
                 <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
-                  <span className="hidden lg:inline-block">Представлені{" "}</span>{" "}Користувачі
+                  <span className="hidden lg:inline-block">{getTranslation('represented')}{" "}</span>{" "}{getTranslation('users')}
                 </dt>
                 <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                   {selectedNodeCount >= 0
@@ -624,7 +630,7 @@ const GraphContainer: React.FC<{}> = () => {
               </div>
               <div className="flex flex-col items-baseline bg-white text-center">
                 <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
-                  <span className="hidden lg:inline-block">Представлені{" "}</span>{" "}Взаємодії
+                  <span className="hidden lg:inline-block">{getTranslation('represented')}{" "}</span>{" "}{getTranslation('interactions')}
                 </dt>
                 <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                   {selectedNodeEdges
@@ -647,7 +653,7 @@ const GraphContainer: React.FC<{}> = () => {
                     setSearchParams(newParams);
                   }}
                 />
-                <div className="flex flex-row mt-1">
+                {config.overlayLayouts.get(currentLayoutName) && <div className="flex flex-row mt-1">
                   <div className="flex h-6 items-center">
                     <input
                       id="clusterLabels"
@@ -663,12 +669,12 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      Показати спільноти <span className="hidden md:inline">(граф оновиться)</span>
-                      <span className="md:hidden">(граф оновиться)</span>
+                      {getTranslation('show_communities')}{" "}<span className="hidden md:inline">{getTranslation('graph_will_refresh')}</span>
+                      <span className="md:hidden">{getTranslation('graph_will_refresh')}</span>
                     </label>
                   </div>
-                </div>
-                <div className="flex flex-row">
+                </div>}
+                {/* <div className="flex flex-row">
                   <div className="flex h-6 items-center">
                     <input
                       id="clusterLabels"
@@ -676,18 +682,18 @@ const GraphContainer: React.FC<{}> = () => {
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                       checked={showExperimental}
-                      onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && hiddenClusters) { setLoading(true); setHiddenClusters(false); setGraphShouldUpdate(true); } }}
+                      onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && showHiddenClusters) { setLoading(true); setShowHiddenClusters(false); setGraphShouldUpdate(true); } }}
                     />
                   </div>
                   <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
                     <label
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-500"
-                    >Експериментальні опції
+                    >{getTranslation('experimental_options')}
                     </label>
                   </div>
-                </div>
-                {showExperimental && (<div>
+                </div> */}
+                <div>
                   <div className="flex flex-row">
                     <div className="flex h-6 items-center">
                       <input
@@ -695,8 +701,8 @@ const GraphContainer: React.FC<{}> = () => {
                         name="clusterLabels"
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                        checked={hiddenClusters}
-                        onChange={() => { setLoading(true); setHiddenClusters(!hiddenClusters); setGraphShouldUpdate(true); }}
+                        checked={showHiddenClusters}
+                        onChange={() => { setLoading(true); setShowHiddenClusters(!showHiddenClusters); setGraphShouldUpdate(true); }}
                       />
                     </div>
                     <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
@@ -704,12 +710,12 @@ const GraphContainer: React.FC<{}> = () => {
                         htmlFor="clusterLabels"
                         className="font-medium text-gray-900"
                       >
-                        Показати приховані кластери <span className="hidden md:inline">(граф оновиться)</span>
-                        <span className="md:hidden">(граф оновиться)</span>
+                        {getTranslation('show_hidden_clusters')}{" "}<span className="hidden md:inline">{getTranslation('graph_will_refresh')}</span>
+                        <span className="md:hidden">{getTranslation('graph_will_refresh')}</span>
                       </label>
                     </div>
                   </div>
-                </div>)}
+                </div>
               </div>
               <div className="relative flex gap-x-3 ml-4 w-full flex-col">
                 <div className="flex flex-row">
@@ -730,8 +736,8 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="neighbors"
                       className="font-medium text-gray-900"
                     >
-                      Зв'язки <span className="hidden md:inline">друзів</span>
-                      <span className="md:hidden">друзів</span>
+                      {getTranslation('interactions')}{" "}<span className="hidden md:inline">{getTranslation('of_friends')}</span>
+                      <span className="md:hidden">{getTranslation('of_friends')}</span>
                     </label>
                   </div>
                 </div>
@@ -751,8 +757,8 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      Назви <span className="hidden md:inline">кластерів</span>
-                      <span className="md:hidden">кластерів</span>
+                      {getTranslation('labels')}{" "}<span className="hidden md:inline">{getTranslation('of_clusters')}</span>
+                      <span className="md:hidden">{getTranslation('of_clusters')}</span>
                     </label>
                   </div>
                 </div>
@@ -772,8 +778,8 @@ const GraphContainer: React.FC<{}> = () => {
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-900"
                     >
-                      Детальніше <span className="hidden md:inline">про кластери</span>
-                      <span className="md:hidden">про кластери</span>
+                      {getTranslation('more_details')}{" "}<span className="hidden md:inline">{getTranslation('on_clusters')}</span>
+                      <span className="md:hidden">{getTranslation('on_clusters')}</span>
                     </label>
                   </div>
                 </div>
@@ -785,22 +791,27 @@ const GraphContainer: React.FC<{}> = () => {
       <footer className="bg-white fixed bottom-0 text-center w-full z-50">
         <div className="mx-auto max-w-7xl px-2">
           <span className="footer-text text-xs">
-            Алгоритм кластеризації від{" "}
-            <a
-              href="https://uabluerail.org"
-              target="_blank"
-              className="font-bold underline-offset-1 underline"
-            >
-              uabluerail.org
-            </a>
-            . Візуалізація на основі {" "}
+            {config.legend.author &&
+              <div>
+                {getTranslation('cluster_algo_made_by')}{" "}
+                <a
+                  href={config.legend.author.url}
+                  target="_blank"
+                  className="font-bold underline-offset-1 underline"
+                >
+                  {config.legend.author.name}
+                </a>
+                {". "}
+              </div>
+            }
+            {getTranslation('visualization')}{" "}
             <a
               href="https://bsky.jazco.dev/atlas"
               target="_blank"
               className="font-bold underline-offset-1 underline"
             >
-              атласу
-            </a> від {" "}
+              {getTranslation('based_on_atlas')}
+            </a>{" "}{getTranslation('from')}{" "}
             <a
               href="https://bsky.app/profile/jaz.bsky.social"
               target="_blank"

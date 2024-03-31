@@ -1,12 +1,11 @@
 import { MultiDirectedGraph } from "graphology";
-import { legacyClusterConfig } from "../common/legacyClusterConfig.js";
-import { IndexNode, Layer, ClusterRepPrio } from "../common/model.js";
-import forceAtlas2 from "../graphology-layout-forceatlas2/index.js";
+import { config } from "../../common/config";
+import { IndexNode, ClusterRepPrio } from "../../common/model";
+import forceAtlas2 from "../../graphology-layout-forceatlas2/index";
 import circular from "graphology-layout/circular";
 import * as fs from "fs";
 
 function nailGlobus(
-  communitiesGraph: MultiDirectedGraph,
   totalNodes: number,
   nodes: {
     did: string;
@@ -21,14 +20,15 @@ function nailGlobus(
   }[],
   indexNodes: Map<string, IndexNode>
 ) {
+  const communitiesGraph = new MultiDirectedGraph();
   const communities: Map<number, ClusterRepPrio> = new Map();
 
   for (let i = 0; i < totalNodes; i++) {
     const node = nodes[i];
     if (!communities.has(node.community)) {
-      communities.set(node.community, { label: "", layer: Layer.NONE, prio: 0 });
+      communities.set(node.community, { label: "", prio: 0 });
     }
-    const rep = legacyClusterConfig.clusterRepresentatives.get(node.handle);
+    const rep = config.clusterRepresentatives.get(node.handle);
     if (rep !== undefined) {
       if (!communities.has(node.community) || communities.get(node.community)!.prio < rep.prio) {
         communities.set(node.community, rep)

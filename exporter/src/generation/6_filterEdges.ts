@@ -1,9 +1,11 @@
 import { MultiDirectedGraph } from "graphology";
-import { atlasConfig } from "../common/atlasConfig"
-import { legacyClusterConfig } from "../common/legacyClusterConfig";
+import { config } from "../common/config";
 
-function filterEdges(graph: MultiDirectedGraph) {
-
+function filterEdges(
+    log: (msg: string) => void,
+    graph: MultiDirectedGraph
+) {
+    log("Filtering edges...");
     // Mark top n edges as non-removable.
     graph.forEachNode((node, attrs) => {
         const edges = graph.edges(node);
@@ -13,7 +15,7 @@ function filterEdges(graph: MultiDirectedGraph) {
                 graph.getEdgeAttribute(a, "weight")
             );
         });
-        const topEdges = sortedEdges.slice(0, atlasConfig.topNonRemovableEdges);
+        const topEdges = sortedEdges.slice(0, config.settings.topNonRemovableEdges);
         topEdges.forEach((edge) => {
             graph.setEdgeAttribute(edge, 'stay', true);
         });
@@ -27,9 +29,9 @@ function filterEdges(graph: MultiDirectedGraph) {
                 graph.getEdgeAttribute(a, "weight")
             );
         });
-        const topEdges = legacyClusterConfig.focusClusters.indexOf(attrs.label) > -1
-            ? sortedEdges.slice(0, atlasConfig.maxEdgesForFocusCluster)  // max edges for ukrainians
-            : sortedEdges.slice(0, atlasConfig.maxEdgesEveryone); // max edges for everyone else
+        const topEdges = config.maxEdgesOverrides.get(attrs.label)
+            ? sortedEdges.slice(0, config.maxEdgesOverrides.get(attrs.label))  // apply override
+            : sortedEdges.slice(0, config.settings.maxEdges); // default
         const topEdgeSet = new Set(topEdges);
         edges.forEach((edge) => {
             if (graph.hasEdgeAttribute(edge, 'stay')) return;
@@ -39,6 +41,7 @@ function filterEdges(graph: MultiDirectedGraph) {
         });
     });
 
+    log(`Graph has ${graph.order} nodes and ${graph.size} edges.`);
 }
 
 export { filterEdges }

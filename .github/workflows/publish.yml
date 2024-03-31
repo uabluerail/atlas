@@ -23,7 +23,11 @@ jobs:
       - name: Fetch graph data
         env:
           GRAPH_URL: "${{ vars.GRAPH_URL }}"
-        run: wget -O exporter/graph.json "$GRAPH_URL"
+        run: wget -O graph.json "$GRAPH_URL"
+      - name: Fetch graph conf
+        env:
+          GRAPH_URL: "${{ vars.CONF_URL }}"
+        run: wget -O config.json "$CONF_URL"
       - name: Generate layout
         run: |
           mkdir exporter/out

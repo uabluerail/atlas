@@ -66,14 +66,59 @@ interface Cluster {
     positions: { x: number; y: number }[];
 }
 
-enum Layer {
-    MAIN, HIDDEN, NONE
+interface ClusterGroup {
+    name: string;
+    maxEdges?: number;
+    overlay?: string[],
+    underlay?: string[]
+}
+
+interface GroupLegend {
+    label: string;
+    hide?: boolean;
+    description: string;
+    clusters: string[],
+    extras?: string[],
+    links?: {
+        title: string;
+        url: string;
+    }[]
+}
+
+interface ClusterConfig {
+    name: string;
+    label?: string;
+    leader?: string;
+    hide?: boolean;
+    "hide-label"?: boolean;
+    color: string;
+    type: string;
+    group?: string;
+    legend?: {
+        description: string;
+        extra?: string;
+        links?: {
+            title: string;
+            url: string;
+        }[]
+    }
+}
+
+interface Layout {
+    name: string;
+    label: string;
+    groups: {
+        main: ClusterGroup[],
+        hidden?: ClusterGroup[],
+        dot?: ClusterGroup[]
+    };
+    legend?: GroupLegend[]
 }
 
 interface AtlasSettings {
     rotate: boolean,
     angle: number,
-    globusUkrajiny: boolean,
+    globus: boolean,
     maxHistoricWeightSum: number,
     iterationCount: number,
     blackHoleGravity: number,
@@ -84,10 +129,9 @@ interface AtlasSettings {
 
 interface ClusterRepPrio {
     label: string;
-    layer: Layer;
     prio: number;
     displayName?: string;
     dbIndex?: number;
 }
 
-export { InputGraphData, InputCommunitiesData, Edge, Node, IndexNode, Cluster, Layer, AtlasSettings, ClusterRepPrio };
+export { InputGraphData, InputCommunitiesData, Layout, GroupLegend, ClusterConfig, ClusterGroup, Edge, Node, IndexNode, Cluster, AtlasSettings, ClusterRepPrio };
