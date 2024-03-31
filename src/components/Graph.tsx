@@ -491,6 +491,7 @@ const GraphContainer: React.FC<{}> = () => {
     fetchGraph();
   }, []);
 
+  const hiddenClusters = config.hiddenClusters.get(currentLayoutName);
   return (
     <div className="overflow-hidden">
       {loading && <Loading message="Loading Graph" />}
@@ -698,7 +699,7 @@ const GraphContainer: React.FC<{}> = () => {
                     </label>
                   </div>
                 </div> */}
-                <div>
+                {hiddenClusters && hiddenClusters.size > 0 && <div>
                   <div className="flex flex-row">
                     <div className="flex h-6 items-center">
                       <input
@@ -720,7 +721,7 @@ const GraphContainer: React.FC<{}> = () => {
                       </label>
                     </div>
                   </div>
-                </div>
+                </div>}
               </div>
               <div className="relative flex gap-x-3 ml-4 w-full flex-col">
                 <div className="flex flex-row">
