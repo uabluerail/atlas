@@ -1,10 +1,10 @@
 import { MultiDirectedGraph } from "graphology";
 import { config } from "../common/config";
-import { Node, IndexNode, Layout } from "../common/model"
+import { Node, IndexNode, AtlasLayout } from "../common/model"
 
 function addNodes(
     log: (msg: string) => void,
-    layout: Layout,
+    layout: AtlasLayout,
     ctx: {
         totalNodes: number;
         nodes: Node[];

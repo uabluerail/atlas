@@ -66,25 +66,6 @@ interface Cluster {
     positions: { x: number; y: number }[];
 }
 
-interface ClusterGroup {
-    name: string;
-    maxEdges?: number;
-    overlay?: string[],
-    underlay?: string[]
-}
-
-interface GroupLegend {
-    label: string;
-    hide?: boolean;
-    description: string;
-    clusters: string[],
-    extras?: string[],
-    links?: {
-        title: string;
-        url: string;
-    }[]
-}
-
 interface ClusterConfig {
     name: string;
     label?: string;
@@ -104,27 +85,73 @@ interface ClusterConfig {
     }
 }
 
-interface Layout {
+interface AtlasSettings {
+    settings: {
+        graphVersion: number;
+        topNonRemovableEdges: number;
+        maxEdges: number;
+        lang: string;
+        rotate: boolean;
+        angle: number;
+        globus: boolean;
+        maxHistoricWeightSum: number;
+        iterationCount: number;
+        blackHoleGravity: number;
+        hiddenClusterColor: string;
+    }
+    legend: AtlasLegend;
+    layout: AtlasLayoutSettings;
+    clusters: ClusterConfig[];
+}
+
+interface AtlasLegend {
+    author: {
+        name: string;
+        url: string
+    },
+    arrows: string;
+    algo: string;
+    legends: {
+        name: string;
+        groups: GroupLegend[]
+    }[];
+}
+
+interface AtlasLayoutSettings {
+    modes: {
+        default: string[],
+        moderator: string[]
+    },
+    layouts: AtlasLayout[];
+}
+
+interface AtlasLayout {
     name: string;
     label: string;
     groups: {
-        main: ClusterGroup[],
-        hidden?: ClusterGroup[],
-        dot?: ClusterGroup[]
+        main: LayoutClusterGroup[],
+        hidden?: LayoutClusterGroup[]
     };
-    legend?: GroupLegend[]
+    legend?: string;
 }
 
-interface AtlasSettings {
-    rotate: boolean,
-    angle: number,
-    globus: boolean,
-    maxHistoricWeightSum: number,
-    iterationCount: number,
-    blackHoleGravity: number,
-    topNonRemovableEdges: number,
-    maxEdgesEveryone: number,
-    maxEdgesForFocusCluster: number
+interface LayoutClusterGroup {
+    name: string;
+    maxEdges?: number;
+    overlay?: string[],
+    underlay?: string[]
+}
+
+interface GroupLegend {
+    label: string;
+    hide?: boolean;
+    description: string;
+    clusters: string[],
+    extras?: string[],
+    links?: {
+        title: string;
+        url: string;
+    }[]
 }
 
 interface ClusterRepPrio {
@@ -134,4 +161,4 @@ interface ClusterRepPrio {
     dbIndex?: number;
 }
 
-export { InputGraphData, InputCommunitiesData, Layout, GroupLegend, ClusterConfig, ClusterGroup, Edge, Node, IndexNode, Cluster, AtlasSettings, ClusterRepPrio };
+export { InputGraphData, InputCommunitiesData, AtlasLayout, GroupLegend, ClusterConfig, LayoutClusterGroup, Edge, Node, IndexNode, Cluster, AtlasSettings, ClusterRepPrio };

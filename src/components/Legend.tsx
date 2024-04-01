@@ -76,10 +76,12 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
     const legendGroups: any[] = [];
     const includedClusters: Map<string, boolean> = config.includedClusters.get(layoutName) ?? new Map();
     const hiddenClusters: Map<string, boolean> = config.hiddenClusters.get(layoutName) ?? new Map();
-    const currentLayoutLegends: GroupLegend[] = (config.getLayout(layoutName) && config.getLayout(layoutName).legend) ?? [];
+    const currentLayoutLegend = config.getLayout(layoutName) && config.getLayout(layoutName).legend;
+    const currentLayoutLegends: GroupLegend[] = config.legend.legends.filter(legend => legend.name === currentLayoutLegend)[0].groups ?? [];
 
     currentLayoutLegends.forEach(group => {
-        const hasIncludedClusters = group.clusters.filter(clusterName => includedClusters.get(clusterName) && (showHiddenClusters || !hiddenClusters.get(clusterName))).length > 0;
+        const hasIncludedClusters = group.clusters.filter(clusterName => includedClusters.get(clusterName)
+            && (showHiddenClusters || !hiddenClusters.get(clusterName))).length > 0;
         const shouldShowGroup = hasIncludedClusters && group.hide !== true;
         if (shouldShowGroup) {
             legendGroups.push(buildLegend(group));

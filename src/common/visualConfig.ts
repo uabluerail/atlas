@@ -1,5 +1,4 @@
 import { config } from '../../exporter/src/common/config';
-import { Layout, ClusterConfig } from "../../exporter/src/common/model";
 
 var hideClusterLabels: string[] = [];
 
@@ -28,33 +27,8 @@ for (var cluster of config.clusters) {
     }
 }
 
-function getAllLayouts(): Layout[] {
-    var defaultLayout: Layout = config.layout.default;
-    var allLayouts: Layout[] = [defaultLayout];
-    if (config.layout.layouts) allLayouts = allLayouts.concat(config.layout.layouts);
-    return allLayouts;
-}
-
-
-function getLayout(layoutName: string | null): Layout {
-    var searchForLayout = getAllLayouts().filter(layout => layout.name === layoutName)[0];
-    return searchForLayout || config.layout.default;;
-}
-
-function getLayoutName(layoutName: string | null): string {
-    return getLayout(layoutName).name;
-}
-
-function getCluster(clusterName: string): ClusterConfig {
-    return config.clusters.filter(cluster => cluster.name === clusterName)[0];
-}
-
 const clusterVisualConfig = {
     ...config,
-    getAllLayouts,
-    getLayout,
-    getLayoutName,
-    getCluster,
     hideClusterLabels: hideClusterLabels,
     hiddenClusters: config.hiddenClusters,
     knownClusterNames: knownClusterNames,

@@ -1,5 +1,5 @@
 import { MultiDirectedGraph } from "graphology";
-import { Node, IndexNode, Edge, Layout } from "./common/model"
+import { Node, IndexNode, Edge, AtlasLayout } from "./common/model"
 import { config } from "./common/config";
 import path from "node:path";
 
@@ -25,7 +25,7 @@ const outputPath = "./out/"
 
 function exportLayout(
   graphData: { graphVersion: number, edges: Edge[]; nodes: Node[], timestamp?: string },
-  layout: Layout
+  layout: AtlasLayout
 ) {
 
   const outputPathEnriched = path.join(outputPath, `${layout.name + "_" ?? ""}layout.json`);
@@ -74,9 +74,6 @@ function exportLayout(
 
 //Step 0
 fetchGraph(log).then((graphData: { graphVersion: number, edges: Edge[]; nodes: Node[], timestamp?: string }) => {
-  log("Exporting default layout...");
-  exportLayout(graphData, config.layout.default);
-
   if (config.layout.layouts && config.layout.layouts.length > 0) {
     config.layout.layouts.forEach(layout => {
       log("Exporting " + layout.name + " layout...");

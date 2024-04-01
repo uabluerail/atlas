@@ -1,6 +1,6 @@
-import { ClusterRepPrio } from "./model";
-import configJson from "../../../config.json"
-import { Layout, ClusterGroup } from "../common/model"
+import { AtlasSettings, ClusterRepPrio, ClusterConfig } from "./model";
+import importedJson from "../../../config.json"
+import { AtlasLayout, LayoutClusterGroup } from "../common/model"
 
 const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
@@ -12,14 +12,16 @@ const includedClusters: Map<string, Map<string, boolean>> = new Map();
 const hiddenClusters: Map<string, Map<string, boolean>> = new Map();
 const overlayLayouts: Map<string, boolean> = new Map();
 
-var allLayouts: Layout[] = [configJson.layout.default];
-if (configJson.layout.layouts) allLayouts = allLayouts.concat(configJson.layout.layouts);
+//important for type check
+const configJson: AtlasSettings = importedJson;
+
+var allLayouts: AtlasLayout[] = configJson.layout.layouts;
 
 for (var layout of allLayouts) {
     var includedInLayers: Map<string, boolean> = new Map();
     var layoutToBeExcludedCommunities: Map<number, boolean> = new Map();
     var layoutHiddenClusters: Map<string, boolean> = new Map();
-    var allClusterGroups: ClusterGroup[] = layout.groups.main;
+    var allClusterGroups: LayoutClusterGroup[] = layout.groups.main;
     toBeExcludedCommunities.set(layout.name, layoutToBeExcludedCommunities)
     includedClusters.set(layout.name, includedInLayers)
     hiddenClusters.set(layout.name, layoutHiddenClusters);
@@ -35,7 +37,6 @@ for (var layout of allLayouts) {
             }
         }
     }
-    if (layout.groups.dot) allClusterGroups = allClusterGroups.concat(layout.groups.dot);
 
     for (var clusterInGroup of allClusterGroups) {
         includedInLayers.set(clusterInGroup.name, true);
@@ -52,7 +53,7 @@ for (var layout of allLayouts) {
         }
     }
 
-    for (var cluster of configJson.clusters) {
+    for (var cluster of importedJson.clusters) {
         const shouldBeRemoved = !includedInLayers.get(cluster.name);
         if (shouldBeRemoved && cluster.community !== -1) {
             layoutToBeExcludedCommunities.set(cluster.community, true)
@@ -60,7 +61,7 @@ for (var layout of allLayouts) {
     }
 }
 
-for (var cluster of configJson.clusters) {
+for (var cluster of importedJson.clusters) {
     const maxEdgesOverride = cluster.group && groupMaxEdgeOverrides.get(cluster.group);
     if (maxEdgesOverride) {
         maxEdgesOverrides.set(cluster.name, maxEdgesOverride)
@@ -74,8 +75,36 @@ for (var cluster of configJson.clusters) {
     }
 }
 
+function getAllLayouts(moderator?: boolean): AtlasLayout[] {
+    return moderator
+        ? config.layout.layouts.filter(layout => config.layout.modes.moderator.indexOf(layout.name) !== -1)
+        : config.layout.layouts.filter(layout => config.layout.modes.default.indexOf(layout.name) !== -1);
+}
+
+function getDefaultLayout(moderator?: boolean): AtlasLayout {
+    var searchForLayout = getAllLayouts(moderator)[0];
+    return searchForLayout;
+}
+
+function getLayout(layoutName: string | null, moderator?: boolean): AtlasLayout {
+    return getAllLayouts(moderator).filter(layout => !layoutName || layout.name === layoutName)[0];
+}
+
+function getLayoutName(layoutName: string | null, moderator?: boolean): string {
+    return getLayout(layoutName, moderator).name;
+}
+
+function getCluster(clusterName: string): ClusterConfig {
+    return config.clusters.filter(cluster => cluster.name === clusterName)[0];
+}
+
 const config = {
-    ...configJson,
+    ...importedJson,
+    getAllLayouts,
+    getDefaultLayout,
+    getLayout,
+    getLayoutName,
+    getCluster,
     includedClusters: includedClusters,
     overlayLayouts: overlayLayouts,
     maxEdgesOverrides: maxEdgesOverrides,

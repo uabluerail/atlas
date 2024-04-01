@@ -117,7 +117,8 @@ const GraphContainer: React.FC<{}> = () => {
   const [selectedNode, setSelectedNode] = React.useState<string | null>(null);
   const [legend, setLegend] = React.useState<boolean>(false);
   const [showHiddenClusters, setShowHiddenClusters] = React.useState<boolean>(false);
-  const [currentLayoutName, setCurrentLayoutName] = React.useState<string>(config.getLayoutName(searchParams.get("layout")));
+  const [moderator] = React.useState<boolean>(searchParams.get("moderator") === "true");
+  const [currentLayoutName] = React.useState<string>(config.getLayoutName(searchParams.get("layout"), moderator));
   // const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
@@ -790,7 +791,7 @@ const GraphContainer: React.FC<{}> = () => {
                   </div>
                 </div>
                 <div className="flex flex-row">
-                  <LayoutMenu setLoading={setLoading} setCurrentLayoutName={setCurrentLayoutName} setGraphShouldUpdate={setGraphShouldUpdate} />
+                  <LayoutMenu moderator={moderator} />
                 </div>
               </div>
             </div>
