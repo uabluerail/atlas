@@ -24,6 +24,8 @@ export interface SearchControlProps {
    */
   style?: CSSProperties;
 
+  currentLanguage: string;
+
   /**
    * Map of the labels we use in the component.
    * This is usefull for I18N
@@ -58,6 +60,7 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
   id,
   className,
   style,
+  currentLanguage,
   labels = {},
   onLocate,
 }: SearchControlProps) => {
@@ -136,8 +139,8 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
     document.getElementById(inputId)?.blur();
 
     cameraGoTo({
-      x: nodeDisplayData.x,
-      y: nodeDisplayData.y,
+      x: nodeDisplayData && nodeDisplayData.x,
+      y: nodeDisplayData && nodeDisplayData.y,
       ratio: 0.1,
     });
 
@@ -178,7 +181,7 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
         id={inputId}
         type="text"
         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 pl-3"
-        placeholder={labels["placeholder"] || getTranslation('search_for_a_handle')}
+        placeholder={labels["placeholder"] || getTranslation('search_for_a_handle', currentLanguage)}
         list={`${inputId}-datalist`}
         value={search}
         onChange={onInputChange}

@@ -18,6 +18,7 @@
     "graphology-layout": "^0.6.1",
     "graphology-layout-forceatlas2": "^0.10.1",
     "iwanthue": "^2.0.0",
+    "semver": "^7.6.0",
     "ts-node": "^10.9.1",
     "tsc": "^2.0.4",
     "typescript": "^5.0.4",

@@ -1,6 +1,6 @@
 import { FC, Dispatch, SetStateAction } from "react";
 import { config } from "../common/visualConfig"
-import { getTranslation } from "../common/translation";
+import { getTranslation, languages } from "../common/translation";
 import { GroupLegend, ClusterConfig } from "../../exporter/src/common/model";
 
 interface LegendProps {
@@ -8,6 +8,7 @@ interface LegendProps {
     setLegend: Dispatch<SetStateAction<boolean>>;
     layoutName: string;
     showHiddenClusters: boolean;
+    currentLanguage: string
 }
 
 const buildLinks = (links: {
@@ -34,7 +35,7 @@ const buildExtras = (extras: string[]) => {
     return <div>{compiledExtras}</div>;
 }
 
-const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClusters }) => {
+const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClusters, currentLanguage }) => {
     const buildLegend = (legendGroup: GroupLegend) => {
         const clusterLegends: any[] = [];
         legendGroup.clusters.forEach(clusterName => {
@@ -97,7 +98,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                 <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                     <div className="ml-4 mt-2">
                         <h3 className="text-base font-semibold leading-6 text-gray-900">
-                            {getTranslation('clusters_legend')}
+                            {getTranslation('clusters_legend', currentLanguage)}
                         </h3>
                     </div>
                     <div className="ml-4 mt-2 flex-shrink-0">
@@ -113,22 +114,28 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                                     : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
                             }
                         >
-                            {legend ? getTranslation('hide') : getTranslation('show')}
+                            {legend ? getTranslation('hide', currentLanguage) : getTranslation('show', currentLanguage)}
                         </button>
                     </div>
                 </div>
                 <div className="mt-2 max-w-xl text-sm text-gray-500">
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        {getTranslation('overview_title')}
+                        {getTranslation('overview_title', currentLanguage)}
                     </h5>
                     <p>
-                        {getTranslation('overview_part1')}
+                        {getTranslation('overview_part1', currentLanguage)}
                     </p>
                     <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{getTranslation('red_arrows')}</span> - {getTranslation('interactions_from_you')}.
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{getTranslation('red_arrows', currentLanguage)}</span> - {getTranslation('interactions_from_you', currentLanguage)}.
                     </p>
                     <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{getTranslation('blue_arrows')}</span> - {getTranslation('interactions_to_you')}.
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{getTranslation('blue_arrows', currentLanguage)}</span> - {getTranslation('interactions_to_you', currentLanguage)}.
+                    </p>
+                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                        {getTranslation('algo', currentLanguage)}
+                    </h5>
+                    <p className="bg-green-100 text-green-800">
+                        {getTranslation('algo_note', currentLanguage)}
                     </p>
                     {config.legend.arrows && <p className="mt-2">
                         {config.legend.arrows}
@@ -137,7 +144,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                         {config.legend.algo}
                     </p>}
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        {getTranslation('overview_clusters')}
+                        {getTranslation('overview_clusters', currentLanguage)}
                     </h5>
                     {legendGroups}
                 </div>

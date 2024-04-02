@@ -1,6 +1,7 @@
 import { AtlasSettings, ClusterRepPrio, ClusterConfig } from "./model";
 import importedJson from "../../../config.json"
 import { AtlasLayout, LayoutClusterGroup } from "../common/model"
+import { parse } from "semver";
 
 const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 
@@ -14,6 +15,12 @@ const overlayLayouts: Map<string, boolean> = new Map();
 
 //important for type check
 const configJson: AtlasSettings = importedJson;
+
+var configVersion = parse(configJson.settings.configVersion);
+
+if (configVersion == null) {
+    throw new Error('Could not parse config version');
+}
 
 var allLayouts: AtlasLayout[] = configJson.layout.layouts;
 
@@ -78,19 +85,19 @@ for (var cluster of importedJson.clusters) {
 function getAllLayouts(moderator?: boolean): AtlasLayout[] {
     return moderator
         ? config.layout.layouts.filter(layout => config.layout.modes.moderator.indexOf(layout.name) !== -1)
-        : config.layout.layouts.filter(layout => config.layout.modes.default.indexOf(layout.name) !== -1);
+        : config.layout.layouts.filter(layout => config.layout.modes.default.indexOf(layout.name) !== -1)
 }
 
-function getDefaultLayout(moderator?: boolean): AtlasLayout {
-    var searchForLayout = getAllLayouts(moderator)[0];
-    return searchForLayout;
+function getDefaultLayout(moderator?: boolean, isMobile?: boolean): string {
+    var searchForLayout = getAllLayouts(moderator).filter(layout => isMobile === layout.isMobile || (!isMobile && !layout.isMobile))[0];
+    return searchForLayout.name;
 }
 
 function getLayout(layoutName: string | null, moderator?: boolean): AtlasLayout {
-    return getAllLayouts(moderator).filter(layout => !layoutName || layout.name === layoutName)[0];
+    return getAllLayouts(moderator).filter(layout => (!layoutName || layout.name === layoutName))[0];
 }
 
-function getLayoutName(layoutName: string | null, moderator?: boolean): string {
+function getLayoutName(layoutName: string | null, moderator?: boolean, isMobile?: boolean): string {
     return getLayout(layoutName, moderator).name;
 }
 
@@ -100,6 +107,8 @@ function getCluster(clusterName: string): ClusterConfig {
 
 const config = {
     ...importedJson,
+    configVersion,
+    json: importedJson,
     getAllLayouts,
     getDefaultLayout,
     getLayout,

@@ -2,6 +2,8 @@ import { MultiDirectedGraph } from "graphology";
 import { Node, IndexNode, Edge, AtlasLayout } from "./common/model"
 import { config } from "./common/config";
 import path from "node:path";
+import * as fs from "fs";
+import { SemVer, parse } from "semver";
 
 import { nailGlobus } from "./generation/util/globus.js"
 import { fetchGraph } from "./generation/0_fetchGraph";
@@ -29,6 +31,44 @@ function exportLayout(
 ) {
 
   const outputPathEnriched = path.join(outputPath, `${layout.name + "_" ?? ""}layout.json`);
+  const versionPath = path.join(outputPath, `${layout.name + "_" ?? ""}layout_version.json`);
+  const configPath = path.join(outputPath, `${config.configVersion}_config.json`);
+
+  var layoutVersion;
+  try {
+    layoutVersion = JSON.parse(fs.readFileSync(versionPath, "utf8")) as {
+      configVersion: string;
+      graphVersion: number;
+    };
+  } catch (err) {
+  }
+
+  function writeLayoutVersion() {
+    fs.writeFileSync(versionPath, JSON.stringify({
+      configVersion: config.configVersion.raw,
+      graphVersion: config.settings.graphVersion
+    }));
+    fs.writeFileSync(configPath, JSON.stringify(config.json));
+  }
+
+  const layoutFileExists = fs.existsSync(outputPathEnriched);
+
+  const layoutConfigVersion: SemVer | null = parse(layoutVersion?.configVersion);
+
+  if (layoutVersion && layoutConfigVersion && layoutFileExists
+    && config.settings.graphVersion <= layoutVersion.graphVersion
+    && config.configVersion.major <= layoutConfigVersion.major
+    && config.configVersion.minor <= layoutConfigVersion.minor) {
+    log(`No changes requiring layout ${layout.name} re-gen.`);
+    if (config.configVersion.patch > layoutConfigVersion.patch) {
+      log(`Updating version: ${config.configVersion}.`);
+    }
+    log("Skipping export.");
+    writeLayoutVersion();
+    return;
+  }
+
+  log(`Generating layout ${layout.name} on config version: ${config.configVersion}`);
 
   const { edges, nodes } = graphData;
   // Create the graph
@@ -37,8 +77,6 @@ function exportLayout(
   const totalNodes = nodes.length;
   const indexNodes: Map<string, IndexNode> = new Map();
   const hiddenNodes: Map<string, boolean> = new Map();
-
-  // config.hiddenCommunities.forEach((community, value) => log("" + community + ":" + value));
 
   //Step 1 add nodes
   addNodes(log, layout, { totalNodes, nodes, indexNodes, hiddenNodes }, graph);
@@ -70,13 +108,14 @@ function exportLayout(
 
   //Step 8 export layout file
   writeFiles(log, { graphData, outputPathEnriched }, graph);
+
+  writeLayoutVersion();
 }
 
 //Step 0
 fetchGraph(log).then((graphData: { graphVersion: number, edges: Edge[]; nodes: Node[], timestamp?: string }) => {
   if (config.layout.layouts && config.layout.layouts.length > 0) {
     config.layout.layouts.forEach(layout => {
-      log("Exporting " + layout.name + " layout...");
       exportLayout(graphData, layout);
     });
   }

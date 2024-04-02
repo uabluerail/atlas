@@ -1,8 +1,7 @@
-import React, { useState, FC, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MultiDirectedGraph } from "graphology";
-import { formatDistanceToNow, parseISO } from "date-fns";
-import LayoutMenu from "./LayoutMenu";
+import Menu from "./Menu";
 import getNodeProgramImage from "sigma/rendering/programs/node-image";
 import {
   SigmaContainer,
@@ -12,17 +11,13 @@ import {
 } from "@react-sigma/core";
 import { Coordinates } from "sigma/types";
 import "@react-sigma/core/lib/react-sigma.min.css";
-
-import { CustomSearch } from "./CustomSearch";
 import iwanthue from "iwanthue";
 import Loading from "./Loading";
 import Legend from "./Legend";
 import { config } from "../common/visualConfig"
-import { getTranslation } from "../common/translation";
-
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ')
-}
+import { getTranslation, getLanguageByName } from "../common/translation";
+import Footer from "./Footer";
+import { useMediaQuery } from 'react-responsive'
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -118,7 +113,11 @@ const GraphContainer: React.FC<{}> = () => {
   const [legend, setLegend] = React.useState<boolean>(false);
   const [showHiddenClusters, setShowHiddenClusters] = React.useState<boolean>(false);
   const [moderator] = React.useState<boolean>(searchParams.get("moderator") === "true");
-  const [currentLayoutName] = React.useState<string>(config.getLayoutName(searchParams.get("layout"), moderator));
+
+  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  console.log("------------------------ isMobile: " + isMobile);
+  const [currentLayoutName] = React.useState<string>(searchParams.get("layout") ? config.getLayoutName(searchParams.get("layout"), moderator) : config.getDefaultLayout(moderator, isMobile));
+  const [currentLanguage, setCurrentLanguage] = React.useState<string>(getLanguageByName(searchParams.get("lang")));
   // const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
@@ -492,10 +491,9 @@ const GraphContainer: React.FC<{}> = () => {
     fetchGraph();
   }, []);
 
-  const hiddenClusters = config.hiddenClusters.get(currentLayoutName);
   return (
     <div className="overflow-hidden">
-      {loading && <Loading message="Loading Graph" />}
+      {loading && <Loading message={getTranslation('loading_graph', currentLanguage)} />}
       <SigmaContainer
         graph={MultiDirectedGraph}
         style={{ height: "100vh" }}
@@ -519,7 +517,7 @@ const GraphContainer: React.FC<{}> = () => {
               <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
                 <div className="ml-4 mt-2">
                   <h3 className="text-base font-semibold leading-6 text-gray-900">
-                    {getTranslation('top_moots')}
+                    {getTranslation('top_moots', currentLanguage)}
                   </h3>
                 </div>
                 <div className="ml-4 mt-2 flex-shrink-0">
@@ -542,13 +540,13 @@ const GraphContainer: React.FC<{}> = () => {
                         : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
                     }
                   >
-                    {showMootList ? getTranslation('hide') : getTranslation('show')}
+                    {showMootList ? getTranslation('hide', currentLanguage) : getTranslation('show', currentLanguage)}
                   </button>
                 </div>
               </div>
               <div className="mt-2 max-w-xl text-sm text-gray-500">
                 <p>
-                  {getTranslation('these_are_top_moots_that')}{" "}
+                  {getTranslation('these_are_top_moots_that', currentLanguage)}{" "}
                   <a
                     className="font-bold underline-offset-1 underline break-all"
                     href={`https://bsky.app/profile/${graph?.getNodeAttribute(
@@ -559,7 +557,7 @@ const GraphContainer: React.FC<{}> = () => {
                   >
                     {graph?.getNodeAttribute(selectedNode, "label")}
                   </a>{" "}
-                  {getTranslation('has_interacted_with')}.
+                  {getTranslation('has_interacted_with', currentLanguage)}.
                 </p>
               </div>
             </div>
@@ -590,7 +588,13 @@ const GraphContainer: React.FC<{}> = () => {
             </ul>
           </div>
         )}
-        {legend && (<Legend legend={legend} setLegend={setLegend} layoutName={currentLayoutName} showHiddenClusters={showHiddenClusters} />)}
+        {legend && (<Legend
+          legend={legend}
+          setLegend={setLegend}
+          layoutName={currentLayoutName}
+          showHiddenClusters={showHiddenClusters}
+          currentLanguage={currentLanguage}
+        />)}
         <div className="overflow-hidden w-screen h-screen absolute top-0 left-0">
           {clusters.map((cluster) => {
             if (cluster.label !== undefined) {
@@ -619,240 +623,31 @@ const GraphContainer: React.FC<{}> = () => {
           })}
         </div>
         <SocialGraph />
-        <div className="
-        mobile:bottom-12 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
-        desktop:left-1/2 desktop:bottom-12 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
-         z-50 fixed">
-          <div className="bg-white shadow sm:rounded-lg py-1">
-            <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
-              <div className="flex flex-col items-baseline bg-white text-center">
-                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
-                  <span className="hidden lg:inline-block">{getTranslation('represented')}{" "}</span>{" "}{getTranslation('users')}
-                </dt>
-                <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
-                  {selectedNodeCount >= 0
-                    ? selectedNodeCount.toLocaleString()
-                    : userCount.toLocaleString()}
-                </dd>
-              </div>
-              <div className="flex flex-col items-baseline bg-white text-center">
-                <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
-                  <span className="hidden lg:inline-block">{getTranslation('represented')}{" "}</span>{" "}{getTranslation('interactions')}
-                </dt>
-                <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
-                  {selectedNodeEdges
-                    ? selectedNodeEdges.length.toLocaleString()
-                    : edgeCount.toLocaleString()}
-                </dd>
-              </div>
-            </dl>
-            <div className="px-2 py-2 sm:p-2 w-fit ml-auto mr-auto mt-0 grid grid-flow-row-dense grid-cols-3 ">
-              <div className="col-span-2 mt-auto mb-auto ">
-                <CustomSearch
-                  onLocate={(node) => {
-                    const nodeLabel = graph?.getNodeAttribute(node, "label");
-                    let newParams: { s?: string; ml?: string } = {
-                      s: `${nodeLabel}`,
-                    };
-                    if (showMootList) {
-                      newParams.ml = `${showMootList}`;
-                    }
-                    setSearchParams(newParams);
-                  }}
-                />
-                {config.overlayLayouts.get(currentLayoutName) && <div className="flex flex-row mt-1">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="clusterLabels"
-                      name="clusterLabels"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={useSubclusterOverlay}
-                      onChange={() => { setLoading(true); setUseSubclusterOverlay(!useSubclusterOverlay); setGraphShouldUpdate(true); }}
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-900"
-                    >
-                      {getTranslation('show_communities')}{" "}<span className="hidden md:inline">{getTranslation('graph_will_refresh')}</span>
-                      <span className="md:hidden">{getTranslation('graph_will_refresh')}</span>
-                    </label>
-                  </div>
-                </div>}
-                {/* <div className="flex flex-row">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="clusterLabels"
-                      name="clusterLabels"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={showExperimental}
-                      onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && showHiddenClusters) { setLoading(true); setShowHiddenClusters(false); setGraphShouldUpdate(true); } }}
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-500"
-                    >{getTranslation('experimental_options')}
-                    </label>
-                  </div>
-                </div> */}
-                {hiddenClusters && hiddenClusters.size > 0 && <div>
-                  <div className="flex flex-row">
-                    <div className="flex h-6 items-center">
-                      <input
-                        id="clusterLabels"
-                        name="clusterLabels"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                        checked={showHiddenClusters}
-                        onChange={() => { setLoading(true); setShowHiddenClusters(!showHiddenClusters); setGraphShouldUpdate(true); }}
-                      />
-                    </div>
-                    <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
-                      <label
-                        htmlFor="clusterLabels"
-                        className="font-medium text-gray-900"
-                      >
-                        {getTranslation('show_hidden_clusters')}{" "}<span className="hidden md:inline">{getTranslation('graph_will_refresh')}</span>
-                        <span className="md:hidden">{getTranslation('graph_will_refresh')}</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>}
-              </div>
-              <div className="relative flex gap-x-3 ml-4 w-full flex-col">
-                <div className="flex flex-row">
-                  <div className="flex h-6 items-center mt-auto mb-auto">
-                    <input
-                      id="neighbors"
-                      name="neighbors"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={showSecondDegreeNeighbors}
-                      onChange={() =>
-                        setShowSecondDegreeNeighbors(!showSecondDegreeNeighbors)
-                      }
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
-                    <label
-                      htmlFor="neighbors"
-                      className="font-medium text-gray-900"
-                    >
-                      {getTranslation('interactions')}{" "}<span className="hidden md:inline">{getTranslation('of_friends')}</span>
-                      <span className="md:hidden">{getTranslation('of_friends')}</span>
-                    </label>
-                  </div>
-                </div>
-                <div className="flex flex-row">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="clusterLabels"
-                      name="clusterLabels"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={showClusterLabels}
-                      onChange={() => setShowClusterLabels(!showClusterLabels)}
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-900"
-                    >
-                      {getTranslation('labels')}{" "}<span className="hidden md:inline">{getTranslation('of_clusters')}</span>
-                      <span className="md:hidden">{getTranslation('of_clusters')}</span>
-                    </label>
-                  </div>
-                </div>
-                <div className="flex flex-row">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="clusterLabels"
-                      name="clusterLabels"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={legend}
-                      onChange={() => setLegend(!legend)}
-                    />
-                  </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-900"
-                    >
-                      {getTranslation('more_details')}{" "}<span className="hidden md:inline">{getTranslation('on_clusters')}</span>
-                      <span className="md:hidden">{getTranslation('on_clusters')}</span>
-                    </label>
-                  </div>
-                </div>
-                <div className="flex flex-row">
-                  <LayoutMenu moderator={moderator} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <Menu
+          selectedNodeCount={selectedNodeCount}
+          userCount={userCount}
+          selectedNodeEdges={selectedNodeEdges}
+          edgeCount={edgeCount}
+          graph={graph}
+          showMootList={showMootList}
+          currentLayoutName={currentLayoutName}
+          currentLanguage={currentLanguage}
+          setSearchParams={setSearchParams}
+          setLoading={setLoading}
+          useSubclusterOverlay={useSubclusterOverlay}
+          setUseSubclusterOverlay={setUseSubclusterOverlay}
+          setGraphShouldUpdate={setGraphShouldUpdate}
+          showHiddenClusters={showHiddenClusters}
+          setShowHiddenClusters={setShowHiddenClusters}
+          showSecondDegreeNeighbors={showSecondDegreeNeighbors}
+          setShowSecondDegreeNeighbors={setShowSecondDegreeNeighbors}
+          showClusterLabels={showClusterLabels}
+          setShowClusterLabels={setShowClusterLabels}
+          legend={legend}
+          setLegend={setLegend}
+          moderator={moderator} />
       </SigmaContainer>
-      <footer className="bg-white fixed bottom-0 text-center w-full z-50">
-        <div className="mx-auto max-w-7xl px-2">
-          <span className="footer-text text-xs">
-            {config.legend.author &&
-              <div>
-                {getTranslation('cluster_algo_made_by')}{" "}
-                <a
-                  href={config.legend.author.url}
-                  target="_blank"
-                  className="font-bold underline-offset-1 underline"
-                >
-                  {config.legend.author.name}
-                </a>
-                {". "}
-              </div>
-            }
-            {getTranslation('visualization')}{" "}
-            <a
-              href="https://bsky.jazco.dev/atlas"
-              target="_blank"
-              className="font-bold underline-offset-1 underline"
-            >
-              {getTranslation('based_on_atlas')}
-            </a>{" "}{getTranslation('from')}{" "}
-            <a
-              href="https://bsky.app/profile/jaz.bsky.social"
-              target="_blank"
-              className="font-bold underline-offset-1 underline"
-            >
-              Jaz
-            </a>
-            {" 🏳️‍⚧️"}
-          </span>
-          <span className="footer-text text-xs">
-            {" | "}
-            {graph
-              ? formatDistanceToNow(
-                parseISO(graph?.getAttribute("lastUpdated")),
-                { addSuffix: true }
-              )
-              : "loading..."}{" "}
-            <img src="/update-icon.svg" className="inline-block h-4 w-4" />
-            {" | "}
-            <a
-              href="https://github.com/uabluerail/atlas"
-              target="_blank"
-            >
-              <img
-                src="/github.svg"
-                className="inline-block h-3.5 w-4 mb-0.5"
-              />
-            </a>
-          </span>
-        </div>
-      </footer>
+      <Footer graph={graph} currentLanguage={currentLanguage} setCurrentLanguage={setCurrentLanguage} />
     </div>
   );
 };

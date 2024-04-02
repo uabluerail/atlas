@@ -88,6 +88,7 @@ interface ClusterConfig {
 interface AtlasSettings {
     settings: {
         graphVersion: number;
+        configVersion: string;
         topNonRemovableEdges: number;
         maxEdges: number;
         lang: string;
@@ -128,6 +129,7 @@ interface AtlasLayoutSettings {
 interface AtlasLayout {
     name: string;
     label: string;
+    isMobile?: boolean;
     groups: {
         main: LayoutClusterGroup[],
         hidden?: LayoutClusterGroup[]
