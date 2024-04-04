@@ -82,38 +82,51 @@ for (var cluster of importedJson.clusters) {
     }
 }
 
-function getAllLayouts(moderator?: boolean): AtlasLayout[] {
+function getAllLayoutsByMode(moderator: boolean): AtlasLayout[] {
     return moderator
         ? config.layout.layouts.filter(layout => config.layout.modes.moderator.indexOf(layout.name) !== -1)
         : config.layout.layouts.filter(layout => config.layout.modes.default.indexOf(layout.name) !== -1)
 }
 
-function getDefaultLayout(moderator?: boolean, isMobile?: boolean): string {
-    var searchForLayout = getAllLayouts(moderator).filter(layout => isMobile === layout.isMobile || (!isMobile && !layout.isMobile))[0];
+function getAllLayouts(): AtlasLayout[] {
+    return config.layout.layouts;
+}
+
+function getDefaultLayout(moderator: boolean, isMobile?: boolean): string {
+    var searchForLayout = getAllLayoutsByMode(moderator).filter(layout => isMobile === layout.isMobile || (!isMobile && !layout.isMobile))[0];
     return searchForLayout.name;
 }
 
-function getLayout(layoutName: string | null, moderator?: boolean): AtlasLayout {
-    return getAllLayouts(moderator).filter(layout => (!layoutName || layout.name === layoutName))[0];
+function getLayout(layoutName: string | null): AtlasLayout {
+    return getAllLayouts().filter(layout => (!layoutName || layout.name === layoutName))[0];
 }
 
-function getLayoutName(layoutName: string | null, moderator?: boolean, isMobile?: boolean): string {
-    return getLayout(layoutName, moderator).name;
+function getLayoutByName(layoutName: string | null): AtlasLayout {
+    return getAllLayouts().filter(layout => (!layoutName || layout.name === layoutName))[0];
 }
 
-function getCluster(clusterName: string): ClusterConfig {
+function getLayoutName(layoutName: string | null): string {
+    return getLayout(layoutName).name;
+}
+
+function getClusterByName(clusterName: string | undefined): ClusterConfig {
     return config.clusters.filter(cluster => cluster.name === clusterName)[0];
+}
+
+function getClusterByCommunity(community: number): ClusterConfig {
+    return config.clusters.filter(cluster => cluster.community === community)[0];
 }
 
 const config = {
     ...importedJson,
     configVersion,
     json: importedJson,
-    getAllLayouts,
+    getAllLayouts: getAllLayoutsByMode,
     getDefaultLayout,
     getLayout,
     getLayoutName,
-    getCluster,
+    getClusterByName,
+    getClusterByCommunity,
     includedClusters: includedClusters,
     overlayLayouts: overlayLayouts,
     maxEdgesOverrides: maxEdgesOverrides,

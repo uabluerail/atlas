@@ -18,6 +18,8 @@ import { config } from "../common/visualConfig"
 import { getTranslation, getLanguageByName } from "../common/translation";
 import Footer from "./Footer";
 import { useMediaQuery } from 'react-responsive'
+import { Node, Edge, MootNode, Cluster } from "../model";
+import MootsMenu from "./MootsMenu";
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -30,38 +32,6 @@ function usePrevious<T>(value: T): T {
   }, [value]); // Only re-run if value changes
   // Return previous value (happens before update in useEffect above)
   return ref.current;
-}
-
-interface Edge {
-  source: string;
-  target: string;
-  weight: number;
-  ogWeight: number;
-}
-
-interface Node {
-  key: number;
-  size: number;
-  label: string;
-  did: string;
-}
-
-interface MootNode {
-  node: string;
-  label: string;
-  did: string;
-  weight: number;
-}
-
-interface Cluster {
-  label?: string;
-  displayName?: string;
-  idx: string;
-  x?: number;
-  y?: number;
-  color?: string;
-  size: number;
-  positions: { x: number; y: number }[];
 }
 
 function constructEdgeMap(graph: MultiDirectedGraph): Map<string, Edge> {
@@ -92,8 +62,6 @@ function constructNodeMap(graph: MultiDirectedGraph): Map<string, Node> {
   return nodeMap;
 }
 
-
-
 const isLocal = document.location.hostname === "localhost";
 
 const GraphContainer: React.FC<{}> = () => {
@@ -116,7 +84,9 @@ const GraphContainer: React.FC<{}> = () => {
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
   console.log("------------------------ isMobile: " + isMobile);
-  const [currentLayoutName] = React.useState<string>(searchParams.get("layout") ? config.getLayoutName(searchParams.get("layout"), moderator) : config.getDefaultLayout(moderator, isMobile));
+  const [currentLayoutName] = React.useState<string>(searchParams.get("layout")
+    ? config.getLayoutName(searchParams.get("layout"))
+    : config.getDefaultLayout(moderator, isMobile));
   const [currentLanguage, setCurrentLanguage] = React.useState<string>(getLanguageByName(searchParams.get("lang")));
   // const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
@@ -508,85 +478,18 @@ const GraphContainer: React.FC<{}> = () => {
           zIndex: true,
         }}
       >
-        {selectedNode !== null && mootList.length > 0 && (
-          <div className="bg-white shadow rounded-md absolute
-          mobile:overflow-scroll mobile:left-1/2 mobile:top-2 mobile:transform mobile:left-2 mobile:right-2 mobile:w-fit mobile:translate-x-0
-          desktop:overflow-hidden desktop:left-1/2 desktop:top-5 desktop:transform desktop:w-1/3 desktop:left-5 desktop:translate-x-0
-          mt-auto z-50">
-            <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
-              <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
-                <div className="ml-4 mt-2">
-                  <h3 className="text-base font-semibold leading-6 text-gray-900">
-                    {getTranslation('top_moots', currentLanguage)}
-                  </h3>
-                </div>
-                <div className="ml-4 mt-2 flex-shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowMootList(!showMootList);
-                      let newParams: { s?: string; ml?: string } = {
-                        s: `${graph?.getNodeAttribute(selectedNode, "label")}`,
-                      };
-                      if (!showMootList) {
-                        newParams.ml = `${!showMootList}`;
-                      }
-                      setSearchParams(newParams);
-                    }}
-                    className={
-                      `relative inline-flex items-center rounded-md  px-3 py-2 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
-                      (showMootList
-                        ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
-                        : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
-                    }
-                  >
-                    {showMootList ? getTranslation('hide', currentLanguage) : getTranslation('show', currentLanguage)}
-                  </button>
-                </div>
-              </div>
-              <div className="mt-2 max-w-xl text-sm text-gray-500">
-                <p>
-                  {getTranslation('these_are_top_moots_that', currentLanguage)}{" "}
-                  <a
-                    className="font-bold underline-offset-1 underline break-all"
-                    href={`https://bsky.app/profile/${graph?.getNodeAttribute(
-                      selectedNode,
-                      "did"
-                    )}`}
-                    target="_blank"
-                  >
-                    {graph?.getNodeAttribute(selectedNode, "label")}
-                  </a>{" "}
-                  {getTranslation('has_interacted_with', currentLanguage)}.
-                </p>
-              </div>
-            </div>
-            <ul
-              role="list"
-              className="divide-y divide-gray-200 mobile:max-h-40 desktop:max-h-96 md:max-h-screen overflow-auto"
-            >
-              {showMootList &&
-                mootList.slice(0, 10).map((moot) => (
-                  <li key={moot.node} className="px-4 py-3 sm:px-6">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-medium text-gray-900 truncate">
-                        <a
-                          href={`https://bsky.app/profile/${moot.did}`}
-                          target="_blank"
-                        >
-                          {moot.label}
-                        </a>
-                      </div>
-                      <div className="ml-2 flex-shrink-0 flex">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          {moot.weight}
-                        </span>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-            </ul>
-          </div>
+        {selectedNode !== null && mootList.length >= 0 && (
+          <MootsMenu
+            currentLayoutName={currentLayoutName}
+            currentLanguage={currentLanguage}
+            selectedNode={selectedNode}
+            showMootList={showMootList}
+            setShowMootList={setShowMootList}
+            mootList={mootList}
+            setSearchParams={setSearchParams}
+            graph={graph}
+            showHiddenClusters={showHiddenClusters}
+          />
         )}
         {legend && (<Legend
           legend={legend}

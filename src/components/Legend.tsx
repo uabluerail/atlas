@@ -1,6 +1,6 @@
 import { FC, Dispatch, SetStateAction } from "react";
 import { config } from "../common/visualConfig"
-import { getTranslation, languages } from "../common/translation";
+import { getTranslation } from "../common/translation";
 import { GroupLegend, ClusterConfig } from "../../exporter/src/common/model";
 
 interface LegendProps {
@@ -39,7 +39,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
     const buildLegend = (legendGroup: GroupLegend) => {
         const clusterLegends: any[] = [];
         legendGroup.clusters.forEach(clusterName => {
-            const cluster: ClusterConfig = config.getCluster(clusterName);
+            const cluster: ClusterConfig = config.getClusterByName(clusterName);
             const hideCluster = !includedClusters.get(clusterName) //not included in the graph
                 || (hiddenClusters.get(clusterName) && !showHiddenClusters); //hidden when option show all clusters is off
             if (cluster && cluster.legend && !hideCluster) {
