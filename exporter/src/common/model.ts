@@ -68,7 +68,7 @@ interface Cluster {
 
 interface ClusterConfig {
     name: string;
-    label?: string;
+    label?: { [language: string]: string; }
     leader?: string;
     hide?: boolean;
     "hide-label"?: boolean;
@@ -76,12 +76,14 @@ interface ClusterConfig {
     type: string;
     group?: string;
     legend?: {
-        description: string;
-        extra?: string;
-        links?: {
-            title: string;
-            url: string;
-        }[]
+        [language: string]: {
+            description: string;
+            extra?: string;
+            links?: {
+                title: string;
+                url: string;
+            }[]
+        }
     }
 }
 
@@ -91,7 +93,7 @@ interface AtlasSettings {
         configVersion: string;
         topNonRemovableEdges: number;
         maxEdges: number;
-        lang: string;
+        languages: string[];
         rotate: boolean;
         angle: number;
         globus: boolean;
@@ -110,8 +112,12 @@ interface AtlasLegend {
         name: string;
         url: string
     },
-    arrows: string;
-    algo: string;
+    overview: {
+        [language: string]: {
+            arrows: string;
+            algo: string;
+        }
+    }
     legends: {
         name: string;
         groups: GroupLegend[]
@@ -128,7 +134,7 @@ interface AtlasLayoutSettings {
 
 interface AtlasLayout {
     name: string;
-    label: string;
+    label: { [key: string]: string };
     isMobile?: boolean;
     groups: {
         main: LayoutClusterGroup[],
@@ -145,15 +151,21 @@ interface LayoutClusterGroup {
 }
 
 interface GroupLegend {
-    label: string;
+    name: string;
     hide?: boolean;
-    description: string;
     clusters: string[],
-    extras?: string[],
-    links?: {
-        title: string;
-        url: string;
-    }[]
+    legend: {
+        [language: string]: {
+            label: string;
+            description: string;
+            extras?: string[],
+            links?: {
+                title: string;
+                url: string;
+            }[]
+        }
+    }
+
 }
 
 interface ClusterRepPrio {

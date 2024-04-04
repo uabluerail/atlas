@@ -1,11 +1,15 @@
 import { config } from '../../exporter/src/common/config';
 
-var hideClusterLabels: string[] = [];
+let hideClusterLabels: string[] = [];
 
 const knownClusterColorMappings: Map<string, string> = new Map();
 const knownOverlayClusterColorMappings: Map<string, string> = new Map();
 const knownOverlayClusterHideCustomColorMappings: Map<string, string> = new Map();
-const knownClusterNames: Map<string, string> = new Map();
+const knownClusterNames: Map<string, Map<string, string>> = new Map();
+
+for (let lang of config.settings.languages) {
+    knownClusterNames.set(lang, new Map())
+}
 
 for (var cluster of config.clusters) {
     if (!cluster.name) {
@@ -13,7 +17,10 @@ for (var cluster of config.clusters) {
     }
 
     if (cluster.label) {
-        knownClusterNames.set(cluster.name, cluster.label);
+        for (let lang of config.settings.languages) {
+            const translation = knownClusterNames.get(lang)
+            if (translation) translation.set(cluster.name, cluster.label[lang]);
+        }
     }
     if (cluster.color) {
         knownClusterColorMappings.set(cluster.name, cluster.color);

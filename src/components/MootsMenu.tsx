@@ -1,6 +1,6 @@
 import { FC, Dispatch, SetStateAction } from "react";
 import { MultiDirectedGraph } from "graphology";
-import { getTranslation } from "../common/translation";
+import { getTranslation, getValueByLanguage } from "../common/translation";
 import { SetURLSearchParams } from "react-router-dom";
 import { config } from '../common/visualConfig';
 import { MootNode } from "../model";
@@ -46,24 +46,24 @@ const buildClusters = (selectedNode, graph, currentLayoutName, currentLanguage, 
         compiledClusters.push(<p className="mt-2 text-xs">
             {getTranslation('community', currentLanguage)}{": "}
             <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: detailedCluster?.color }}>
-                {detailedCluster.label}
-            </span> - {detailedCluster.legend?.description}
+                {detailedCluster.label && getValueByLanguage(detailedCluster.label, currentLanguage)}
+            </span> - {detailedCluster.legend && getValueByLanguage(detailedCluster.legend, currentLanguage).description}
         </p>)
     }
     if (mainCluster && (!hiddenClusters.get(mainCluster.name) || showHiddenClusters)) {
         compiledClusters.push(<p className="mt-2 text-xs">
             {getTranslation('cluster', currentLanguage)}{": "}
             <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: mainCluster?.color }}>
-                {mainCluster.label}
-            </span> - {mainCluster.legend?.description}
+                {mainCluster.label && getValueByLanguage(mainCluster.label, currentLanguage)}
+            </span> - {mainCluster.legend && getValueByLanguage(mainCluster.legend, currentLanguage).description}
         </p>)
     }
     if (superCluster && (!hiddenClusters.get(superCluster.name) || showHiddenClusters)) {
         compiledClusters.push(<p className="mt-2 text-xs">
             {getTranslation('supercluster', currentLanguage)}{": "}
             <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: superCluster?.color }}>
-                {superCluster.label}
-            </span> - {superCluster.legend?.description}
+                {superCluster.label && getValueByLanguage(superCluster.label, currentLanguage)}
+            </span> - {superCluster.legend && getValueByLanguage(superCluster.legend, currentLanguage).description}
         </p>)
     }
     return <div><p className="max-w-xl text-sm text-gray-500">

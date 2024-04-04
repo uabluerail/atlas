@@ -1,7 +1,7 @@
 import { FC, Fragment } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { getTranslation } from "../common/translation";
+import { getTranslation, getValueByLanguage } from "../common/translation";
 import { config } from '../common/visualConfig';
 
 interface LayoutMenuProps {
@@ -13,20 +13,20 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-function buildMenu(moderator: boolean) {
+function buildMenu(moderator: boolean, currentLanguage: string) {
     const menuItems: any[] = [];
     config.getAllLayouts(moderator).forEach(layout => menuItems.push(
         <Menu.Item>
             {({ active }) => (
                 <a
                     key={layout.name}
-                    href={moderator ? `?moderator=${moderator}&layout=${layout.name}` : `?layout=${layout.name}`}
+                    href={moderator ? `?lang=${currentLanguage}&moderator=${moderator}&layout=${layout.name}` : `?lang=${currentLanguage}&layout=${layout.name}`}
                     className={classNames(
                         active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                         'block px-4 py-2 text-xs'
                     )}
                 >
-                    {layout.label}
+                    {getValueByLanguage(layout.label, currentLanguage)}
                 </a>
 
             )}
@@ -49,7 +49,7 @@ const LayoutMenu: FC<LayoutMenuProps> = ({ moderator, currentLanguage }) => {
             >
                 <Menu.Items className="absolute bottom-5 right-0 z-10 mt-1 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
-                        {buildMenu(moderator)}
+                        {buildMenu(moderator, currentLanguage)}
                     </div>
                 </Menu.Items>
             </Transition>

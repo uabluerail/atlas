@@ -15,7 +15,7 @@ import iwanthue from "iwanthue";
 import Loading from "./Loading";
 import Legend from "./Legend";
 import { config } from "../common/visualConfig"
-import { getTranslation, getLanguageByName } from "../common/translation";
+import { getTranslation, getLanguageOrDefault, getValueByLanguageFromMap } from "../common/translation";
 import Footer from "./Footer";
 import { useMediaQuery } from 'react-responsive'
 import { Node, Edge, MootNode, Cluster } from "../model";
@@ -83,11 +83,11 @@ const GraphContainer: React.FC<{}> = () => {
   const [moderator] = React.useState<boolean>(searchParams.get("moderator") === "true");
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
-  console.log("------------------------ isMobile: " + isMobile);
+
   const [currentLayoutName] = React.useState<string>(searchParams.get("layout")
     ? config.getLayoutName(searchParams.get("layout"))
     : config.getDefaultLayout(moderator, isMobile));
-  const [currentLanguage, setCurrentLanguage] = React.useState<string>(getLanguageByName(searchParams.get("lang")));
+  const [currentLanguage, setCurrentLanguage] = React.useState<string>(getLanguageOrDefault(searchParams.get("lang")));
   // const [showExperimental, setShowExperimental] = React.useState<boolean>(false);
   const [selectedNodeCount, setSelectedNodeCount] = React.useState<number>(-1);
   const [inWeight, setInWeight] = React.useState<number>(-1);
@@ -518,7 +518,7 @@ const GraphContainer: React.FC<{}> = () => {
                 >
                   {config.hideClusterLabels.indexOf(cluster.label) > -1
                     ? ""
-                    : config.knownClusterNames.get(cluster.label)
+                    : getValueByLanguageFromMap(config.knownClusterNames, currentLanguage).get(cluster.label)
                     ?? (cluster.displayName || cluster.label)}
                 </div>
               );

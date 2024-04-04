@@ -1,6 +1,6 @@
 import { FC, Dispatch, SetStateAction } from "react";
 import { config } from "../common/visualConfig"
-import { getTranslation } from "../common/translation";
+import { getTranslation, getValueByLanguage, lang2ToNames } from "../common/translation";
 import { GroupLegend, ClusterConfig } from "../../exporter/src/common/model";
 
 interface LegendProps {
@@ -43,32 +43,37 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
             const hideCluster = !includedClusters.get(clusterName) //not included in the graph
                 || (hiddenClusters.get(clusterName) && !showHiddenClusters); //hidden when option show all clusters is off
             if (cluster && cluster.legend && !hideCluster) {
-                const newLegend = <div>
-                    {cluster.legend.description && <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: cluster.color }}>
-                            {cluster.label}
-                        </span> - {cluster.legend.description}
-                    </p>}
-                    {cluster.legend.extra && <p className="mt-2">
-                        {cluster.legend.extra}
-                    </p>}
-                    {cluster.legend.links && <p className="mt-2 mb-5">
-                        {buildLinks(cluster.legend.links)}
-                    </p>}
-                </div>;
-                clusterLegends.push(newLegend);
+                const legend = getValueByLanguage(cluster.legend, currentLanguage) ?? cluster.legend[config.settings.languages[0]];
+                if (legend) {
+                    const clusterLegend = getValueByLanguage(cluster.legend, currentLanguage);
+                    const newLegend = legend && <div>
+                        {clusterLegend && clusterLegend.description && <p className="mt-2">
+                            <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: cluster.color }}>
+                                {cluster.label && getValueByLanguage(cluster.label, currentLanguage)}
+                            </span> - {legend.description}
+                        </p>}
+                        {legend.extra && <p className="mt-2">
+                            {legend.extra}
+                        </p>}
+                        {legend.links && <p className="mt-2 mb-5">
+                            {buildLinks(legend.links)}
+                        </p>}
+                    </div>;
+                    clusterLegends.push(newLegend);
+                }
             }
         });
+        const legend = getValueByLanguage(legendGroup.legend, currentLanguage) ?? legendGroup.legend[config.settings.languages[0]];
         return <div>
-            <h5 className="text-sm font-semibold leading-10 text-gray-600 mt-2">{legendGroup.label}</h5>
+            <h5 className="text-sm font-semibold leading-10 text-gray-600 mt-2">{legend.label}</h5>
             <p className="mt-2">
-                {legendGroup.description}
+                {legend && legend.description}
             </p>
-            {legendGroup.extras && <p className="mt-2">
-                {buildExtras(legendGroup.extras)}
+            {legend && legend.extras && <p className="mt-2">
+                {buildExtras(legend.extras)}
             </p>}
-            {legendGroup.links && <p className="mt-2 mb-5">
-                {buildLinks(legendGroup.links)}
+            {legend && legend.links && <p className="mt-2 mb-5">
+                {buildLinks(legend.links)}
             </p>}
             {clusterLegends}
         </div>
@@ -135,13 +140,14 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                         {getTranslation('algo', currentLanguage)}
                     </h5>
                     <p className="bg-green-100 text-green-800">
-                        {getTranslation('algo_note', currentLanguage)}
+                        {getTranslation('algo_note', currentLanguage)}{" "}
+                        {getTranslation('available_languages', currentLanguage)}{": "}{lang2ToNames(config.settings.languages)}
                     </p>
-                    {config.legend.arrows && <p className="mt-2">
-                        {config.legend.arrows}
+                    {getValueByLanguage(config.legend.overview, currentLanguage) && getValueByLanguage(config.legend.overview, currentLanguage).arrows && <p className="mt-2">
+                        {getValueByLanguage(config.legend.overview, currentLanguage).arrows}
                     </p>}
-                    {config.legend.algo && <p className="mt-2">
-                        {config.legend.algo}
+                    {getValueByLanguage(config.legend.overview, currentLanguage) && getValueByLanguage(config.legend.overview, currentLanguage).algo && <p className="mt-2">
+                        {getValueByLanguage(config.legend.overview, currentLanguage).algo}
                     </p>}
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         {getTranslation('overview_clusters', currentLanguage)}
