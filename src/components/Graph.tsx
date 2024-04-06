@@ -126,8 +126,8 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   // Moot List State
   const [mootList, setMootList] = React.useState<MootNode[]>([]);
   const [communityList, setCommunityList] = React.useState<MootNode[]>([]);
-  const [showMootList, setShowMootList] = React.useState<boolean>(true);
-  const [showCommunityList, setShowCommunityList] = React.useState<boolean>(true);
+  const [showMootList, setShowMootList] = React.useState<boolean>(searchParams.get("ml") === "true");
+  const [showCommunityList, setShowCommunityList] = React.useState<boolean>(searchParams.get("cl") === "true");
 
   const [avatarURI, setAvatarURI] = React.useState<string>();
   const [edgeMap, setEdgeMap] = React.useState<Map<string, Edge>>(new Map());
@@ -151,6 +151,15 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
     useEffect(() => {
       // Create the graph
       const newGraph = new MultiDirectedGraph();
+
+      async function loginBskyClient() {
+        await bsky.login({
+          identifier: identifier || "",
+          password: password || ""
+        })
+      }
+
+      loginBskyClient();
 
       const hiddenClusters = config.hiddenClusters.get(currentLayoutName) ?? new Map();
       if (graphDump !== null && (graph === null || graphShouldUpdate)) {
@@ -285,17 +294,30 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
       ) {
 
         async function getAvatarURL(node: string) {
-          await bsky.login({
-            identifier: identifier || "",
-            password: password || ""
-          })
           const response = await bsky.getProfile({
             actor: graph?.getNodeAttribute(node, "did")
           });
           setAvatarURI(response.data.avatar);
         }
 
+        async function getAvatarMootsAvatarUrls() {
+          mootList.forEach(async (node) => {
+            const response = await bsky.getProfile({
+              actor: graph?.getNodeAttribute(node, "did")
+            });
+            node.avatarUrl = response.data.avatar;
+          });
+          communityList.forEach(async (node) => {
+            const response = await bsky.getProfile({
+              actor: graph?.getNodeAttribute(node, "did")
+            });
+            node.avatarUrl = response.data.avatar;
+          });
+          setMootList(mootList);
+        }
+
         getAvatarURL(selectedNode);
+        getAvatarMootsAvatarUrls();
 
         // Hide all edges
         graph?.edges().forEach((edge) => {
@@ -356,7 +378,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         setMootList(mootList);
 
         const { detailedCluster } = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
-        const communityList = graph?.filterNodes((_, atts) => {
+        const communityList: MootNode[] = graph?.filterNodes((_, atts) => {
           return atts.community === detailedCluster?.community;
         }).map(key => {
           return {

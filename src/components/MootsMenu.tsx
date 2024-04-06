@@ -27,7 +27,6 @@ const buildClusters = (
     currentLayoutName,
     currentLanguage,
     showHiddenClusters,
-    showMootList,
     setShowMootList,
     showCommunityList,
     setShowCommunityList,
@@ -119,9 +118,11 @@ const MootsMenu: FC<MootsMenuProps> = ({
     graph,
     showHiddenClusters,
     showCommunityList,
-    setShowCommunityList,
+    setShowCommunityList
 }) => {
-    const { detailedCluster, mainCluster, superCluster } = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
+
+    let i = 0;
+    const { detailedCluster } = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
     return (
         <div className="bg-white shadow rounded-md absolute
         mobile:overflow-scroll mobile:left-1/2 mobile:top-2 mobile:transform mobile:left-2 mobile:right-2 mobile:w-fit mobile:translate-x-0
@@ -137,7 +138,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                     <div className="-ml-2 mt-2 max-w-xl text-xs text-gray-500">
                         <p>
                             {avatarURI && <img className="inline-block size-8 rounded-full" src={avatarURI} />}
-                            {" "}
+                            {avatarURI && " "}
                             <a
                                 className="font-bold underline-offset-1 underline break-all"
                                 href={`https://bsky.app/profile/${graph?.getNodeAttribute(
@@ -190,7 +191,6 @@ const MootsMenu: FC<MootsMenuProps> = ({
                     currentLayoutName,
                     currentLanguage,
                     showHiddenClusters,
-                    showMootList,
                     setShowMootList,
                     showCommunityList,
                     setShowCommunityList,
@@ -228,24 +228,32 @@ const MootsMenu: FC<MootsMenuProps> = ({
                 className="divide-y divide-gray-200 mobile:max-h-40 desktop:max-h-96 md:max-h-screen overflow-auto"
             >
                 {showMootList && (
-                    <ol>
-                        <li key='header' className="px-4 py-3 sm:px-6">
-                            <div className="z-50 text-xs  flex items-center justify-between">
-                                <div className="font-medium text-gray-900 truncate">
+                    <div className="table text-xs ml-4 mr-4 mt-2 w-11/12 border-spacing-2">
+                        <div className="table-header-group">
+                            <div className="z-50 table-row flex items-center justify-between">
+                                <div className="table-cell font-medium text-gray-900 truncate">
+                                    {"#"}
+                                </div>
+                                <div className="table-cell font-medium text-gray-900 truncate">
                                     {getTranslation('user', currentLanguage)}
                                 </div>
-                                <div className="ml-2 flex-shrink-0 flex">
+                                <div className="table-cell ml-2 flex-shrink-0 flex">
                                     {getTranslation('interactions_weight', currentLanguage)}
                                 </div>
-                                <div className="ml-2 flex-shrink-0 flex">
+                                <div className="table-cell ml-2 flex-shrink-0 flex">
                                     {getTranslation('node_size', currentLanguage)}
                                 </div>
                             </div>
-                        </li>
+                        </div>
                         {mootList.slice(0, 10).map((moot) => (
-                            <li key={moot.node} className="px-4 py-3 sm:px-6">
-                                <div className="z-50 text-xs flex items-center justify-between">
-                                    <div className="font-medium text-gray-900 truncate">
+                            <div className="table-row-group">
+                                <div className="z-50 table-row flex items-center justify-between">
+                                    <div className="table-cell font-medium text-gray-900 truncate">
+                                        {++i}
+                                    </div>
+                                    <div className="table-cell font-medium text-gray-900 truncate">
+                                        {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
+                                        {moot.avatarUrl && " "}
                                         <a
                                             href={`https://bsky.app/profile/${moot.did}`}
                                             target="_blank"
@@ -253,37 +261,45 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                             {moot.label}
                                         </a>
                                     </div>
-                                    <div className="ml-2 flex-shrink-0 flex">
-                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    <div className="table-cell ml-2 flex-shrink-0 flex">
+                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                             {moot.weight}
                                         </span>
                                     </div>
-                                    <div className="ml-2 flex-shrink-0 flex">
-                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getClusterByCommunity(moot.community).color }}>
+                                    <div className="table-cell ml-2 flex-shrink-0 flex">
+                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getClusterByCommunity(moot.community).color }}>
                                             {moot.size}
                                         </span>
                                     </div>
                                 </div>
-                            </li>
+                            </div>
                         ))}
-                    </ol>
+                    </div>
                 )}
                 {showCommunityList && (
-                    <ol>
-                        <li key='header' className="px-4 py-3 sm:px-6">
-                            <div className="z-50 text-xs flex items-center justify-between">
-                                <div className="font-medium text-gray-900 truncate">
+                    <div className="table text-xs  ml-4 mr-4 mt-2 w-11/12 border-spacing-2">
+                        <div className="table-header-group">
+                            <div className="z-50 table-row flex items-center justify-between">
+                                <div className="table-cell font-medium text-gray-900 truncate">
+                                    {"#"}
+                                </div>
+                                <div className="table-cell font-medium text-gray-900 truncate">
                                     {getTranslation('user', currentLanguage)}
                                 </div>
-                                <div className="ml-2 flex-shrink-0 flex">
+                                <div className="table-cell ml-2 flex-shrink-0 flex">
                                     {getTranslation('node_size', currentLanguage)}
                                 </div>
                             </div>
-                        </li>
+                        </div>
                         {communityList.slice(0, 10).map((moot) => (
-                            <li key={moot.node} className="px-4 py-3 sm:px-6">
-                                <div className="z-50 flex items-center justify-between">
-                                    <div className="text-sm font-medium text-gray-900 truncate">
+                            <div className="table-row-group">
+                                <div className="z-50 table-row flex items-center justify-between">
+                                    <div className="table-cell font-medium text-gray-900 truncate">
+                                        {++i}
+                                    </div>
+                                    <div className="table-cell font-medium text-gray-900 truncate">
+                                        {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
+                                        {moot.avatarUrl && " "}
                                         <a
                                             href={`https://bsky.app/profile/${moot.did}`}
                                             target="_blank"
@@ -291,15 +307,15 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                             {moot.label}
                                         </a>
                                     </div>
-                                    <div className="ml-2 flex-shrink-0 flex">
-                                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getClusterByCommunity(moot.community).color }}>
+                                    <div className="table-cell ml-2 flex-shrink-0 flex">
+                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getClusterByCommunity(moot.community).color }}>
                                             {moot.weight}
                                         </span>
                                     </div>
                                 </div>
-                            </li>
+                            </div>
                         ))}
-                    </ol>
+                    </div>
                 )}
             </ul>
 
