@@ -4,10 +4,12 @@ import forceAtlas2 from "../graphology-layout-forceatlas2/index";
 import circular from "graphology-layout/circular";
 import rotation from 'graphology-layout/rotation';
 import { globusForceCoordinates } from "./util/globus"
+import { AtlasLayout } from "../common/model";
 
 function generateLayout(
     log: (msg: string) => void,
     graph: MultiDirectedGraph,
+    layout: AtlasLayout,
     communitiesGraph: MultiDirectedGraph
 ) {
     log("Assigning layout...");
@@ -68,7 +70,7 @@ function generateLayout(
 
     if (config.settings.rotate) {
         log(`Rotating Force Atlas...`);
-        rotation.assign(graph, config.settings.angle * Math.PI);
+        rotation.assign(graph, (layout.angle ?? config.settings.angle) * Math.PI);
         log("Successfully rotated Atlas");
     }
 }

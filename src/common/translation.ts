@@ -62,7 +62,7 @@ const getValueByLanguage = (translation: { [key: string]: any }, language: strin
 }
 
 const getValueByLanguageFromMap = (translation: Map<string, Map<string, string>>, language: string) => {
-    return translation.get(language) ?? translation.get(getLang2(language))
+    return translation.get(language) ?? translation.get(getLang2(language)) ?? new Map();
 }
 
 const lang2ToNames = (lang2: string[] | null) => {

@@ -1,5 +1,6 @@
 import { MultiDirectedGraph } from "graphology";
 import { config } from "../common/config";
+import { AtlasLayout } from "../common/model";
 
 function filterEdges(
     log: (msg: string) => void,

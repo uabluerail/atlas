@@ -134,6 +134,7 @@ interface AtlasLayoutSettings {
 
 interface AtlasLayout {
     name: string;
+    angle?: number;
     label: { [key: string]: string };
     isMobile?: boolean;
     groups: {
@@ -146,6 +147,9 @@ interface AtlasLayout {
 interface LayoutClusterGroup {
     name: string;
     maxEdges?: number;
+    "hide-label"?: boolean; //default false
+    "hide-overlay-labels"?: boolean; //default true
+    "hide-underlay-labels"?: boolean; //default true
     overlay?: string[],
     underlay?: string[]
 }

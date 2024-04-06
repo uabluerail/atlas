@@ -16,10 +16,10 @@ function classNames(...classes) {
 function buildMenu(moderator: boolean, currentLanguage: string) {
     const menuItems: any[] = [];
     config.getAllLayouts(moderator).forEach(layout => menuItems.push(
-        <Menu.Item>
+        <Menu.Item
+            key={layout.name}>
             {({ active }) => (
                 <a
-                    key={layout.name}
                     href={moderator ? `?lang=${currentLanguage}&moderator=${moderator}&layout=${layout.name}` : `?lang=${currentLanguage}&layout=${layout.name}`}
                     className={classNames(
                         active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',

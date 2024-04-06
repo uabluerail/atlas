@@ -1,4 +1,4 @@
-import { FC, Dispatch, SetStateAction } from "react";
+import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MultiDirectedGraph } from "graphology";
 import { getTranslation, getValueByLanguage } from "../common/translation";
 import { SetURLSearchParams } from "react-router-dom";
@@ -12,6 +12,7 @@ interface MootsMenuProps {
     showMootList: boolean;
     setShowMootList: Dispatch<SetStateAction<boolean>>;
     mootList: MootNode[];
+    avatarURI: string | undefined;
     setSearchParams: SetURLSearchParams;
     graph: MultiDirectedGraph | null;
     showHiddenClusters: boolean;
@@ -78,6 +79,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
     showMootList,
     setShowMootList,
     mootList,
+    avatarURI,
     setSearchParams,
     graph,
     showHiddenClusters
@@ -121,6 +123,8 @@ const MootsMenu: FC<MootsMenuProps> = ({
                 <div className="mt-2 max-w-xl text-sm text-gray-500">
                     <p>
                         {getTranslation('user', currentLanguage)}{" "}
+                        {avatarURI && <img className="inline-block size-8 rounded-full" src={avatarURI} />}
+                        {" "}
                         <a
                             className="font-bold underline-offset-1 underline break-all"
                             href={`https://bsky.app/profile/${graph?.getNodeAttribute(
@@ -131,6 +135,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                         >
                             {graph?.getNodeAttribute(selectedNode, "label")}
                         </a>
+
                     </p>
                 </div>
                 {buildClusters(selectedNode, graph, currentLayoutName, currentLanguage, showHiddenClusters)}

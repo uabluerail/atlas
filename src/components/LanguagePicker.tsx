@@ -17,10 +17,9 @@ function buildMenu(currentLanguage: string, setCurrentLanguage: Dispatch<SetStat
     getPickerLanguages()
         .filter(language => language.lang !== currentLanguage)
         .forEach(language => menuItems.push(
-            <Menu.Item>
+            <Menu.Item key={language.lang}>
                 {({ active }) => (
                     <a
-                        key={language.lang}
                         className={classNames(
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                             'block px-4 py-2 text-xs'

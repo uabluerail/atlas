@@ -20,6 +20,14 @@ import Footer from "./Footer";
 import { useMediaQuery } from 'react-responsive'
 import { Node, Edge, MootNode, Cluster } from "../model";
 import MootsMenu from "./MootsMenu";
+import { BskyAgent } from '@atproto/api'
+
+const bsky = new BskyAgent({
+  service: 'https://bsky.social'
+})
+
+const password = process.env.BSKY_APP_PASSWORD
+const identifier = process.env.BSKY_IDENTIFIER
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -64,7 +72,11 @@ function constructNodeMap(graph: MultiDirectedGraph): Map<string, Node> {
 
 const isLocal = document.location.hostname === "localhost";
 
-const GraphContainer: React.FC<{}> = () => {
+interface GraphProps {
+  fetchURL: (currentLayoutName: string) => string;
+}
+
+const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   // Router info
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -115,6 +127,7 @@ const GraphContainer: React.FC<{}> = () => {
   const [mootList, setMootList] = React.useState<MootNode[]>([]);
   const [showMootList, setShowMootList] = React.useState<boolean>(true);
 
+  const [avatarURI, setAvatarURI] = React.useState<string>();
   const [edgeMap, setEdgeMap] = React.useState<Map<string, Edge>>(new Map());
   const [nodeMap, setNodeMap] = React.useState<Map<string, Node>>(new Map());
 
@@ -128,6 +141,10 @@ const GraphContainer: React.FC<{}> = () => {
     const loadGraph = useLoadGraph();
     const registerEvents = useRegisterEvents();
     const { sigma, container } = useSigmaContext();
+
+    useEffect(() => {
+      document.title = getTranslation('title', currentLanguage);
+    }, []);
 
     useEffect(() => {
       // Create the graph
@@ -164,15 +181,10 @@ const GraphContainer: React.FC<{}> = () => {
         for (const community in communityClusters) {
           const cluster = communityClusters[community];
           if (cluster.label !== undefined) {
-            cluster.color =
-              // knownClusterColorMappings.get(cluster.label) ?? palette.pop();
-
-              config.knownOverlayClusterColorMappings.get(cluster.label)
-                ? useSubclusterOverlay
-                  ? config.knownOverlayClusterColorMappings.get(cluster.label)
-                  : config.knownOverlayClusterHideCustomColorMappings.get(cluster.label)
-                : config.knownClusterColorMappings.get(cluster.label)
-                ?? palette.pop();
+            cluster.color = config.knownOverlayClusterColorMappings.get(cluster.label) && useSubclusterOverlay
+              ? config.knownOverlayClusterColorMappings.get(cluster.label) //use overlay color
+              : config.knownClusterColorMappings.get(cluster.label) //use normal color
+              ?? palette.pop();
           } else {
             cluster.color = palette.pop();
           }
@@ -269,6 +281,20 @@ const GraphContainer: React.FC<{}> = () => {
         (selectedNode !== previousSelectedNode ||
           showSecondDegreeNeighbors !== previousSecondDegreeNeighbors)
       ) {
+
+        async function getAvatarURL(node: string) {
+          await bsky.login({
+            identifier: identifier || "",
+            password: password || ""
+          })
+          const response = await bsky.getProfile({
+            actor: graph?.getNodeAttribute(node, "did")
+          });
+          setAvatarURI(response.data.avatar);
+        }
+
+        getAvatarURL(selectedNode);
+
         // Hide all edges
         graph?.edges().forEach((edge) => {
           graph?.setEdgeAttribute(edge, "hidden", true);
@@ -436,9 +462,7 @@ const GraphContainer: React.FC<{}> = () => {
   };
 
   async function fetchGraph() {
-    let fetchURL = `./exporter/out/${currentLayoutName}_layout.json`;
-
-    const textGraph = await fetch(fetchURL);
+    const textGraph = await fetch(fetchURL(currentLayoutName));
     const responseJSON = await textGraph.json();
     setGraphDump(responseJSON);
   }
@@ -486,6 +510,7 @@ const GraphContainer: React.FC<{}> = () => {
             showMootList={showMootList}
             setShowMootList={setShowMootList}
             mootList={mootList}
+            avatarURI={avatarURI}
             setSearchParams={setSearchParams}
             graph={graph}
             showHiddenClusters={showHiddenClusters}
@@ -516,7 +541,7 @@ const GraphContainer: React.FC<{}> = () => {
                     zIndex: 3,
                   }}
                 >
-                  {config.hideClusterLabels.indexOf(cluster.label) > -1
+                  {config.hideClusterLabels.get(currentLayoutName)?.get(cluster.label)
                     ? ""
                     : getValueByLanguageFromMap(config.knownClusterNames, currentLanguage).get(cluster.label)
                     ?? (cluster.displayName || cluster.label)}
