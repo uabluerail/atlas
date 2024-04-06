@@ -125,7 +125,9 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
 
   // Moot List State
   const [mootList, setMootList] = React.useState<MootNode[]>([]);
+  const [communityList, setCommunityList] = React.useState<MootNode[]>([]);
   const [showMootList, setShowMootList] = React.useState<boolean>(true);
+  const [showCommunityList, setShowCommunityList] = React.useState<boolean>(true);
 
   const [avatarURI, setAvatarURI] = React.useState<string>();
   const [edgeMap, setEdgeMap] = React.useState<Map<string, Edge>>(new Map());
@@ -337,6 +339,8 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
                 source === selectedNode ? targetAttrs.did : sourceAttrs.did;
               acc.push({
                 node: key,
+                size: graph?.getNodeAttribute(key, "size"),
+                community: graph?.getNodeAttribute(key, "community"),
                 weight: weight,
                 label: label,
                 did: did,
@@ -350,6 +354,25 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         mootList.sort((a, b) => b.weight - a.weight);
 
         setMootList(mootList);
+
+        const { detailedCluster } = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
+        const communityList = graph?.filterNodes((_, atts) => {
+          return atts.community === detailedCluster?.community;
+        }).map(key => {
+          return {
+            node: key,
+            size: graph?.getNodeAttribute(key, "size"),
+            community: graph?.getNodeAttribute(key, "community"),
+            weight: graph?.getNodeAttribute(key, "size"),
+            label: graph?.getNodeAttribute(key, "label"),
+            did: graph?.getNodeAttribute(key, "did"),
+          }
+        }
+        );
+
+        communityList.sort((a, b) => b.weight - a.weight);
+
+        setCommunityList(communityList);
 
         // Re-color all nodes connected to selected node
         graph?.forEachNeighbor(selectedNode, (node, attrs) => {
@@ -432,11 +455,14 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
       registerEvents({
         clickNode: (event: any) => {
           const nodeLabel = graph?.getNodeAttribute(event.node, "label");
-          let newParams: { s?: string; ml?: string } = {
+          let newParams: { s?: string; ml?: string; cl?: string } = {
             s: `${nodeLabel}`,
           };
           if (showMootList) {
             newParams.ml = `${showMootList}`;
+          }
+          if (showCommunityList) {
+            newParams.cl = `${showCommunityList}`;
           }
           setSearchParams(newParams);
         },
@@ -510,10 +536,13 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
             showMootList={showMootList}
             setShowMootList={setShowMootList}
             mootList={mootList}
+            communityList={communityList}
             avatarURI={avatarURI}
             setSearchParams={setSearchParams}
             graph={graph}
             showHiddenClusters={showHiddenClusters}
+            showCommunityList={showCommunityList}
+            setShowCommunityList={setShowCommunityList}
           />
         )}
         {legend && (<Legend

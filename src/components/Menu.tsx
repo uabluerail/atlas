@@ -60,7 +60,7 @@ const Menu: FC<MenuProps> = ({
         <div className="
         mobile:bottom-12 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
         desktop:left-1/2 desktop:bottom-12 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
-         z-50 fixed">
+         z-40 fixed">
             <div className="bg-white shadow sm:rounded-lg py-1">
                 <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
                     <div className="flex flex-col items-baseline bg-white text-center">

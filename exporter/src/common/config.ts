@@ -117,6 +117,31 @@ function getClusterByCommunity(community: number): ClusterConfig {
     return config.clusters.filter(cluster => cluster.community === community)[0];
 }
 
+function identifyClusters(community: number, currentLayoutName: string) {
+    const clusterByCommunity = config.getClusterByCommunity(community);
+    const clusterByCommunityLayout = config.getLayout(currentLayoutName).groups.main
+        .filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity.name) != -1)[0]
+        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity.name) != -1)[0];
+    const mainClusterByDetailedName = config.getLayout(currentLayoutName).groups.main
+        .filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0]?.name
+        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0]?.name;
+    const clusterByLayoutName = config.getLayout(currentLayoutName).groups.main
+        .filter(group => group.name === clusterByCommunity.name)[0]?.name
+        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.name === clusterByCommunity.name)[0]?.name;
+    const superClusterOnlyName = clusterByCommunityLayout?.underlay;
+    const mainCluster = mainClusterByDetailedName ? config.getClusterByName(mainClusterByDetailedName)
+        : superClusterOnlyName ? undefined
+            : config.getClusterByName(clusterByLayoutName);
+    const superClusterByMain = config.getLayout(currentLayoutName).groups.main
+        .filter(group => group.underlay && group.name === mainCluster?.name)[0]?.underlay
+        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.underlay && group.name === mainCluster?.name)[0]?.underlay;
+    const superCluster = superClusterOnlyName
+        ? config.getClusterByName(superClusterOnlyName[0])
+        : config.getClusterByName(superClusterByMain && superClusterByMain[0]);
+    const detailedCluster = mainClusterByDetailedName !== undefined ? clusterByCommunity : undefined;
+    return { detailedCluster, mainCluster, superCluster }
+}
+
 const config = {
     ...importedJson,
     configVersion,
@@ -127,6 +152,7 @@ const config = {
     getLayoutName,
     getClusterByName,
     getClusterByCommunity,
+    identifyClusters,
     includedClusters: includedClusters,
     overlayLayouts: overlayLayouts,
     maxEdgesOverrides: maxEdgesOverrides,

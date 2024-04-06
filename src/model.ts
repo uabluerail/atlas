@@ -14,6 +14,8 @@ interface Node {
 
 interface MootNode {
     node: string;
+    size: number;
+    community: number;
     label: string;
     did: string;
     weight: number;

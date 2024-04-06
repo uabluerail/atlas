@@ -67,6 +67,7 @@ interface Cluster {
 }
 
 interface ClusterConfig {
+    community: number;
     name: string;
     label?: { [language: string]: string; }
     leader?: string;
