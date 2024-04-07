@@ -48,7 +48,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                     const clusterLegend = getValueByLanguage(cluster.legend, currentLanguage);
                     const newLegend = legend && <div>
                         {clusterLegend && clusterLegend.description && <p className="mt-2">
-                            <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: cluster.color }}>
+                            <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: cluster.color }}>
                                 {cluster.label && getValueByLanguage(cluster.label, currentLanguage)}
                             </span> - {legend.description}
                         </p>}

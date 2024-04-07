@@ -142,6 +142,15 @@ function identifyClusters(community: number, currentLayoutName: string) {
     return { detailedCluster, mainCluster, superCluster }
 }
 
+function getNodeColor(community: number, currentLayoutName: string, useSubclusterOverlay: boolean): string {
+    const { detailedCluster, mainCluster, superCluster } = identifyClusters(community, currentLayoutName);
+    if (useSubclusterOverlay && detailedCluster) {
+        return detailedCluster.color;
+    } else {
+        return mainCluster?.color ?? superCluster.color;
+    }
+}
+
 const config = {
     ...importedJson,
     configVersion,
@@ -153,6 +162,7 @@ const config = {
     getClusterByName,
     getClusterByCommunity,
     identifyClusters,
+    getNodeColor,
     includedClusters: includedClusters,
     overlayLayouts: overlayLayouts,
     maxEdgesOverrides: maxEdgesOverrides,

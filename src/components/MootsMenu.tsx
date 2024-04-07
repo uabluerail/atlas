@@ -1,4 +1,4 @@
-import { FC, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { FC, Dispatch, SetStateAction } from "react";
 import { MultiDirectedGraph } from "graphology";
 import { getTranslation, getValueByLanguage } from "../common/translation";
 import { SetURLSearchParams } from "react-router-dom";
@@ -19,6 +19,7 @@ interface MootsMenuProps {
     showHiddenClusters: boolean;
     showCommunityList: boolean
     setShowCommunityList: Dispatch<SetStateAction<boolean>>;
+    useSubclusterOverlay: boolean;
 }
 
 const buildClusters = (
@@ -41,7 +42,7 @@ const buildClusters = (
             <span className="font-bold">
                 {getTranslation('supercluster', currentLanguage)}{": "}
             </span>
-            <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: superCluster?.color }}>
+            <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: superCluster?.color }}>
                 {superCluster.label && getValueByLanguage(superCluster.label, currentLanguage)}
             </span> - {superCluster.legend && getValueByLanguage(superCluster.legend, currentLanguage).description}
         </p>)
@@ -51,7 +52,7 @@ const buildClusters = (
             <span className="font-bold">
                 {getTranslation('cluster', currentLanguage)}{": "}
             </span>
-            <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: mainCluster?.color }}>
+            <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: mainCluster?.color }}>
                 {mainCluster.label && getValueByLanguage(mainCluster.label, currentLanguage)}
             </span> - {mainCluster.legend && getValueByLanguage(mainCluster.legend, currentLanguage).description}
         </p>)
@@ -64,7 +65,7 @@ const buildClusters = (
                         <span className="font-bold">
                             {getTranslation('community', currentLanguage)}{": "}
                         </span>
-                        <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: detailedCluster?.color }}>
+                        <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: detailedCluster?.color }}>
                             {detailedCluster.label && getValueByLanguage(detailedCluster.label, currentLanguage)}
                         </span> - {detailedCluster.legend && getValueByLanguage(detailedCluster.legend, currentLanguage).description}
                     </p>
@@ -118,7 +119,8 @@ const MootsMenu: FC<MootsMenuProps> = ({
     graph,
     showHiddenClusters,
     showCommunityList,
-    setShowCommunityList
+    setShowCommunityList,
+    useSubclusterOverlay
 }) => {
 
     let i = 0;
@@ -267,7 +269,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                         </span>
                                     </div>
                                     <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getClusterByCommunity(moot.community).color }}>
+                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay) }}>
                                             {moot.size}
                                         </span>
                                     </div>
@@ -308,7 +310,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                         </a>
                                     </div>
                                     <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getClusterByCommunity(moot.community).color }}>
+                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay) }}>
                                             {moot.weight}
                                         </span>
                                     </div>

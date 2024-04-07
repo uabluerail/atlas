@@ -565,6 +565,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
             showHiddenClusters={showHiddenClusters}
             showCommunityList={showCommunityList}
             setShowCommunityList={setShowCommunityList}
+            useSubclusterOverlay={useSubclusterOverlay}
           />
         )}
         {legend && (<Legend
