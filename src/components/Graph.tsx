@@ -192,8 +192,8 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         for (const community in communityClusters) {
           const cluster = communityClusters[community];
           if (cluster.label !== undefined) {
-            cluster.color = config.knownOverlayClusterColorMappings.get(cluster.label) && useSubclusterOverlay
-              ? config.knownOverlayClusterColorMappings.get(cluster.label) //use overlay color
+            cluster.color = useSubclusterOverlay
+              ? (config.knownOverlayClusterColorMappings.get(cluster.label) ?? "#f0f0f0") //use overlay color
               : config.knownClusterColorMappings.get(cluster.label) //use normal color
               ?? palette.pop();
           } else {

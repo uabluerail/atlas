@@ -43,6 +43,10 @@ for (var cluster of config.clusters) {
         //err
     }
 
+    if (cluster.name == 'ua-yellow') {
+        knownOverlayClusterColorMappings.set(cluster.name, "#88b087");
+    }
+
     if (cluster.label) {
         for (let lang of config.settings.languages) {
             const translation = knownClusterNames.get(lang)

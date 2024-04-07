@@ -59,7 +59,7 @@ const buildClusters = (
     }
     if (detailedCluster && (!hiddenClusters.get(detailedCluster.name) || showHiddenClusters)) {
         compiledClusters.push(
-            <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between">
+            <div className="-ml-4 mt-2">
                 <div className="ml-4 mt-2">
                     <p className="mt-2 text-xs">
                         <span className="font-bold">
