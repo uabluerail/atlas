@@ -2492,6 +2492,11 @@ prop-types@^15.6.1, prop-types@^15.7.2:
     object-assign "^4.1.1"
     react-is "^16.13.1"
 
+proto@*:
+  version "1.0.19"
+  resolved "https://registry.yarnpkg.com/proto/-/proto-1.0.19.tgz#4dba250b34398ae242de24153e7bf9dab2fe4385"
+  integrity sha512-NNRn4T3FAcMbiRZAr6HlAP3PyqSv79bcYdfiZbY1nognRTVeGAd5Ncg4yHZdM2ey9ovP/sOg/0lfalvaj3ZpHA==
+
 punycode@^2.1.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.3.1.tgz#027422e2faec0b25e1549c3e1bd8309b9133b6e5"
@@ -2998,6 +3003,13 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==
+
+xolor@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/xolor/-/xolor-1.2.0.tgz#861c6bbd25897770b4ecdb9e03ffbeb64288f009"
+  integrity sha512-CntGPdZJ8i2HPLrNnz32UnZbGvJcLm7mfUqYgLOPGKrRHzKelZzE/IXewXX9n2OP8X53VdRvVtUdAIHLPpE6cw==
+  dependencies:
+    proto "*"
 
 yallist@^3.0.2:
   version "3.1.1"

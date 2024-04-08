@@ -16,7 +16,7 @@ const buildLinks = (links: {
     url: string;
 }[]) => {
     const compiledLinks: any[] = [];
-    links.forEach(link => compiledLinks.push(<p className="mt-2">
+    links.forEach(link => compiledLinks.push(<p className="mt-0">
         <a
             href={link.url}
             target="_blank"
@@ -47,15 +47,19 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                 if (legend) {
                     const clusterLegend = getValueByLanguage(cluster.legend, currentLanguage);
                     const newLegend = legend && <div>
-                        {clusterLegend && clusterLegend.description && <p className="mt-2">
-                            <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: cluster.color }}>
+                        {clusterLegend && clusterLegend.description && <p className="mt-4">
+                            <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full"
+                                style={{
+                                    backgroundColor: cluster.color,
+                                    color: config.getContrastColor(cluster.color)
+                                }}>
                                 {cluster.label && getValueByLanguage(cluster.label, currentLanguage)}
                             </span> - {legend.description}
                         </p>}
-                        {legend.extra && <p className="mt-2">
+                        {legend.extra && <p className="mt-0">
                             {legend.extra}
                         </p>}
-                        {legend.links && <p className="mt-2 mb-5">
+                        {legend.links && <p className="mt-0 mb-5">
                             {buildLinks(legend.links)}
                         </p>}
                     </div>;
@@ -69,10 +73,10 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
             <p className="mt-2">
                 {legend && legend.description}
             </p>
-            {legend && legend.extras && <p className="mt-2">
+            {legend && legend.extras && <p className="mt-0">
                 {buildExtras(legend.extras)}
             </p>}
-            {legend && legend.links && <p className="mt-2 mb-5">
+            {legend && legend.links && <p className="mt-0 mb-5">
                 {buildLinks(legend.links)}
             </p>}
             {clusterLegends}
@@ -95,12 +99,12 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
     });
 
     return (
-        <div className="overflow-scroll bg-white shadow sm:rounded-md absolute transform
-    mobile:left-1/2 mobile:top-2 mobile:left-2 mobile:right-2 mobile:w-fit mobile:h-1/2
+        <div className="overflow-scroll bg-white shadow desktop:rounded-md absolute transform
+    mobile:left-1/2 mobile:top-1 mobile:left-1 mobile:right-1 mobile:w-fit mobile:h-3/5
     desktop:right-1/2 desktop:top-5 desktop:right-5 desktop:w-3/7 desktop:h-1/2
     translate-x-0 mt-auto z-50">
-            <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
-                <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between sm:flex-nowrap">
+            <div className="border-b border-gray-200 bg-white px-3 py-3 desktop:px-6">
+                <div className="-ml-4 -mt-2 flex flex-wrap items-center justify-between desktop:flex-nowrap">
                     <div className="ml-4 mt-2">
                         <h3 className="text-base font-semibold leading-6 text-gray-900">
                             {getTranslation('clusters_legend', currentLanguage)}
@@ -113,13 +117,12 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                                 setLegend(!legend);
                             }}
                             className={
-                                `relative inline-flex items-center rounded-md  px-3 py-2 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
-                                (legend
-                                    ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
-                                    : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
+                                `relative inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+
+                                " bg-gray-500 hover:bg-gray-600 focus-visible:ring-green-500"
                             }
                         >
-                            {legend ? getTranslation('hide', currentLanguage) : getTranslation('show', currentLanguage)}
+                            x
                         </button>
                     </div>
                 </div>

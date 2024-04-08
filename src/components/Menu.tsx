@@ -15,6 +15,7 @@ interface MenuProps {
     showMootList: boolean;
     currentLayoutName: string;
     currentLanguage: string;
+    searchParams: URLSearchParams;
     setSearchParams: SetURLSearchParams;
     setLoading: Dispatch<SetStateAction<boolean>>;
     useSubclusterOverlay: boolean;
@@ -40,6 +41,7 @@ const Menu: FC<MenuProps> = ({
     showMootList,
     currentLayoutName,
     currentLanguage,
+    searchParams,
     setSearchParams,
     setLoading,
     useSubclusterOverlay,
@@ -58,45 +60,43 @@ const Menu: FC<MenuProps> = ({
     const hiddenClusters = config.hiddenClusters.get(currentLayoutName);
     return (
         <div className="
-        mobile:bottom-12 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
-        desktop:left-1/2 desktop:bottom-12 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
+        xs:bottom-5 mobile:bottom-12 mobile:left-0 mobile:right-0 mobile:w-fit mobile:h-3/7 mobile:transform mobile:translate-x-0
+        desktop:left-1/2 desktop:bottom-14 desktop:transform desktop:-translate-x-1/2 desktop:w-fit
          z-40 fixed">
-            <div className="bg-white shadow sm:rounded-lg py-1">
+            <div className="bg-white shadow desktop:rounded-lg py-1">
                 <dl className="mx-auto grid gap-px bg-gray-900/5 grid-cols-2">
                     <div className="flex flex-col items-baseline bg-white text-center">
-                        <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
-                            <span className="hidden lg:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('users', currentLanguage)}
+                        <dt className="desktop:text-sm text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
+                            <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('users', currentLanguage)}
                         </dt>
-                        <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
+                        <dd className="desktop:text-3xl xs:-mt-2 mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                             {selectedNodeCount >= 0
                                 ? selectedNodeCount.toLocaleString()
                                 : userCount.toLocaleString()}
                         </dd>
                     </div>
                     <div className="flex flex-col items-baseline bg-white text-center">
-                        <dt className="text-sm font-medium leading-6 text-gray-500 ml-auto mr-auto mt-2">
-                            <span className="hidden lg:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('interactions', currentLanguage)}
+                        <dt className="desktop:text-sm text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
+                            <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('interactions', currentLanguage)}
                         </dt>
-                        <dd className="lg:text-3xl mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
+                        <dd className="desktop:text-3xl xs:-mt-2 mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
                             {selectedNodeEdges
                                 ? selectedNodeEdges.length.toLocaleString()
                                 : edgeCount.toLocaleString()}
                         </dd>
                     </div>
                 </dl>
-                <div className="px-2 py-2 sm:p-2 w-fit ml-auto mr-auto mt-0 grid grid-flow-row-dense grid-cols-3 ">
-                    <div className="col-span-2 mt-auto mb-auto ">
+                <div className="px-2 py-2 desktop:p-2 w-fit ml-auto mr-auto mt-0 grid grid-flow-row-dense grid-cols-3 ">
+                    <div className="col-span-2 xs:-mt-3 xs:-ml-1 mb-auto ">
                         <CustomSearch
                             currentLanguage={currentLanguage}
                             onLocate={(node) => {
                                 const nodeLabel = graph?.getNodeAttribute(node, "label");
-                                let newParams: { s?: string; ml?: string } = {
-                                    s: `${nodeLabel}`,
-                                };
+                                searchParams.set('s', `${nodeLabel}`)
                                 if (showMootList) {
-                                    newParams.ml = `${showMootList}`;
+                                    searchParams.set('ml', `${showMootList}`);
                                 }
-                                setSearchParams(newParams);
+                                setSearchParams(searchParams);
                             }}
                         />
                         {config.overlayLayouts.get(currentLayoutName) && <div className="flex flex-row mt-1">
@@ -107,16 +107,22 @@ const Menu: FC<MenuProps> = ({
                                     type="checkbox"
                                     className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                                     checked={useSubclusterOverlay}
-                                    onChange={() => { setLoading(true); setUseSubclusterOverlay(!useSubclusterOverlay); setGraphShouldUpdate(true); }}
+                                    onChange={() => {
+                                        searchParams.set('sc', !useSubclusterOverlay ? "true" : "false")
+                                        setSearchParams(searchParams);
+                                        setUseSubclusterOverlay(!useSubclusterOverlay);
+                                        setLoading(true);
+                                        setGraphShouldUpdate(true);
+                                    }}
                                 />
                             </div>
-                            <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                            <div className="desktop:text-sm flex text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
                                 <label
                                     htmlFor="clusterLabels"
                                     className="font-medium text-gray-900"
                                 >
-                                    {getTranslation('show_communities', currentLanguage)}{" "}<span className="hidden md:inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
-                                    <span className="md:hidden">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                    {getTranslation('show_communities', currentLanguage)}{" "}<span className="hidden desktop:inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                    <span className="desktop:hidden">{getTranslation('graph_will_refresh', currentLanguage)}</span>
                                 </label>
                             </div>
                         </div>}
@@ -131,7 +137,7 @@ const Menu: FC<MenuProps> = ({
                       onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && showHiddenClusters) { setLoading(true); setShowHiddenClusters(false); setGraphShouldUpdate(true); } }}
                     />
                   </div>
-                  <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                  <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
                     <label
                       htmlFor="clusterLabels"
                       className="font-medium text-gray-500"
@@ -151,19 +157,18 @@ const Menu: FC<MenuProps> = ({
                                         onChange={() => { setLoading(true); setShowHiddenClusters(!showHiddenClusters); setGraphShouldUpdate(true); }}
                                     />
                                 </div>
-                                <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto">
+                                <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
                                     <label
                                         htmlFor="clusterLabels"
                                         className="font-medium text-gray-900"
                                     >
-                                        {getTranslation('show_hidden_clusters', currentLanguage)}{" "}<span className="hidden md:inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
-                                        <span className="md:hidden">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                        {getTranslation('show_hidden_clusters', currentLanguage)}{" "}<span className="hidden desktop:inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
                                     </label>
                                 </div>
                             </div>
                         </div>}
                     </div>
-                    <div className="relative flex gap-x-3 ml-4 w-full flex-col">
+                    <div className="relative flex gap-x-3 ml-4 xs:-mt-4 xs:-ml-2 w-full flex-col">
                         <div className="flex flex-row">
                             <div className="flex h-6 items-center mt-auto mb-auto">
                                 <input
@@ -177,13 +182,12 @@ const Menu: FC<MenuProps> = ({
                                     }
                                 />
                             </div>
-                            <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
+                            <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
                                 <label
                                     htmlFor="neighbors"
                                     className="font-medium text-gray-900"
                                 >
-                                    {getTranslation('interactions', currentLanguage)}{" "}<span className="hidden md:inline">{getTranslation('of_friends', currentLanguage)}</span>
-                                    <span className="md:hidden">{getTranslation('of_friends', currentLanguage)}</span>
+                                    {getTranslation('interactions', currentLanguage)}{" "}<span className="hidden desktop:inline">{getTranslation('of_friends', currentLanguage)}</span>
                                 </label>
                             </div>
                         </div>
@@ -198,13 +202,12 @@ const Menu: FC<MenuProps> = ({
                                     onChange={() => setShowClusterLabels(!showClusterLabels)}
                                 />
                             </div>
-                            <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
+                            <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
                                 <label
                                     htmlFor="clusterLabels"
                                     className="font-medium text-gray-900"
                                 >
-                                    {getTranslation('labels', currentLanguage)}{" "}<span className="hidden md:inline">{getTranslation('of_clusters', currentLanguage)}</span>
-                                    <span className="md:hidden">{getTranslation('of_clusters', currentLanguage)}</span>
+                                    {getTranslation('labels', currentLanguage)}{" "}<span className="hidden desktop:inline">{getTranslation('of_clusters', currentLanguage)}</span>
                                 </label>
                             </div>
                         </div>
@@ -219,18 +222,23 @@ const Menu: FC<MenuProps> = ({
                                     onChange={() => setLegend(!legend)}
                                 />
                             </div>
-                            <div className="flex md:text-sm text-xs leading-6 pl-1 md:pl-3 mb-auto mt-auto mr-2">
+                            <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
                                 <label
                                     htmlFor="clusterLabels"
                                     className="font-medium text-gray-900"
                                 >
-                                    {getTranslation('more_details', currentLanguage)}{" "}<span className="hidden md:inline">{getTranslation('on_clusters', currentLanguage)}</span>
-                                    <span className="md:hidden">{getTranslation('on_clusters', currentLanguage)}</span>
+                                    {getTranslation('more_details', currentLanguage)}{" "}<span className="hidden desktop:inline">{getTranslation('on_clusters', currentLanguage)}</span>
                                 </label>
                             </div>
                         </div>
                         <div className="flex flex-row">
-                            <LayoutMenu moderator={moderator} currentLanguage={currentLanguage} />
+                            <LayoutMenu
+                                setLoading={setLoading}
+                                setGraphShouldUpdate={setGraphShouldUpdate}
+                                searchParams={searchParams}
+                                setSearchParams={setSearchParams}
+                                moderator={moderator}
+                                currentLanguage={currentLanguage} />
                         </div>
                     </div>
                 </div>

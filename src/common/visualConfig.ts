@@ -1,4 +1,5 @@
 import { config } from '../../exporter/src/common/config';
+import xolor from 'xolor';
 
 let hideClusterLabels: Map<string, Map<string, boolean>> = new Map();
 
@@ -43,10 +44,6 @@ for (var cluster of config.clusters) {
         //err
     }
 
-    if (cluster.name == 'ua-yellow') {
-        knownOverlayClusterColorMappings.set(cluster.name, "#88b087");
-    }
-
     if (cluster.label) {
         for (let lang of config.settings.languages) {
             const translation = knownClusterNames.get(lang)
@@ -69,8 +66,19 @@ for (var cluster of config.clusters) {
     // }
 }
 
+const getContrastColor = (color: string | undefined): string => {
+    if (!color) {
+        return "#000000";
+    }
+
+    const c = xolor(color);
+    const brightness = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+    return brightness >= 128 ? "#000000" : "#ffffff";
+}
+
 const clusterVisualConfig = {
     ...config,
+    getContrastColor,
     hideClusterLabels: hideClusterLabels,
     hiddenClusters: config.hiddenClusters,
     knownClusterNames: knownClusterNames,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { SetStateAction, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MultiDirectedGraph } from "graphology";
 import Menu from "./Menu";
@@ -20,14 +20,6 @@ import Footer from "./Footer";
 import { useMediaQuery } from 'react-responsive'
 import { Node, Edge, MootNode, Cluster } from "../model";
 import MootsMenu from "./MootsMenu";
-import { BskyAgent } from '@atproto/api'
-
-const bsky = new BskyAgent({
-  service: 'https://bsky.social'
-})
-
-const password = process.env.BSKY_APP_PASSWORD
-const identifier = process.env.BSKY_IDENTIFIER
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -95,6 +87,8 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   const [moderator] = React.useState<boolean>(searchParams.get("moderator") === "true");
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const [accessJwt, setAccessJwt] = React.useState<string>("");
+  const [refreshJwt, setRefreshJwt] = React.useState<string>("");
 
   const [currentLayoutName] = React.useState<string>(searchParams.get("layout")
     ? config.getLayoutName(searchParams.get("layout"))
@@ -107,6 +101,8 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   const [selectedNodeEdges, setSelectedNodeEdges] = React.useState<
     string[] | null
   >(null);
+  const [useSubclusterOverlay, setUseSubclusterOverlay] =
+    React.useState<boolean>(searchParams.get("sc") === "true");
   const [showSecondDegreeNeighbors, setShowSecondDegreeNeighbors] =
     React.useState<boolean>(false);
 
@@ -116,6 +112,9 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   const previousSecondDegreeNeighbors: boolean = usePrevious<boolean>(
     showSecondDegreeNeighbors
   );
+  const previousUseSubclusterOverlay: boolean = usePrevious<boolean>(
+    useSubclusterOverlay
+  )
 
   // Graph State
   const [graph, setGraph] = React.useState<MultiDirectedGraph | null>(null);
@@ -125,6 +124,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
 
   // Moot List State
   const [mootList, setMootList] = React.useState<MootNode[]>([]);
+  const [selectedCommunity, setSelectedCommunity] = React.useState<string>();
   const [communityList, setCommunityList] = React.useState<MootNode[]>([]);
   const [showMootList, setShowMootList] = React.useState<boolean>(searchParams.get("ml") === "true");
   const [showCommunityList, setShowCommunityList] = React.useState<boolean>(searchParams.get("cl") === "true");
@@ -136,30 +136,18 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   const [clusters, setClusters] = React.useState<Cluster[]>([]);
   const [showClusterLabels, setShowClusterLabels] =
     React.useState<boolean>(true);
-  const [useSubclusterOverlay, setUseSubclusterOverlay] =
-    React.useState<boolean>(searchParams.get("withSubclusters") != null);
 
   const SocialGraph: React.FC = () => {
     const loadGraph = useLoadGraph();
     const registerEvents = useRegisterEvents();
     const { sigma, container } = useSigmaContext();
+    const title = getTranslation('title', currentLanguage);
 
-    useEffect(() => {
-      document.title = getTranslation('title', currentLanguage);
-    }, []);
+    document.title = title;
 
     useEffect(() => {
       // Create the graph
       const newGraph = new MultiDirectedGraph();
-
-      async function loginBskyClient() {
-        await bsky.login({
-          identifier: identifier || "",
-          password: password || ""
-        })
-      }
-
-      loginBskyClient();
 
       const hiddenClusters = config.hiddenClusters.get(currentLayoutName) ?? new Map();
       if (graphDump !== null && (graph === null || graphShouldUpdate)) {
@@ -289,35 +277,12 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
       if (
         graph !== null &&
         selectedNode !== null &&
-        (selectedNode !== previousSelectedNode ||
-          showSecondDegreeNeighbors !== previousSecondDegreeNeighbors)
+        (
+          selectedNode !== previousSelectedNode
+          || showSecondDegreeNeighbors !== previousSecondDegreeNeighbors
+          || useSubclusterOverlay !== previousUseSubclusterOverlay
+        )
       ) {
-
-        async function getAvatarURL(node: string) {
-          const response = await bsky.getProfile({
-            actor: graph?.getNodeAttribute(node, "did")
-          });
-          setAvatarURI(response.data.avatar);
-        }
-
-        async function getAvatarMootsAvatarUrls() {
-          mootList.forEach(async (node) => {
-            const response = await bsky.getProfile({
-              actor: graph?.getNodeAttribute(node, "did")
-            });
-            node.avatarUrl = response.data.avatar;
-          });
-          communityList.forEach(async (node) => {
-            const response = await bsky.getProfile({
-              actor: graph?.getNodeAttribute(node, "did")
-            });
-            node.avatarUrl = response.data.avatar;
-          });
-          setMootList(mootList);
-        }
-
-        getAvatarURL(selectedNode);
-        getAvatarMootsAvatarUrls();
 
         // Hide all edges
         graph?.edges().forEach((edge) => {
@@ -333,7 +298,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
             attrs.hidden = true;
           } else {
             attrs.hidden = false;
-            attrs.color = "rgba(0,0,0,0.1)";
+            attrs.color = "rgba(0,0,0,0.03)";
           }
           return attrs;
         });
@@ -395,6 +360,14 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         communityList.sort((a, b) => b.weight - a.weight);
 
         setCommunityList(communityList);
+
+        // Re-color all communityNodes
+        if (useSubclusterOverlay && communityList && communityList.length > 0) {
+          communityList.forEach(node => {
+            graph?.setNodeAttribute(node.node, 'hidden', false);
+            graph?.setNodeAttribute(node.node, 'color', graph?.getNodeAttribute(node.node, 'old-color'));
+          })
+        }
 
         // Re-color all nodes connected to selected node
         graph?.forEachNeighbor(selectedNode, (node, attrs) => {
@@ -469,7 +442,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         setOutWeight(-1);
         sigma.refresh();
       }
-    }, [selectedNode, showSecondDegreeNeighbors]);
+    }, [selectedNode, showSecondDegreeNeighbors, useSubclusterOverlay]);
 
     useEffect(() => {
       renderClusterLabels();
@@ -477,16 +450,14 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
       registerEvents({
         clickNode: (event: any) => {
           const nodeLabel = graph?.getNodeAttribute(event.node, "label");
-          let newParams: { s?: string; ml?: string; cl?: string } = {
-            s: `${nodeLabel}`,
-          };
+          searchParams.set('s', `${nodeLabel}`);
           if (showMootList) {
-            newParams.ml = `${showMootList}`;
+            searchParams.set('ml', `${showMootList}`);
           }
           if (showCommunityList) {
-            newParams.cl = `${showCommunityList}`;
+            searchParams.set('cl', `${showCommunityList}`);
           }
-          setSearchParams(newParams);
+          setSearchParams(searchParams);
         },
         doubleClickNode: (event: any) => {
           window.open(
@@ -501,7 +472,8 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           renderClusterLabels();
         },
         clickStage: (_: any) => {
-          setSearchParams({});
+          searchParams.delete('s');
+          setSearchParams(searchParams);
         },
       });
     }, [registerEvents]);
@@ -517,7 +489,6 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
 
   useEffect(() => {
     const selectedUserFromParams = searchParams.get("s");
-    const showMootListFromParams = searchParams.get("ml");
     if (selectedUserFromParams !== null) {
       const selectedNodeKey = nodeMap.get(selectedUserFromParams)?.key;
       if (selectedNodeKey !== undefined) {
@@ -525,8 +496,9 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
       }
     } else {
       setSelectedNode(null);
+      searchParams.delete("s");
+      setSearchParams(searchParams);
     }
-    setShowMootList(showMootListFromParams === "true");
   }, [searchParams, nodeMap]);
 
   useEffect(() => {
@@ -555,11 +527,13 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
             currentLayoutName={currentLayoutName}
             currentLanguage={currentLanguage}
             selectedNode={selectedNode}
+            setSelectedNode={setSelectedNode}
             showMootList={showMootList}
             setShowMootList={setShowMootList}
             mootList={mootList}
             communityList={communityList}
             avatarURI={avatarURI}
+            searchParams={searchParams}
             setSearchParams={setSearchParams}
             graph={graph}
             showHiddenClusters={showHiddenClusters}
@@ -612,6 +586,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           showMootList={showMootList}
           currentLayoutName={currentLayoutName}
           currentLanguage={currentLanguage}
+          searchParams={searchParams}
           setSearchParams={setSearchParams}
           setLoading={setLoading}
           useSubclusterOverlay={useSubclusterOverlay}
@@ -627,7 +602,12 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           setLegend={setLegend}
           moderator={moderator} />
       </SigmaContainer>
-      <Footer graph={graph} currentLanguage={currentLanguage} setCurrentLanguage={setCurrentLanguage} />
+      <Footer
+        graph={graph}
+        searchParams={searchParams}
+        setSearchParams={setSearchParams}
+        currentLanguage={currentLanguage}
+        setCurrentLanguage={setCurrentLanguage} />
     </div>
   );
 };

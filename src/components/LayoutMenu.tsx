@@ -1,10 +1,15 @@
-import { FC, Fragment } from 'react'
+import { FC, Fragment, Dispatch, SetStateAction } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { getTranslation, getValueByLanguage } from "../common/translation";
 import { config } from '../common/visualConfig';
+import { SetURLSearchParams } from 'react-router-dom';
 
 interface LayoutMenuProps {
+    setLoading: Dispatch<SetStateAction<boolean>>;
+    setGraphShouldUpdate: Dispatch<SetStateAction<boolean>>;
+    searchParams: URLSearchParams;
+    setSearchParams: SetURLSearchParams;
     moderator: boolean;
     currentLanguage: string;
 }
@@ -13,29 +18,53 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-function buildMenu(moderator: boolean, currentLanguage: string) {
-    const menuItems: any[] = [];
-    config.getAllLayouts(moderator).forEach(layout => menuItems.push(
-        <Menu.Item
-            key={layout.name}>
-            {({ active }) => (
-                <a
-                    href={moderator ? `?lang=${currentLanguage}&moderator=${moderator}&layout=${layout.name}` : `?lang=${currentLanguage}&layout=${layout.name}`}
-                    className={classNames(
-                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                        'block px-4 py-2 text-xs'
-                    )}
-                >
-                    {getValueByLanguage(layout.label, currentLanguage)}
-                </a>
 
-            )}
-        </Menu.Item>
-    ));
+
+function buildMenu(
+    setLoading: Dispatch<SetStateAction<boolean>>,
+    setGraphShouldUpdate: Dispatch<SetStateAction<boolean>>,
+    searchParams: URLSearchParams,
+    setSearchParams: SetURLSearchParams,
+    moderator: boolean,
+    currentLanguage: string
+) {
+    const menuItems: any[] = [];
+    config.getAllLayouts(moderator).forEach(layout => {
+        const chooseLayout = () => {
+            searchParams.set('layout', layout.name);
+            //when switching layout we don't want to preserve selected node as it might not be available on the new layout
+            searchParams.delete('s');
+            return "?" + searchParams.toString()
+        }
+        menuItems.push(
+            <Menu.Item
+                key={layout.name}>
+                {({ active }) => (
+                    <a
+                        href={`${chooseLayout()}`}
+                        className={classNames(
+                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                            'block px-4 py-2 text-xs'
+                        )}
+                    >
+                        {getValueByLanguage(layout.label, currentLanguage)}
+                    </a>
+
+                )}
+            </Menu.Item >
+        )
+    });
     return menuItems;
 }
 
-const LayoutMenu: FC<LayoutMenuProps> = ({ moderator, currentLanguage }) => {
+const LayoutMenu: FC<LayoutMenuProps> = ({
+    setLoading,
+    setGraphShouldUpdate,
+    searchParams,
+    setSearchParams,
+    moderator,
+    currentLanguage
+}) => {
     return (
         <Menu as="div" className="relative inline-block text-left">
             <Transition
@@ -49,7 +78,13 @@ const LayoutMenu: FC<LayoutMenuProps> = ({ moderator, currentLanguage }) => {
             >
                 <Menu.Items className="absolute bottom-5 right-0 z-10 mt-1 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
-                        {buildMenu(moderator, currentLanguage)}
+                        {buildMenu(
+                            setLoading,
+                            setGraphShouldUpdate,
+                            searchParams,
+                            setSearchParams,
+                            moderator,
+                            currentLanguage)}
                     </div>
                 </Menu.Items>
             </Transition>

@@ -9,11 +9,13 @@ interface MootsMenuProps {
     currentLayoutName: string;
     currentLanguage: string;
     selectedNode: string;
+    setSelectedNode: Dispatch<React.SetStateAction<string | null>>;
     showMootList: boolean;
     setShowMootList: Dispatch<SetStateAction<boolean>>;
     mootList: MootNode[];
     communityList: MootNode[];
     avatarURI: string | undefined;
+    searchParams: URLSearchParams;
     setSearchParams: SetURLSearchParams;
     graph: MultiDirectedGraph | null;
     showHiddenClusters: boolean;
@@ -21,6 +23,8 @@ interface MootsMenuProps {
     setShowCommunityList: Dispatch<SetStateAction<boolean>>;
     useSubclusterOverlay: boolean;
 }
+
+
 
 const buildClusters = (
     selectedNode,
@@ -30,7 +34,9 @@ const buildClusters = (
     showHiddenClusters,
     setShowMootList,
     showCommunityList,
+    communityList,
     setShowCommunityList,
+    searchParams,
     setSearchParams
 ) => {
     const hiddenClusters: Map<string, boolean> = config.hiddenClusters.get(currentLayoutName) ?? new Map();
@@ -38,70 +44,85 @@ const buildClusters = (
     const { detailedCluster, mainCluster, superCluster } = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
     const hasCommunity = detailedCluster != undefined;
     if (superCluster && (!hiddenClusters.get(superCluster.name) || showHiddenClusters)) {
-        compiledClusters.push(<p className="mt-2 text-xs">
-            <span className="font-bold">
-                {getTranslation('supercluster', currentLanguage)}{": "}
-            </span>
-            <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: superCluster?.color }}>
-                {superCluster.label && getValueByLanguage(superCluster.label, currentLanguage)}
-            </span> - {superCluster.legend && getValueByLanguage(superCluster.legend, currentLanguage).description}
-        </p>)
+        compiledClusters.push(
+            <div className="ml-0 mt-0" key={superCluster.name}>
+                <p className="mt-1 text-xs">
+                    <span className="font-bold">
+                        {getTranslation('supercluster', currentLanguage)}{": "}
+                    </span>
+                    <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full"
+                        style={{
+                            backgroundColor: superCluster?.color,
+                            color: config.getContrastColor(superCluster?.color)
+                        }}>
+                        {superCluster.label && getValueByLanguage(superCluster.label, currentLanguage)}
+                    </span>
+                    <span className="xs:hidden"> - {superCluster.legend && getValueByLanguage(superCluster.legend, currentLanguage).description}</span>
+                </p>
+            </div>)
     }
     if (mainCluster && (!hiddenClusters.get(mainCluster.name) || showHiddenClusters)) {
-        compiledClusters.push(<p className="mt-2 text-xs">
-            <span className="font-bold">
-                {getTranslation('cluster', currentLanguage)}{": "}
-            </span>
-            <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: mainCluster?.color }}>
-                {mainCluster.label && getValueByLanguage(mainCluster.label, currentLanguage)}
-            </span> - {mainCluster.legend && getValueByLanguage(mainCluster.legend, currentLanguage).description}
-        </p>)
+        compiledClusters.push(
+            <div className="ml-0 mt-0" key={mainCluster.name}>
+                <p className="mt-1 text-xs">
+                    <span className="font-bold">
+                        {getTranslation('cluster', currentLanguage)}{": "}
+                    </span>
+                    <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full"
+                        style={{
+                            backgroundColor: mainCluster?.color,
+                            color: config.getContrastColor(mainCluster?.color)
+                        }}>
+                        {mainCluster.label && getValueByLanguage(mainCluster.label, currentLanguage)}
+                    </span>
+                    <span className="xs:hidden"> - {mainCluster.legend && getValueByLanguage(mainCluster.legend, currentLanguage).description}</span>
+                </p>
+            </div>)
     }
     if (detailedCluster && (!hiddenClusters.get(detailedCluster.name) || showHiddenClusters)) {
         compiledClusters.push(
-            <div className="-ml-4 mt-2">
+            <div className="-ml-4 mt-2" key={detailedCluster.name}>
                 <div className="ml-4 mt-2">
-                    <p className="mt-2 text-xs">
+                    <p className="mt-1 text-xs">
                         <span className="font-bold">
                             {getTranslation('community', currentLanguage)}{": "}
                         </span>
-                        <span className="px-2 text-shadow-[0_0px_4px_#ffffff] inline-flex text-xs leading-5 font-bold rounded-full text-black" style={{ backgroundColor: detailedCluster?.color }}>
+                        <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full"
+                            style={{
+                                backgroundColor: detailedCluster?.color,
+                                color: config.getContrastColor(detailedCluster?.color)
+                            }}>
                             {detailedCluster.label && getValueByLanguage(detailedCluster.label, currentLanguage)}
-                        </span> - {detailedCluster.legend && getValueByLanguage(detailedCluster.legend, currentLanguage).description}
-                    </p>
-                </div>
-                {hasCommunity && (
-                    <div className="ml-4 mt-2 flex-shrink-0">
+                        </span>
                         <button
                             type="button"
                             onClick={() => {
                                 setShowCommunityList(!showCommunityList);
                                 setShowMootList(false);
-                                let newParams: { s?: string; ml?: string; cl?: string } = {
-                                    s: `${graph?.getNodeAttribute(selectedNode, "label")}`,
-                                };
+                                searchParams.set('s', `${graph?.getNodeAttribute(selectedNode, "label")}`);
                                 if (!showCommunityList) {
-                                    newParams.cl = `${!showCommunityList}`;
-                                    newParams.ml = `${false}`;
+                                    searchParams.set('cl', `${!showCommunityList}`);
+                                    searchParams.set('ml', `${false}`);
                                 }
-                                setSearchParams(newParams);
+                                setSearchParams(searchParams);
                             }}
                             className={
-                                `relative inline-flex items-center rounded-md  px-3 py-2 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+                                `relative ml-1 inline-flex items-center rounded-sm px-1 py-0 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
                                 (showCommunityList
                                     ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
                                     : " bg-orange-500 hover:bg-orange-600 focus-visible:ring-orange-500")
                             }
                         >
-                            {showCommunityList ? getTranslation('hide_top', currentLanguage) : getTranslation('show_community', currentLanguage)}
+                            {showCommunityList ? getTranslation('hide_community', currentLanguage) : getTranslation('show_community', currentLanguage)}
                         </button>
-                    </div>)
-                }
+                        <span className="xs:hidden"> - {detailedCluster.legend && getValueByLanguage(detailedCluster.legend, currentLanguage).description}</span>
+                    </p>
+                </div>
             </div >
 
         )
     }
-    return <div><p className="ml-2 max-w-xl text-xs text-gray-500">
+    return <div><p className="ml-0 -mt-1 max-w-xl text-xs text-gray-500">
         {compiledClusters.length > 0 && getTranslation('belongs_to', currentLanguage) + ": "}
     </p>{compiledClusters}</div>;
 }
@@ -110,11 +131,13 @@ const MootsMenu: FC<MootsMenuProps> = ({
     currentLayoutName,
     currentLanguage,
     selectedNode,
+    setSelectedNode,
     showMootList,
     setShowMootList,
     mootList,
     communityList,
     avatarURI,
+    searchParams,
     setSearchParams,
     graph,
     showHiddenClusters,
@@ -127,17 +150,37 @@ const MootsMenu: FC<MootsMenuProps> = ({
     const { detailedCluster } = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
     return (
         <div className="bg-white shadow rounded-md absolute
-        mobile:overflow-scroll mobile:left-1/2 mobile:top-2 mobile:transform mobile:left-2 mobile:right-2 mobile:w-fit mobile:translate-x-0
+        mobile:overflow-scroll mobile:top-0 mobile:-ml-2 mobile:-mr-4 mobile:transform mobile:w-fit mobile:translate-x-0
         desktop:overflow-hidden desktop:left-1/2 desktop:top-5 desktop:transform desktop:w-1/3 desktop:left-5 desktop:translate-x-0
         mt-auto z-50">
-            <div className="border-b border-gray-200 bg-white px-4 py-5 sm:px-6">
-                <div className="-mt-2">
-                    <h3 className="text-base font-semibold leading-6 text-gray-900">
-                        {getTranslation('info_top_moots', currentLanguage)}
-                    </h3>
+            <div className="border-b border-gray-200 bg-white px-4 py-5 mr-1 desktop:px-6">
+                <div className="ml-0 flex flex-nowrap items-center justify-between">
+                    <div className="-mt-4">
+                        <h3 className="text-base font-semibold leading-6 text-gray-900">
+                            {getTranslation('info_top_moots', currentLanguage)}
+                        </h3>
+                    </div>
+                    <div className="-mt-4">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowMootList(!showMootList);
+                                setShowCommunityList(false)
+                                searchParams.delete('s');
+                                setSearchParams(searchParams);
+                            }}
+                            className={
+                                `relative inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+
+                                " bg-gray-500 hover:bg-gray-600 focus-visible:ring-green-500"
+                            }
+                        >
+                            x
+                        </button>
+                    </div>
                 </div>
                 <div className="ml-4 flex flex-nowrap items-center justify-between">
-                    <div className="-ml-2 mt-2 max-w-xl text-xs text-gray-500">
+                    <div className="-ml-4 mt-1 max-w-xl text-xs text-gray-500">
                         <p>
                             {avatarURI && <img className="inline-block size-8 rounded-full" src={avatarURI} />}
                             {avatarURI && " "}
@@ -155,7 +198,11 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                 backgroundColor: graph?.getNodeAttribute(
                                     selectedNode,
                                     "color"
-                                )
+                                ),
+                                color: config.getContrastColor(graph?.getNodeAttribute(
+                                    selectedNode,
+                                    "color"
+                                ))
                             }}>
                                 {graph?.getNodeAttribute(selectedNode, "size")}
                             </span>
@@ -167,17 +214,15 @@ const MootsMenu: FC<MootsMenuProps> = ({
                             onClick={() => {
                                 setShowMootList(!showMootList);
                                 setShowCommunityList(false)
-                                let newParams: { s?: string; ml?: string; cl?: string } = {
-                                    s: `${graph?.getNodeAttribute(selectedNode, "label")}`,
-                                };
+                                searchParams.set('s', `${graph?.getNodeAttribute(selectedNode, "label")}`);
                                 if (!showMootList) {
-                                    newParams.ml = `${!showMootList}`;
-                                    newParams.cl = `${false}`;
+                                    searchParams.set('ml', `${!showMootList}`);
+                                    searchParams.set('cl', `${false}`);
                                 }
-                                setSearchParams(newParams);
+                                setSearchParams(searchParams);
                             }}
                             className={
-                                `relative inline-flex items-center rounded-md  px-3 py-2 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+                                `relative inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
                                 (showMootList
                                     ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
                                     : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
@@ -195,11 +240,13 @@ const MootsMenu: FC<MootsMenuProps> = ({
                     showHiddenClusters,
                     setShowMootList,
                     showCommunityList,
+                    communityList,
                     setShowCommunityList,
+                    searchParams,
                     setSearchParams
                 )}
                 {showMootList &&
-                    (<div className="z-50 mt-2 max-w-xl text-xs text-gray-500">
+                    (<div className="z-50 mt-1 -mb-3  max-w-xl text-xs text-gray-500">
                         <p>
                             {getTranslation('these_are_top_moots_that', currentLanguage)}{" "}
                             <a
@@ -215,24 +262,28 @@ const MootsMenu: FC<MootsMenuProps> = ({
                             {getTranslation('has_interacted_with', currentLanguage)}{":"}
                         </p>
                     </div>)}
-                {showCommunityList &&
-                    (<div className="z-50 mt-2 max-w-xl text-xs text-gray-500">
+                {showCommunityList && communityList.length > 0 &&
+                    (<div className="z-50 mt-1 -mb-3 max-w-xl text-xs text-gray-500">
                         <p>
                             {getTranslation('these_are_top_community', currentLanguage)}{" "}
-                            <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full bg-black" style={{ color: detailedCluster?.color }}>
+                            <span className="px-2 inline-flex text-xs leading-5 font-bold rounded-full"
+                                style={{
+                                    backgroundColor: detailedCluster?.color,
+                                    color: config.getContrastColor(detailedCluster?.color)
+                                }}>
                                 {detailedCluster?.label && getValueByLanguage(detailedCluster?.label, currentLanguage)}
                             </span>{" :"}
                         </p>
                     </div>)}
             </div>
-            <ul
+            <div
                 role="list"
-                className="divide-y divide-gray-200 mobile:max-h-40 desktop:max-h-96 md:max-h-screen overflow-auto"
+                className="z-50 divide-y divide-gray-200 mobile:max-h-36 desktop:max-h-96 md:max-h-screen overflow-auto"
             >
                 {showMootList && (
-                    <div className="table text-xs ml-4 mr-4 mt-2 w-11/12 border-spacing-2">
+                    <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
                         <div className="table-header-group">
-                            <div className="z-50 table-row flex items-center justify-between">
+                            <div className="table-row flex items-center justify-between">
                                 <div className="table-cell font-medium text-gray-900 truncate">
                                     {"#"}
                                 </div>
@@ -248,7 +299,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                             </div>
                         </div>
                         {mootList.slice(0, 10).map((moot) => (
-                            <div className="table-row-group">
+                            <div className="table-row-group" key={moot.node}>
                                 <div className="z-50 table-row flex items-center justify-between">
                                     <div className="table-cell font-medium text-gray-900 truncate">
                                         {++i}
@@ -257,8 +308,12 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                         {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
                                         {moot.avatarUrl && " "}
                                         <a
-                                            href={`https://bsky.app/profile/${moot.did}`}
-                                            target="_blank"
+                                            href="#"
+                                            onClick={() => {
+                                                searchParams.set('s', `${moot.label}`);
+                                                setSearchParams(searchParams);
+                                                setSelectedNode(moot.node)
+                                            }}
                                         >
                                             {moot.label}
                                         </a>
@@ -269,7 +324,11 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                         </span>
                                     </div>
                                     <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay) }}>
+                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900"
+                                            style={{
+                                                backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
+                                                color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
+                                            }}>
                                             {moot.size}
                                         </span>
                                     </div>
@@ -278,8 +337,8 @@ const MootsMenu: FC<MootsMenuProps> = ({
                         ))}
                     </div>
                 )}
-                {showCommunityList && (
-                    <div className="table text-xs  ml-4 mr-4 mt-2 w-11/12 border-spacing-2">
+                {showCommunityList && communityList.length > 0 && (
+                    <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
                         <div className="table-header-group">
                             <div className="z-50 table-row flex items-center justify-between">
                                 <div className="table-cell font-medium text-gray-900 truncate">
@@ -294,7 +353,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                             </div>
                         </div>
                         {communityList.slice(0, 10).map((moot) => (
-                            <div className="table-row-group">
+                            <div className="table-row-group" key={moot.node}>
                                 <div className="z-50 table-row flex items-center justify-between">
                                     <div className="table-cell font-medium text-gray-900 truncate">
                                         {++i}
@@ -303,14 +362,21 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                         {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
                                         {moot.avatarUrl && " "}
                                         <a
-                                            href={`https://bsky.app/profile/${moot.did}`}
-                                            target="_blank"
+                                            href="#"
+                                            onClick={() => {
+                                                searchParams.set('s', `${moot.label}`);
+                                                setSearchParams(searchParams);
+                                                setSelectedNode(moot.node)
+                                            }}
                                         >
                                             {moot.label}
                                         </a>
                                     </div>
                                     <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{ backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay) }}>
+                                        <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{
+                                            backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
+                                            color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
+                                        }}>
                                             {moot.weight}
                                         </span>
                                     </div>
@@ -319,7 +385,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                         ))}
                     </div>
                 )}
-            </ul>
+            </div>
 
         </div >
     )

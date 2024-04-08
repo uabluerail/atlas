@@ -2,8 +2,12 @@ import { FC, Fragment, Dispatch, SetStateAction } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { getPickerLanguages, getLanguageName } from "../common/translation";
+import { SetURLSearchParams } from 'react-router-dom';
+// import { SearchParams } from '../model';
 
 interface LanguagePickerProps {
+    searchParams: URLSearchParams;
+    setSearchParams: SetURLSearchParams;
     currentLanguage: string;
     setCurrentLanguage: Dispatch<SetStateAction<string>>;
 }
@@ -12,7 +16,12 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-function buildMenu(currentLanguage: string, setCurrentLanguage: Dispatch<SetStateAction<string>>) {
+function buildMenu(
+    searchParams: URLSearchParams,
+    setSearchParams: SetURLSearchParams,
+    currentLanguage: string,
+    setCurrentLanguage: Dispatch<SetStateAction<string>>
+) {
     const menuItems: any[] = [];
     getPickerLanguages()
         .filter(language => language.lang !== currentLanguage)
@@ -24,7 +33,11 @@ function buildMenu(currentLanguage: string, setCurrentLanguage: Dispatch<SetStat
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                             'block px-4 py-2 text-xs'
                         )}
-                        onClick={() => { setCurrentLanguage(language.lang) }}
+                        onClick={() => {
+                            setCurrentLanguage(language.lang)
+                            searchParams.set('lang', language.lang);
+                            setSearchParams(searchParams);
+                        }}
                     >
                         {language.name}
                     </a>
@@ -35,7 +48,11 @@ function buildMenu(currentLanguage: string, setCurrentLanguage: Dispatch<SetStat
     return menuItems;
 }
 
-const LanguagePicker: FC<LanguagePickerProps> = ({ currentLanguage, setCurrentLanguage }) => {
+const LanguagePicker: FC<LanguagePickerProps> = ({
+    searchParams,
+    setSearchParams,
+    currentLanguage,
+    setCurrentLanguage }) => {
     return (
         <Menu as="div" className="relative inline-block text-left">
             <Transition
@@ -49,7 +66,7 @@ const LanguagePicker: FC<LanguagePickerProps> = ({ currentLanguage, setCurrentLa
             >
                 <Menu.Items className="absolute bottom-5 right-0 z-10 mt-1 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
-                        {buildMenu(currentLanguage, setCurrentLanguage)}
+                        {buildMenu(searchParams, setSearchParams, currentLanguage, setCurrentLanguage)}
                     </div>
                 </Menu.Items>
             </Transition>
