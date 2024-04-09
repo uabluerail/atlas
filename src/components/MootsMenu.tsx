@@ -34,7 +34,6 @@ const buildClusters = (
     showHiddenClusters,
     setShowMootList,
     showCommunityList,
-    communityList,
     setShowCommunityList,
     searchParams,
     setSearchParams
@@ -42,7 +41,6 @@ const buildClusters = (
     const hiddenClusters: Map<string, boolean> = config.hiddenClusters.get(currentLayoutName) ?? new Map();
     const compiledClusters: any[] = [];
     const { detailedCluster, mainCluster, superCluster } = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
-    const hasCommunity = detailedCluster != undefined;
     if (superCluster && (!hiddenClusters.get(superCluster.name) || showHiddenClusters)) {
         compiledClusters.push(
             <div className="ml-0 mt-0" key={superCluster.name}>
@@ -75,6 +73,26 @@ const buildClusters = (
                         }}>
                         {mainCluster.label && getValueByLanguage(mainCluster.label, currentLanguage)}
                     </span>
+                    {/* <button
+                        type="button"
+                        onClick={() => {
+                            setShowCommunityList(!showCommunityList);
+                            setShowMootList(false);
+                            if (!showCommunityList) {
+                                searchParams.set('cl', `${!showCommunityList}`);
+                                searchParams.set('ml', `${false}`);
+                            }
+                            setSearchParams(searchParams);
+                        }}
+                        className={
+                            `relative ml-1 inline-flex items-center rounded-sm px-1 py-0 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+                            (showCommunityList
+                                ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
+                                : " bg-orange-500 hover:bg-orange-600 focus-visible:ring-orange-500")
+                        }
+                    >
+                        {showCommunityList ? getTranslation('hide_community', currentLanguage) : getTranslation('show_community', currentLanguage)}
+                    </button> */}
                     <span className="xs:hidden"> - {mainCluster.legend && getValueByLanguage(mainCluster.legend, currentLanguage).description}</span>
                 </p>
             </div>)
@@ -99,7 +117,6 @@ const buildClusters = (
                             onClick={() => {
                                 setShowCommunityList(!showCommunityList);
                                 setShowMootList(false);
-                                searchParams.set('s', `${graph?.getNodeAttribute(selectedNode, "label")}`);
                                 if (!showCommunityList) {
                                     searchParams.set('cl', `${!showCommunityList}`);
                                     searchParams.set('ml', `${false}`);
@@ -166,7 +183,6 @@ const MootsMenu: FC<MootsMenuProps> = ({
                             onClick={() => {
                                 setShowMootList(!showMootList);
                                 setShowCommunityList(false)
-                                searchParams.set('s', `${graph?.getNodeAttribute(selectedNode, "label")}`);
                                 if (!showMootList) {
                                     searchParams.set('ml', `${!showMootList}`);
                                     searchParams.set('cl', `${false}`);
@@ -240,7 +256,6 @@ const MootsMenu: FC<MootsMenuProps> = ({
                     showHiddenClusters,
                     setShowMootList,
                     showCommunityList,
-                    communityList,
                     setShowCommunityList,
                     searchParams,
                     setSearchParams
@@ -350,7 +365,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                     {getTranslation('user', currentLanguage)}
                                 </div>
                                 <div className="table-cell ml-2 flex-shrink-0 flex">
-                                    {getTranslation('node_size', currentLanguage)}
+                                    {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
                                 </div>
                             </div>
                         </div>
