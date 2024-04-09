@@ -4,6 +4,9 @@ const plugin = require('tailwindcss/plugin')
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    fontFamily: {
+      'emoji': ['Noto Color Emoji', 'Sergoe UI Emoji', 'Apple Color Emoji', 'sans-serif']
+    },
     extend: {
       textShadow: {
         sm: '0 1px 2px var(--tw-shadow-color)',
@@ -15,9 +18,9 @@ export default {
         '144': '36rem',
       },
       screens: {
-        desktop: { 'min': '601px' },
+        desktop: { 'min': '701px' },
         // => @media (min-width: 601px) { ... }
-        mobile: { 'max': '600px' },
+        mobile: { 'max': '700px' },
         // => @media (max-width: 600px) { ... }
         xs: { 'max': '350px' }
         // => @media (max-width: 350px) { ... }

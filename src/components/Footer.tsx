@@ -21,11 +21,11 @@ const Footer: FC<FooterProps> = ({
     currentLanguage,
     setCurrentLanguage }) => {
     return (
-        <footer className="bg-white fixed bottom-0 xs:bottom-1 text-center w-full z-40">
+        <footer className="bg-white fixed bottom-0 text-center w-full z-40">
             <div className="mx-auto max-w-7xl px-2">
                 <span className="footer-text text-xs">
                     {config.legend.author &&
-                        <div>
+                        <div className="xs:mb-1">
                             <span>{"🌐 "}{getTranslation('language', currentLanguage)}{": "}</span>
                             <LanguagePicker
                                 searchParams={searchParams}
@@ -56,7 +56,7 @@ const Footer: FC<FooterProps> = ({
                     }
                 </span>
             </div>
-            <div>
+            <div className='mb-0.5'>
                 <span className="xs:hidden footer-text text-xs">
                     {getTranslation('visualization', currentLanguage)}{" "}
                     <a

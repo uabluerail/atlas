@@ -1,11 +1,17 @@
 .clusterLabel {
     position: absolute;
     transform: translate(-50%, -50%);
-    font-family: sans-serif;
     font-variant: small-caps;
+}
 
-    text-shadow: 2px 2px 1px white, -2px -2px 1px white, -2px 2px 1px white,
-        2px -2px 1px white;
+.whiteShadow {
+    text-shadow: 1px 1px 1px white, -1px -1px 1px white, -1px 1px 1px white,
+        1px -1px 1px white;
+}
+
+.blackShadow {
+    text-shadow: 1px 1px 1px black, -1px -1px 1px black, -1px 1px 1px black,
+        1px -1px 1px black;
 }
 
 .sigma-hovers {

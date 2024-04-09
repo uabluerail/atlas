@@ -84,6 +84,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   const [selectedNode, setSelectedNode] = React.useState<string | null>(null);
   const [legend, setLegend] = React.useState<boolean>(false);
   const [showHiddenClusters, setShowHiddenClusters] = React.useState<boolean>(false);
+  const [hideMenu, setHideMenu] = React.useState<boolean>(searchParams.get("hm") === "true");
   const [moderator] = React.useState<boolean>(searchParams.get("moderator") === "true");
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
@@ -518,6 +519,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           labelDensity: 0.07,
           labelGridCellSize: 60,
           labelRenderedSizeThreshold: 9,
+          labelSize: 12,
           labelFont: "Lato, sans-serif",
           zIndex: true,
         }}
@@ -557,10 +559,11 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
                   key={cluster.idx}
                   id={`cluster-${cluster.idx}`}
                   hidden={!showClusterLabels}
-                  className="clusterLabel absolute md:text-3xl text-xl"
+                  className={`clusterLabel ${config.getContrastColor(cluster.color) === "#000000" ? "blackShadow" : "whiteShadow"} absolute desktop:text-xl mobile:text-md xs:text-sm tracking-tight font-emoji`}
                   style={{
-                    fontSize: 24,
+                    fontVariant: 'small-caps',
                     fontWeight: "bolder",
+                    wordSpacing: -16,
                     color: `${cluster.color}`,
                     top: `${cluster.y}px`,
                     left: `${cluster.x}px`,
@@ -600,7 +603,9 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           setShowClusterLabels={setShowClusterLabels}
           legend={legend}
           setLegend={setLegend}
-          moderator={moderator} />
+          moderator={moderator}
+          hideMenu={hideMenu}
+          setHideMenu={setHideMenu} />
       </SigmaContainer>
       <Footer
         graph={graph}
