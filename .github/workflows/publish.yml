@@ -23,14 +23,37 @@ jobs:
 
       - name: Install dependencies
         run: yarn install && yarn --cwd exporter install
-      - name: Fetch graph data
-        env:
-          GRAPH_URL: "${{ vars.GRAPH_URL }}"
-        run: wget -O graph.json "$GRAPH_URL"
+      - name: Cache graph
+        id: cache-graph
+        uses: actions/cache@v3
+        with:
+          path: .
+          key: ${{ runner.os }}-${{ hashFiles('**/graph.json') }}
       - name: Fetch graph conf
         env:
           CONF_URL: "${{ vars.CONF_URL }}"
-        run: wget -O config.json "$CONF_URL"
+        steps:
+          run: wget -O config.json "$CONF_URL"
+        - id: set_var
+          run: |
+            content=`cat ./config.json`
+            # the following lines are only required for multi line json
+            content="${content//'%'/'%25'}"
+            content="${content//$'\n'/'%0A'}"
+            content="${content//$'\r'/'%0D'}"
+            # end of optional handling for multi line json
+            echo "::set-output name=configJson::$content"
+        - run: |
+            echo "${{fromJson(steps.set_var.outputs.configJson).settings.graphVersion}}"
+      - name: Fetch graph data
+        env:
+          GRAPH_URL: "${{ vars.GRAPH_URL }}"
+        steps:
+          run: wget -O graph.json "$GRAPH_URL"
+          run: |
+            cd exporter
+            yarn getGraphVersion >> $GRAPH_VERSION
+        if: steps.cache-graph.outputs.cache-hit != 'true' || fromJson(steps.set_var.outputs.configJson).settings.graphVersion != vars.GRAPH_VERSION
       - name: Cache layouts
         id: cache-layouts
         uses: actions/cache@v3
