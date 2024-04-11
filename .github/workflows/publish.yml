@@ -32,19 +32,7 @@ jobs:
       - name: Fetch graph conf
         env:
           CONF_URL: "${{ vars.CONF_URL }}"
-        steps:
-          - run: wget -O config.json "$CONF_URL"
-          - id: set_var
-            run: |
-            content=`cat ./config.json`
-            # the following lines are only required for multi line json
-            content="${content//'%'/'%25'}"
-            content="${content//$'\n'/'%0A'}"
-            content="${content//$'\r'/'%0D'}"
-            # end of optional handling for multi line json
-            echo "::set-output name=configJson::$content"
-          - run: |
-            echo "${{fromJson(steps.set_var.outputs.configJson).settings.graphVersion}}"
+        run: wget -O config.json "$CONF_URL"
       - name: Fetch graph data
         env:
           GRAPH_URL: "${{ vars.GRAPH_URL }}"
