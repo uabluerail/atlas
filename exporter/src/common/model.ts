@@ -13,26 +13,6 @@ interface InputGraphData {
     timestamp?: string;
 }
 
-interface InputCommunitiesData {
-    graphVersion?: number;
-    timestamp?: string;
-    weakCommunities: {
-        leader: string;
-        name?: string;
-        id: number;
-    }[];
-    harmonicCommunities: {
-        leader: string;
-        name?: string;
-        id: number;
-    }[];
-    detailCommunities: {
-        leader: string;
-        name?: string;
-        id: number;
-    }[];
-}
-
 interface Edge {
     source: string;
     target: string;
@@ -180,4 +160,4 @@ interface ClusterRepPrio {
     dbIndex?: number;
 }
 
-export { InputGraphData, InputCommunitiesData, AtlasLayout, GroupLegend, ClusterConfig, LayoutClusterGroup, Edge, Node, IndexNode, Cluster, AtlasSettings, ClusterRepPrio };
+export { InputGraphData, AtlasLayout, GroupLegend, ClusterConfig, LayoutClusterGroup, Edge, Node, IndexNode, Cluster, AtlasSettings, ClusterRepPrio };

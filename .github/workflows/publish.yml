@@ -23,25 +23,28 @@ jobs:
 
       - name: Install dependencies
         run: yarn install && yarn --cwd exporter install
+      - name: Fetch graph conf
+        env:
+          CONF_URL: "${{ vars.CONF_URL }}"
+        steps:
+          run: wget -O config.json "$CONF_URL"
+          run: |
+            cd exporter
+            yarn getGraphVersion >> $CURRENT_GRAPH_VERSION
       - name: Cache graph
         id: cache-graph
         uses: actions/cache@v3
         with:
           path: ./
           key: ${{ runner.os }}-graph-${{ hashFiles('**/graph.json') }}
-      - name: Fetch graph conf
-        env:
-          CONF_URL: "${{ vars.CONF_URL }}"
-        run: wget -O config.json "$CONF_URL"
       - name: Fetch graph data
         env:
           GRAPH_URL: "${{ vars.GRAPH_URL }}"
-        steps:
-          run: wget -O graph.json "$GRAPH_URL"
-          run: |
-            cd exporter
-            yarn getGraphVersion >> $GRAPH_VERSION
-        if: steps.cache-graph.outputs.cache-hit != 'true' || fromJson(steps.set_var.outputs.configJson).settings.graphVersion != vars.GRAPH_VERSION
+        run: |
+          wget -O graph.json "$GRAPH_URL"
+          cd exporter
+          yarn getGraphVersion >> $CACHED_GRAPH_VERSION
+        if: steps.cache-graph.outputs.cache-hit != 'true' || vars.CURRENT_GRAPH_VERSION != vars.CACHED_GRAPH_VERSION
       - name: Cache layouts
         id: cache-layouts
         uses: actions/cache@v3
