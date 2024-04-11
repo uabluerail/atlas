@@ -27,7 +27,7 @@ jobs:
         id: cache-graph
         uses: actions/cache@v3
         with:
-          path: .
+          path: ./
           key: ${{ runner.os }}-graph-${{ hashFiles('**/graph.json') }}
       - name: Fetch graph conf
         env:
