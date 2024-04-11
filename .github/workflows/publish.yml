@@ -39,7 +39,7 @@ jobs:
           key: ${{ runner.os }}-exporter-out-${{ hashFiles('**/*.json') }}
       - name: Generate layout
         run: |
-          mkdir exporter/out
+          mkdir -p exporter/out
           cd exporter
           yarn start graph.json
       - name: Build
