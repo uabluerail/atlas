@@ -31,12 +31,13 @@ jobs:
         env:
           CONF_URL: "${{ vars.CONF_URL }}"
         run: wget -O config.json "$CONF_URL"
-      - name: Generate layout
-        id: generate-layout
+      - name: Cache layouts
+        id: cache-layouts
         uses: actions/cache@v3
         with:
           path: ./exporter/out/
           key: ${{ runner.os }}-exporter-out-${{ hashFiles('**/*.json') }}
+      - name: Generate layout
         run: |
           mkdir exporter/out
           cd exporter
