@@ -18,6 +18,9 @@ jobs:
           node-version: 18
           cache: npm
 
+      - name: Yarn install cache
+        uses: c-hive/gha-yarn-cache@v2
+
       - name: Install dependencies
         run: yarn install && yarn --cwd exporter install
       - name: Fetch graph data
@@ -29,6 +32,11 @@ jobs:
           CONF_URL: "${{ vars.CONF_URL }}"
         run: wget -O config.json "$CONF_URL"
       - name: Generate layout
+        id: generate-layout
+        uses: actions/cache@v3
+        with:
+          path: ./exporter/out/
+          key: ${{ runner.os }}-exporter-out-${{ hashFiles('**/*.json') }}
         run: |
           mkdir exporter/out
           cd exporter
