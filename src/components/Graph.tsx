@@ -125,7 +125,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
 
   // Moot List State
   const [mootList, setMootList] = React.useState<MootNode[]>([]);
-  const [selectedCommunity, setSelectedCommunity] = React.useState<string>();
+  const [clusterList, setClusterList] = React.useState<MootNode[]>([]);
   const [communityList, setCommunityList] = React.useState<MootNode[]>([]);
   const [showMootList, setShowMootList] = React.useState<boolean>(searchParams.get("ml") === "true");
   const [showCommunityList, setShowCommunityList] = React.useState<boolean>(searchParams.get("cl") === "true");
@@ -362,6 +362,28 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
 
         setCommunityList(communityList);
 
+        const clusters = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
+        console.log(clusters.mainClusterChildren);
+        const clusterList: MootNode[] = graph?.filterNodes((_, atts) => {
+          console.log(atts.community);
+          return clusters.mainClusterChildren ? clusters.mainClusterChildren?.indexOf(atts.community) !== -1
+            : clusters.mainCluster?.community === atts.community;
+        }).map(key => {
+          return {
+            node: key,
+            size: graph?.getNodeAttribute(key, "size"),
+            community: graph?.getNodeAttribute(key, "community"),
+            weight: graph?.getNodeAttribute(key, "size"),
+            label: graph?.getNodeAttribute(key, "label"),
+            did: graph?.getNodeAttribute(key, "did"),
+          }
+        }
+        );
+
+        clusterList.sort((a, b) => b.weight - a.weight);
+
+        setClusterList(clusterList);
+
         // Re-color all communityNodes
         if (useSubclusterOverlay && communityList && communityList.length > 0) {
           communityList.forEach(node => {
@@ -529,11 +551,13 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
             currentLayoutName={currentLayoutName}
             currentLanguage={currentLanguage}
             selectedNode={selectedNode}
+            previousSelectedNode={previousSelectedNode}
             setSelectedNode={setSelectedNode}
             showMootList={showMootList}
             setShowMootList={setShowMootList}
             mootList={mootList}
             communityList={communityList}
+            clusterList={clusterList}
             avatarURI={avatarURI}
             searchParams={searchParams}
             setSearchParams={setSearchParams}
@@ -559,7 +583,9 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
                   key={cluster.idx}
                   id={`cluster-${cluster.idx}`}
                   hidden={!showClusterLabels}
-                  className={`clusterLabel ${config.getContrastColor(cluster.color) === "#000000" ? "blackShadow" : "whiteShadow"} absolute desktop:text-xl mobile:text-md xs:text-sm tracking-tight font-emoji`}
+                  className={`clusterLabel ${config.getContrastColor(cluster.color) === "#000000"
+                    ? "blackShadow" : "whiteShadow"}
+                  absolute desktop:text-xl mobile:text-md xs:text-sm tracking-tight font-emoji`}
                   style={{
                     fontVariant: 'small-caps',
                     fontWeight: "bolder",
@@ -572,7 +598,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
                 >
                   {config.hideClusterLabels.get(currentLayoutName)?.get(cluster.label)
                     ? ""
-                    : getValueByLanguageFromMap(config.knownClusterNames, currentLanguage).get(cluster.label)
+                    : getValueByLanguageFromMap(config.knownClusterNames, currentLanguage)?.get(cluster.label)
                     ?? (cluster.displayName || cluster.label)}
                 </div>
               );

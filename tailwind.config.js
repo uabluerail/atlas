@@ -22,8 +22,8 @@ export default {
         // => @media (min-width: 601px) { ... }
         mobile: { 'max': '700px' },
         // => @media (max-width: 600px) { ... }
-        xs: { 'max': '350px' }
-        // => @media (max-width: 350px) { ... }
+        xs: { 'max': '370px' }
+        // => @media (max-width: 370px) { ... }
       },
     },
   },

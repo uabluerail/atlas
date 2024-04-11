@@ -99,11 +99,11 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
     });
 
     return (
-        <div className="overflow-scroll bg-white shadow desktop:rounded-md absolute transform
-    mobile:top-1 mobile:left-0 mobile:right-0 mobile:w-full mobile:h-3/5
-    desktop:right-1/2 desktop:top-2 desktop:right-2 desktop:w-5/12 desktop:h-1/2
-    translate-x-0 mt-auto z-50">
-            <div className="border-b border-gray-200 bg-white px-3 py-3 desktop:px-6">
+        <div className="bg-white shadow desktop:rounded-md absolute
+    mobile:top-1 mobile:left-0 mobile:right-0 mobile:w-full
+    desktop:right-1/2 desktop:top-2 desktop:right-2 desktop:w-5/12 desktop:max-w-lg
+    z-50">
+            <div className="border-b divide-y divide-gray-200 border-gray-200 bg-white px-3 py-3 desktop:px-6">
                 <div className="-ml-4 -mt-2 desktop:mt-0 flex flex-wrap items-center justify-between desktop:flex-nowrap">
                     <div className="ml-4">
                         <h3 className="text-base font-semibold leading-6 text-gray-900">
@@ -126,7 +126,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                         </button>
                     </div>
                 </div>
-                <div className="-mt-2 desktop:mt-0 max-w-xl text-sm text-gray-500">
+                <div className="z-50 mt-2 desktop:mt-2 text-sm text-gray-500 xs:max-h-64 mobile:max-h-80 desktop:max-h-96 overflow-scroll">
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         {getTranslation('overview_title', currentLanguage)}
                     </h5>

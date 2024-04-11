@@ -118,28 +118,39 @@ function getClusterByCommunity(community: number): ClusterConfig {
 }
 
 function identifyClusters(community: number, currentLayoutName: string) {
+    const currentLayout = config.getLayout(currentLayoutName);
     const clusterByCommunity = config.getClusterByCommunity(community);
-    const clusterByCommunityLayout = config.getLayout(currentLayoutName).groups.main
+    const clusterByCommunityLayout = currentLayout.groups.main
         .filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity.name) != -1)[0]
-        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity.name) != -1)[0];
-    const mainClusterByDetailedName = config.getLayout(currentLayoutName).groups.main
-        .filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0]?.name
-        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0]?.name;
-    const clusterByLayoutName = config.getLayout(currentLayoutName).groups.main
-        .filter(group => group.name === clusterByCommunity.name)[0]?.name
-        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.name === clusterByCommunity.name)[0]?.name;
+        || currentLayout.groups.hidden?.filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity.name) != -1)[0];
+    const normalClusterByDetailedName = currentLayout.groups.main.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0];
+    const hiddenClusterByDetailedName = currentLayout.groups.hidden?.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0];
+    const mainClusterByDetailedName = normalClusterByDetailedName?.name || hiddenClusterByDetailedName?.name;
+    const mainGroupByLayoutName = currentLayout.groups.main.filter(group => group.name === clusterByCommunity.name)[0]
+    const hiddenGroupByLayoutName = currentLayout.groups.hidden?.filter(group => group.name === clusterByCommunity.name)[0];
+    const clusterByLayoutName = mainGroupByLayoutName?.name || hiddenGroupByLayoutName?.name;
     const superClusterOnlyName = clusterByCommunityLayout?.underlay;
     const mainCluster = mainClusterByDetailedName ? config.getClusterByName(mainClusterByDetailedName)
         : superClusterOnlyName ? undefined
             : config.getClusterByName(clusterByLayoutName);
-    const superClusterByMain = config.getLayout(currentLayoutName).groups.main
+    const superClusterByMain = currentLayout.groups.main
         .filter(group => group.underlay && group.name === mainCluster?.name)[0]?.underlay
-        || config.getLayout(currentLayoutName).groups.hidden?.filter(group => group.underlay && group.name === mainCluster?.name)[0]?.underlay;
+        || currentLayout.groups.hidden?.filter(group => group.underlay && group.name === mainCluster?.name)[0]?.underlay;
     const superCluster = superClusterOnlyName
         ? config.getClusterByName(superClusterOnlyName[0])
         : config.getClusterByName(superClusterByMain && superClusterByMain[0]);
     const detailedCluster = mainClusterByDetailedName !== undefined ? clusterByCommunity : undefined;
-    return { detailedCluster, mainCluster, superCluster }
+
+    let mainClusterChildren: number[] | undefined;
+    if (mainCluster?.name === normalClusterByDetailedName?.name) {
+        mainClusterChildren = normalClusterByDetailedName?.overlay?.map(name => getClusterByName(name)?.community);
+    }
+
+    if (mainCluster?.name === hiddenClusterByDetailedName?.name) {
+        mainClusterChildren = hiddenClusterByDetailedName?.overlay?.map(name => getClusterByName(name)?.community);
+    }
+
+    return { detailedCluster, mainCluster, superCluster, mainClusterChildren }
 }
 
 function getNodeColor(community: number, currentLayoutName: string, useSubclusterOverlay: boolean): string {
