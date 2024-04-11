@@ -109,13 +109,13 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
 
   const previousSelectedNode: string | null = usePrevious<string | null>(
     selectedNode
-  );
+  ) || "";
   const previousSecondDegreeNeighbors: boolean = usePrevious<boolean>(
     showSecondDegreeNeighbors
-  );
+  ) || false;
   const previousUseSubclusterOverlay: boolean = usePrevious<boolean>(
     useSubclusterOverlay
-  )
+  ) || false;
 
   // Graph State
   const [graph, setGraph] = React.useState<MultiDirectedGraph | null>(null);
