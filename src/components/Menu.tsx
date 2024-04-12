@@ -190,7 +190,7 @@ const Menu: FC<MenuProps> = ({
                                 </div>
                             </div>}
                         </div>
-                        <div className="relative flex gap-x-3 ml-4 mobile:-mt-4 mobile:-ml-2 w-full flex-col">
+                        <div className="relative flex gap-x-3 ml-4 mobile:-mt-4 mobile:-ml-12 xs:-ml-4 w-fit flex-col">
                             <div className="flex flex-row">
                                 <div className="flex h-6 items-center mt-auto mb-auto">
                                     <input

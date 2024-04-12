@@ -76,9 +76,14 @@ const getContrastColor = (color: string | undefined): string => {
     return brightness >= 128 ? "#000000" : "#ffffff";
 }
 
+const truncateText = (text: string, size: number): string => {
+    return text.length > size ? text?.substring(0, size) + "..." : text;
+}
+
 const clusterVisualConfig = {
     ...config,
     getContrastColor,
+    truncateText,
     hideClusterLabels: hideClusterLabels,
     hiddenClusters: config.hiddenClusters,
     knownClusterNames: knownClusterNames,

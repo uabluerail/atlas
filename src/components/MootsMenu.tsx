@@ -28,10 +28,6 @@ interface MootsMenuProps {
     useSubclusterOverlay: boolean;
 }
 
-const truncate = (text: string, size: number): string => {
-    return text.length > size ? text?.substring(0, size) + "..." : text;
-}
-
 const buildClusters = (
     selectedNode,
     graph,
@@ -235,7 +231,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                     )}`}
                                     target="_blank"
                                 >
-                                    {truncate(graph?.getNodeAttribute(selectedNode, "label"), 30)}
+                                    {config.truncateText(graph?.getNodeAttribute(selectedNode, "label"), 30)}
                                     {" "}
                                     <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                                 </a>
@@ -375,7 +371,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                                     setSelectedNode(moot.node)
                                                 }}
                                             >
-                                                {truncate(moot.label, 25)}
+                                                {config.truncateText(moot.label, 25)}
                                             </a>
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
@@ -429,7 +425,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                                     setSelectedNode(moot.node)
                                                 }}
                                             >
-                                                {truncate(moot.label, 25)}
+                                                {config.truncateText(moot.label, 25)}
                                             </a>
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
@@ -477,7 +473,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                                     setSelectedNode(moot.node)
                                                 }}
                                             >
-                                                {truncate(moot.label, 25)}
+                                                {config.truncateText(moot.label, 25)}
                                             </a>
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
