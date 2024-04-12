@@ -14,19 +14,15 @@ jobs:
     steps:
       - name: Checkout code
       - uses: actions/checkout@v4
-
       - name: Npm cache
       - uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
-
       - name: Yarn install cache
         uses: c-hive/gha-yarn-cache@v2
-
       - name: Install dependencies
         run: yarn install && yarn --cwd exporter install
-
       - name: Fetch graph conf
         env:
           CONF_URL: "${{ vars.CONF_URL }}"
@@ -34,14 +30,12 @@ jobs:
           wget -O config.json "$CONF_URL"
           cd exporter
           yarn getGraphVersion >> $CURRENT_GRAPH_VERSION
-
       - name: Cache graph
         id: cache-graph
         uses: actions/cache@v3
         with:
           path: ./
           key: ${{ runner.os }}-graph-${{ hashFiles('**/graph.json') }}
-
       - name: Fetch graph data
         env:
           GRAPH_URL: "${{ vars.GRAPH_URL }}"
@@ -50,26 +44,22 @@ jobs:
           cd exporter
           yarn getGraphVersion >> $CACHED_GRAPH_VERSION
         if: steps.cache-graph.outputs.cache-hit != 'true' || vars.CURRENT_GRAPH_VERSION != vars.CACHED_GRAPH_VERSION
-
       - name: Cache layouts
         id: cache-layouts
         uses: actions/cache@v3
         with:
           path: ./exporter/out/
           key: ${{ runner.os }}-exporter-out-${{ hashFiles('**/*.json') }}
-
       - name: Generate layout
         run: |
           mkdir -p exporter/out
           cd exporter
           yarn start graph.json
-
       - name: Build
         run: |
           yarn build
           mkdir -p dist/exporter/out
           cp -rv exporter/out/* dist/exporter/out/
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
