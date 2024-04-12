@@ -10,5 +10,5 @@ if (fs.existsSync("../graph.json")) {
 
 if (!graph?.graphVersion
     || graph.graphVersion === config.settings.graphVersion) {
-    console.log(config.settings.graphVersion);
+    console.log("graphVersion:" + config.settings.graphVersion);
 }

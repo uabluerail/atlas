@@ -29,7 +29,7 @@ jobs:
         run: |
           wget -O config.json "$CONF_URL"
           cd exporter
-          yarn getGraphVersion >> $CURRENT_GRAPH_VERSION
+          echo "CURRENT_GRAPH_VERSION=$(yarn getGraphVersion | grep graphVersion | cut -c 14)" >> $GITHUB_ENV
       - name: Cache graph
         id: cache-graph
         uses: actions/cache@v3
@@ -42,7 +42,8 @@ jobs:
         run: |
           wget -O graph.json "$GRAPH_URL"
           cd exporter
-          yarn getGraphVersion >> $CACHED_GRAPH_VERSION
+          echo "CACHED_GRAPH_VERSION=$(yarn getGraphVersion | grep graphVersion | cut -c 14)" >> $GITHUB_ENV
+          echo $CACHED_GRAPH_VERSION
         if: steps.cache-graph.outputs.cache-hit != 'true' || vars.CURRENT_GRAPH_VERSION != vars.CACHED_GRAPH_VERSION
       - name: Cache layouts
         id: cache-layouts
