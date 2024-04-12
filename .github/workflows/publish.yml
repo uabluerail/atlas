@@ -12,8 +12,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
       - uses: actions/checkout@v4
 
+      - name: Npm cache
       - uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -28,11 +30,10 @@ jobs:
       - name: Fetch graph conf
         env:
           CONF_URL: "${{ vars.CONF_URL }}"
-        steps:
-          run: |
-            wget -O config.json "$CONF_URL"
-            cd exporter
-            yarn getGraphVersion >> $CURRENT_GRAPH_VERSION
+        run: |
+          wget -O config.json "$CONF_URL"
+          cd exporter
+          yarn getGraphVersion >> $CURRENT_GRAPH_VERSION
 
       - name: Cache graph
         id: cache-graph
