@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./
-          key: ${{ runner.os }}-graph-${{ hashFiles('**/graph.json') }}
+          key: ${{ runner.os }}-graph-${{ vars.CURRENT_GRAPH_VERSION }}
       - name: Fetch graph data
         env:
           GRAPH_URL: "${{ vars.GRAPH_URL }}"
@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./exporter/out/
-          key: ${{ runner.os }}-exporter-out-${{ hashFiles('**/*.json') }}
+          key: ${{ runner.os }}-exporter-out-${{ hashFiles('**/*layout.json') }}
       - name: Generate layout
         run: |
           mkdir -p exporter/out
