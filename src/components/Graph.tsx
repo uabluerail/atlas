@@ -1,4 +1,4 @@
-import React, { SetStateAction, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { MultiDirectedGraph } from "graphology";
 import Menu from "./Menu";
