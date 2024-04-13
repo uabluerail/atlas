@@ -133,7 +133,7 @@ const buildClusters = (
                                 setSearchParams(searchParams);
                             }}
                             className={
-                                `relative ml-1 inline-flex items-center rounded-sm px-1 py-0 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+                                `relative ml-1 inline-flex items-center rounded-sm px-1 py-0 text-xs font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
                                 (showCommunityList
                                     ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
                                     : " bg-orange-500 hover:bg-orange-600 focus-visible:ring-orange-500")
@@ -281,7 +281,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                     setSearchParams(searchParams);
                                 }}
                                 className={
-                                    `relative inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+                                    `relative inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
                                     (showMootList
                                         ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
                                         : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
@@ -337,164 +337,166 @@ const MootsMenu: FC<MootsMenuProps> = ({
                             </div>)}
                     </div>
                 </div>
-                <div className={`z-50 divide-y divide-gray-200
+                {(showMootList || showCommunityList || showClusterList) && (
+                    <div className={`z-50 divide-y divide-gray-200
                 ${hideMenu ? 'xs:max-h-80' : 'xs:max-h-40'}
                 ${hideMenu ? 'mobile:max-h-80' : 'mobile:h-44'}
                 desktop:max-h-96 md:max-h-screen overflow-auto`}>
-                    {showMootList && (
-                        <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
-                            <div className="table-header-group">
-                                <div className="table-row flex items-center justify-between">
-                                    <div className="table-cell font-medium text-gray-900 truncate">
-                                        {"#"}
-                                    </div>
-                                    <div className="table-cell font-medium text-gray-900 truncate">
-                                        {getTranslation('user', currentLanguage)}
-                                    </div>
-                                    <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        {getTranslation('interactions_weight', currentLanguage)}
-                                    </div>
-                                    <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
+                        {showMootList && (
+                            <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
+                                <div className="table-header-group">
+                                    <div className="table-row flex items-center justify-between">
+                                        <div className="table-cell font-medium text-gray-900 truncate">
+                                            {"#"}
+                                        </div>
+                                        <div className="table-cell font-medium text-gray-900 truncate">
+                                            {getTranslation('user', currentLanguage)}
+                                        </div>
+                                        <div className="table-cell ml-2 flex-shrink-0 flex">
+                                            {getTranslation('interactions_weight', currentLanguage)}
+                                        </div>
+                                        <div className="table-cell ml-2 flex-shrink-0 flex">
+                                            {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
+                                        </div>
                                     </div>
                                 </div>
+                                {mootList.slice(0, 10).map((moot) => (
+                                    <div className="table-row-group" key={moot.node}>
+                                        <div className="z-50 table-row flex items-center justify-between">
+                                            <div className="table-cell font-medium text-gray-900 truncate">
+                                                {++i}
+                                            </div>
+                                            <div className="table-cell underline font-medium text-gray-900 truncate">
+                                                {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
+                                                {moot.avatarUrl && " "}
+                                                <a
+                                                    href="#"
+                                                    onClick={() => {
+                                                        searchParams.set('s', `${moot.label}`);
+                                                        setSearchParams(searchParams);
+                                                        setSelectedNode(moot.node)
+                                                    }}
+                                                >
+                                                    {truncateText(moot.label, 25)}
+                                                </a>
+                                            </div>
+                                            <div className="table-cell ml-2 flex-shrink-0 flex">
+                                                <span className="px-2 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                                    {moot.weight}
+                                                </span>
+                                            </div>
+                                            <div className="table-cell ml-2 flex-shrink-0 flex">
+                                                <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900"
+                                                    style={{
+                                                        backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
+                                                        color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
+                                                    }}>
+                                                    {moot.size}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            {mootList.slice(0, 10).map((moot) => (
-                                <div className="table-row-group" key={moot.node}>
+                        )}
+                        {showCommunityList && communityList.length > 0 && (
+                            <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
+                                <div className="table-header-group">
                                     <div className="z-50 table-row flex items-center justify-between">
                                         <div className="table-cell font-medium text-gray-900 truncate">
-                                            {++i}
+                                            {"#"}
                                         </div>
-                                        <div className="table-cell underline font-medium text-gray-900 truncate">
-                                            {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
-                                            {moot.avatarUrl && " "}
-                                            <a
-                                                href="#"
-                                                onClick={() => {
-                                                    searchParams.set('s', `${moot.label}`);
-                                                    setSearchParams(searchParams);
-                                                    setSelectedNode(moot.node)
-                                                }}
-                                            >
-                                                {truncateText(moot.label, 25)}
-                                            </a>
+                                        <div className="table-cell font-medium text-gray-900 truncate">
+                                            {getTranslation('user', currentLanguage)}
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
-                                            <span className="px-2 inline-flex leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                {moot.weight}
-                                            </span>
+                                            {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
                                         </div>
-                                        <div className="table-cell ml-2 flex-shrink-0 flex">
-                                            <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900"
-                                                style={{
+                                    </div>
+                                </div>
+                                {communityList.slice(0, 10).map((moot) => (
+                                    <div className="table-row-group" key={moot.node}>
+                                        <div className="z-50 table-row flex items-center justify-between">
+                                            <div className="table-cell font-medium text-gray-900 truncate">
+                                                {++i}
+                                            </div>
+                                            <div className="table-cell underline font-medium text-gray-900 truncate">
+                                                {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
+                                                {moot.avatarUrl && " "}
+                                                <a
+                                                    href="#"
+                                                    onClick={() => {
+                                                        searchParams.set('s', `${moot.label}`);
+                                                        setSearchParams(searchParams);
+                                                        setSelectedNode(moot.node)
+                                                    }}
+                                                >
+                                                    {truncateText(moot.label, 25)}
+                                                </a>
+                                            </div>
+                                            <div className="table-cell ml-2 flex-shrink-0 flex">
+                                                <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{
                                                     backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
                                                     color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
                                                 }}>
-                                                {moot.size}
-                                            </span>
+                                                    {moot.weight}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    {showCommunityList && communityList.length > 0 && (
-                        <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
-                            <div className="table-header-group">
-                                <div className="z-50 table-row flex items-center justify-between">
-                                    <div className="table-cell font-medium text-gray-900 truncate">
-                                        {"#"}
-                                    </div>
-                                    <div className="table-cell font-medium text-gray-900 truncate">
-                                        {getTranslation('user', currentLanguage)}
-                                    </div>
-                                    <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
-                            {communityList.slice(0, 10).map((moot) => (
-                                <div className="table-row-group" key={moot.node}>
+                        )}
+                        {showClusterList && clusterList.length > 0 && (
+                            <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
+                                <div className="table-header-group">
                                     <div className="z-50 table-row flex items-center justify-between">
                                         <div className="table-cell font-medium text-gray-900 truncate">
-                                            {++i}
+                                            {"#"}
                                         </div>
-                                        <div className="table-cell underline font-medium text-gray-900 truncate">
-                                            {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
-                                            {moot.avatarUrl && " "}
-                                            <a
-                                                href="#"
-                                                onClick={() => {
-                                                    searchParams.set('s', `${moot.label}`);
-                                                    setSearchParams(searchParams);
-                                                    setSelectedNode(moot.node)
-                                                }}
-                                            >
-                                                {truncateText(moot.label, 25)}
-                                            </a>
-                                        </div>
-                                        <div className="table-cell ml-2 flex-shrink-0 flex">
-                                            <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{
-                                                backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
-                                                color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
-                                            }}>
-                                                {moot.weight}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                    {showClusterList && clusterList.length > 0 && (
-                        <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
-                            <div className="table-header-group">
-                                <div className="z-50 table-row flex items-center justify-between">
-                                    <div className="table-cell font-medium text-gray-900 truncate">
-                                        {"#"}
-                                    </div>
-                                    <div className="table-cell font-medium text-gray-900 truncate">
-                                        {getTranslation('user', currentLanguage)}
-                                    </div>
-                                    <div className="table-cell ml-2 flex-shrink-0 flex">
-                                        {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            {clusterList.slice(0, 10).map((moot) => (
-                                <div className="table-row-group" key={moot.node}>
-                                    <div className="z-50 table-row flex items-center justify-between">
                                         <div className="table-cell font-medium text-gray-900 truncate">
-                                            {++i}
-                                        </div>
-                                        <div className="table-cell underline font-medium text-gray-900 truncate">
-                                            {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
-                                            {moot.avatarUrl && " "}
-                                            <a
-                                                href="#"
-                                                onClick={() => {
-                                                    searchParams.set('s', `${moot.label}`);
-                                                    setSearchParams(searchParams);
-                                                    setSelectedNode(moot.node)
-                                                }}
-                                            >
-                                                {truncateText(moot.label, 25)}
-                                            </a>
+                                            {getTranslation('user', currentLanguage)}
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
-                                            <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{
-                                                backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
-                                                color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
-                                            }}>
-                                                {moot.weight}
-                                            </span>
+                                            {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                                {clusterList.slice(0, 10).map((moot) => (
+                                    <div className="table-row-group" key={moot.node}>
+                                        <div className="z-50 table-row flex items-center justify-between">
+                                            <div className="table-cell font-medium text-gray-900 truncate">
+                                                {++i}
+                                            </div>
+                                            <div className="table-cell underline font-medium text-gray-900 truncate">
+                                                {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
+                                                {moot.avatarUrl && " "}
+                                                <a
+                                                    href="#"
+                                                    onClick={() => {
+                                                        searchParams.set('s', `${moot.label}`);
+                                                        setSearchParams(searchParams);
+                                                        setSelectedNode(moot.node)
+                                                    }}
+                                                >
+                                                    {truncateText(moot.label, 25)}
+                                                </a>
+                                            </div>
+                                            <div className="table-cell ml-2 flex-shrink-0 flex">
+                                                <span className="px-2 inline-flex leading-5 font-semibold rounded-full text-gray-900" style={{
+                                                    backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
+                                                    color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
+                                                }}>
+                                                    {moot.weight}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
             )}
 
