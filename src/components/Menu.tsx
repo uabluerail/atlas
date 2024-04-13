@@ -93,22 +93,22 @@ const Menu: FC<MenuProps> = ({
             {!hideMenu && (
                 <div className="bg-white shadow desktop:rounded-lg py-1">
                     {/* <div className="xs:hidden"> */}
-                    <dl className="mx-auto mobile:-mt-1 mobile:-mb-1 grid gap-px grid-cols-2">
+                    <dl className="mx-auto mobile:-mt-1 xs:-mb-0 mobile:-mb-1 grid gap-px grid-cols-2">
                         <div className="flex flex-col items-baseline bg-white text-center">
                             <dt className="desktop:text-sm mobile:-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
                                 <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('users', currentLanguage)}
                             </dt>
-                            <dd className="desktop:text-3xl xs:text-sm mobile:-mt-2 mr-auto ml-auto text-lg font-bold leading-10 tracking-tight text-gray-900">
+                            <dd className="desktop:text-3xl mobile:text-lg xs:text-sm mobile:-mt-2 mr-auto ml-auto text-lg font-bold leading-10 tracking-tight text-gray-900">
                                 {selectedNodeCount >= 0
                                     ? selectedNodeCount.toLocaleString()
                                     : userCount.toLocaleString()}
                             </dd>
                         </div>
-                        <div className="flex flex-col items-baseline bg-white text-center">
+                        <div className="flex flex-col -ml-10 items-baseline bg-white text-center">
                             <dt className="desktop:text-sm mobile:-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
                                 <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('interactions', currentLanguage)}
                             </dt>
-                            <dd className="desktop:text-3xl xs:text-sm mobile:-mt-2 mr-auto ml-auto text-lg font-bold leading-10 tracking-tight text-gray-900">
+                            <dd className="desktop:text-3xl mobile:text-lg xs:text-sm mobile:-mt-2 mr-auto ml-auto text-lg font-bold leading-10 tracking-tight text-gray-900">
                                 {selectedNodeEdges
                                     ? selectedNodeEdges.length.toLocaleString()
                                     : edgeCount.toLocaleString()}
@@ -118,6 +118,42 @@ const Menu: FC<MenuProps> = ({
                     {/* </div> */}
                     <div className="table px-2 xs:py-0 mobile:py-1 py-2 desktop:p-3 w-full">
                         <div className="table-row-group">
+                            <div className="table-row">
+                                <div className="table-cell w-5/12">
+                                    <div className="flex flex-row">
+                                        <div className="flex h-8 items-center">
+                                            <CustomSearch
+                                                viewPort={viewPort}
+                                                currentLanguage={currentLanguage}
+                                                onLocate={(node) => {
+                                                    const nodeLabel = graph?.getNodeAttribute(node, "label");
+                                                    searchParams.set('s', `${nodeLabel}`)
+                                                    if (showMootList) {
+                                                        searchParams.set('ml', `${showMootList}`);
+                                                    }
+                                                    setSearchParams(searchParams);
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="table-cell xs:w-0 mobile:w-0 desktop:w-0">
+                                    {/* empty */}
+                                </div>
+                                <div className="table-cell w-6/12">
+                                    <div className="flex flex-row">
+                                        <div className="flex h-4 items-center">
+                                            <LayoutMenu
+                                                setLoading={setLoading}
+                                                setGraphShouldUpdate={setGraphShouldUpdate}
+                                                searchParams={searchParams}
+                                                setSearchParams={setSearchParams}
+                                                moderator={moderator}
+                                                currentLanguage={currentLanguage} />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div className="table-row">
                                 <div className="table-cell w-5/12">
                                     <div className="flex flex-row">
@@ -136,15 +172,15 @@ const Menu: FC<MenuProps> = ({
                                                 htmlFor="clusterLabels"
                                                 className="font-medium text-gray-900"
                                             >
-                                                {getTranslation('labels_of_clusters', currentLanguage, { viewPort, xs: 18, mobile: 23 })}
+                                                {getTranslation('labels_of_clusters', currentLanguage, { viewPort, xs: 20, mobile: 24 })}
                                             </label>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="table-cell w-1/12 mobile:w-0">
+                                <div className="table-cell xs:w-0 mobile:w-0 desktop:w-0">
                                     {/* empty */}
                                 </div>
-                                <div className="table-cell w-5/12">
+                                <div className="table-cell w-6/12">
                                     <div className="flex flex-row">
                                         <div className="flex h-6 items-center mt-auto mb-auto">
                                             <input
@@ -163,7 +199,7 @@ const Menu: FC<MenuProps> = ({
                                                 htmlFor="neighbors"
                                                 className="font-medium text-gray-900"
                                             >
-                                                {getTranslation('interactions_of_friends', currentLanguage, { viewPort, xs: 18, mobile: 23 })}
+                                                {getTranslation('interactions_of_friends', currentLanguage, { viewPort, xs: 20, mobile: 24 })}
                                             </label>
                                         </div>
                                     </div>
@@ -194,15 +230,15 @@ const Menu: FC<MenuProps> = ({
                                                     htmlFor="clusterLabels"
                                                     className="font-medium text-gray-900"
                                                 >
-                                                    {getTranslation('show_communities', currentLanguage, { viewPort, xs: 18, mobile: 23 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                                    {getTranslation('show_communities', currentLanguage, { viewPort, xs: 20, mobile: 24 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
                                                 </label>
                                             </div>
                                         </div>}
                                 </div>
-                                <div className="table-cell w-1/12 mobile:w-0">
+                                <div className="table-cell xs:w-0 mobile:w-0 desktop:w-0">
                                     {/* empty */}
                                 </div>
-                                <div className="table-cell w-5/12">
+                                <div className="table-cell w-6/12">
                                     <div className="flex flex-row">
                                         <div className="flex h-6 items-center">
                                             <input
@@ -219,7 +255,7 @@ const Menu: FC<MenuProps> = ({
                                                 htmlFor="clusterLabels"
                                                 className="font-medium text-gray-900"
                                             >
-                                                {getTranslation('more_details', currentLanguage, { viewPort, xs: 18, mobile: 23 })}
+                                                {getTranslation('more_details', currentLanguage, { viewPort, xs: 20, mobile: 24 })}
                                             </label>
                                         </div>
                                     </div>
@@ -244,47 +280,20 @@ const Menu: FC<MenuProps> = ({
                                                     htmlFor="clusterLabels"
                                                     className="font-medium text-gray-900"
                                                 >
-                                                    {getTranslation('show_hidden_clusters', currentLanguage, { viewPort, xs: 18, mobile: 23 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                                    {getTranslation('show_hidden_clusters', currentLanguage, { viewPort, xs: 20, mobile: 24 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
                                                 </label>
                                             </div>
                                         </div>
                                     </div>}
                                 </div>
-                                <div className="table-cell w-1/12 mobile:w-0">
+                                <div className="table-cell xs:w-0 mobile:w-0 desktop:w-0">
                                     {/* empty */}
                                 </div>
                                 <div className="table-cell w-5/12">
 
                                 </div>
                             </div>
-                            <div className="table-row">
-                                <div className="table-cell w-5/12">
-                                    <CustomSearch
-                                        viewPort={viewPort}
-                                        currentLanguage={currentLanguage}
-                                        onLocate={(node) => {
-                                            const nodeLabel = graph?.getNodeAttribute(node, "label");
-                                            searchParams.set('s', `${nodeLabel}`)
-                                            if (showMootList) {
-                                                searchParams.set('ml', `${showMootList}`);
-                                            }
-                                            setSearchParams(searchParams);
-                                        }}
-                                    />
-                                </div>
-                                <div className="table-cell">
-                                    {/* empty */}
-                                </div>
-                                <div className="table-cell w-5/12">
-                                    <LayoutMenu
-                                        setLoading={setLoading}
-                                        setGraphShouldUpdate={setGraphShouldUpdate}
-                                        searchParams={searchParams}
-                                        setSearchParams={setSearchParams}
-                                        moderator={moderator}
-                                        currentLanguage={currentLanguage} />
-                                </div>
-                            </div>
+
                         </div>
                     </div>
                 </div >

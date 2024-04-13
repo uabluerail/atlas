@@ -89,7 +89,7 @@ const LayoutMenu: FC<LayoutMenuProps> = ({
                 </Menu.Items>
             </Transition>
             <div>
-                <Menu.Button className="inline-flex w-full ml-1 justify-center gap-x-1.5 rounded-md bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                <Menu.Button className="inline-flex w-40 ml-1 justify-center gap-x-1.5 rounded-md bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                     {getTranslation('choose', currentLanguage)}{" "}<span className="hidden md:inline">{getTranslation('layout', currentLanguage)}</span>
                     <span className="md:hidden">{getTranslation('layout', currentLanguage)}</span>
                     <ChevronDownIcon className="-mr-1 -ml-1 h-4 w-4 text-gray-400" aria-hidden="true" />

@@ -125,7 +125,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                         </button>
                     </div>
                 </div>
-                <div className="z-50 mt-2 desktop:mt-2 text-sm text-gray-500 xs:max-h-72 mobile:max-h-80 desktop:max-h-96 overflow-scroll">
+                <div className="z-50 mt-2 desktop:mt-2 text-sm text-gray-500 xs:max-h-64 mobile:max-h-80 desktop:max-h-96 overflow-scroll">
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         {getTranslation('overview_title', currentLanguage)}
                     </h5>

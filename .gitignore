@@ -30,3 +30,4 @@ out/
 graph.tsv
 *graph*.json
 config.json
+*.pem
