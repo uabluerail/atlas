@@ -20,6 +20,7 @@ import Footer from "./Footer";
 import { useMediaQuery } from 'react-responsive'
 import { Node, Edge, MootNode, Cluster } from "../model";
 import MootsMenu from "./MootsMenu";
+import useWindowDimensions from "./hooks/viewPort";
 
 // Hook
 function usePrevious<T>(value: T): T {
@@ -71,7 +72,6 @@ interface GraphProps {
 const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   // Router info
   const [searchParams, setSearchParams] = useSearchParams();
-
   // Graph raw data
   const [graphDump, setGraphDump] = React.useState<any>(null);
 
@@ -88,6 +88,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
   const [moderator] = React.useState<boolean>(searchParams.get("moderator") === "true");
 
   const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const [viewPort, setViewPort] = React.useState<{ width: number, height: number }>(useWindowDimensions());
   const [accessJwt, setAccessJwt] = React.useState<string>("");
   const [refreshJwt, setRefreshJwt] = React.useState<string>("");
 
@@ -548,6 +549,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
       >
         {selectedNode !== null && mootList.length >= 0 && (
           <MootsMenu
+            hideMenu={hideMenu}
             currentLayoutName={currentLayoutName}
             currentLanguage={currentLanguage}
             selectedNode={selectedNode}
@@ -607,6 +609,8 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         </div>
         <SocialGraph />
         <Menu
+          isMobile={isMobile}
+          viewPort={viewPort}
           selectedNodeCount={selectedNodeCount}
           userCount={userCount}
           selectedNodeEdges={selectedNodeEdges}

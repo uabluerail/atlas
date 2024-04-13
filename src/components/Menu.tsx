@@ -7,8 +7,11 @@ import { SetURLSearchParams } from "react-router-dom";
 import LayoutMenu from "./LayoutMenu"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons'
+import { is } from "date-fns/locale";
 
 interface MenuProps {
+    isMobile: boolean;
+    viewPort: { width: number, height: number };
     selectedNodeCount: number;
     userCount: number;
     selectedNodeEdges: string[] | null;
@@ -37,6 +40,8 @@ interface MenuProps {
 }
 
 const Menu: FC<MenuProps> = ({
+    isMobile,
+    viewPort,
     selectedNodeCount,
     userCount,
     selectedNodeEdges,
@@ -66,8 +71,8 @@ const Menu: FC<MenuProps> = ({
     const hiddenClusters = config.hiddenClusters.get(currentLayoutName);
     return (
         <div className="
-        xs:bottom-5 mobile:bottom-14 mobile:left-0 mobile:right-0 mobile:w-full mobile:h-3/7 mobile:transform mobile:translate-x-0
-        desktop:left-1/2 desktop:bottom-14 desktop:transform desktop:-translate-x-1/2 desktop:w-3/4
+        xs:bottom-7 mobile:bottom-14 mobile:left-0 mobile:right-0 mobile:w-full mobile:h-3/7
+        desktop:left-1/2 desktop:bottom-14 desktop:transform desktop:-translate-x-1/2 desktop:w-8/12
          z-40 fixed">
             <div className={`${hideMenu ? 'xs:-mt-8 mobile:-mt-6 desktop:-mt-4' : 'mt-1'} fixed right-2 left:1/2`}>
                 <button
@@ -87,186 +92,205 @@ const Menu: FC<MenuProps> = ({
             </div>
             {!hideMenu && (
                 <div className="bg-white shadow desktop:rounded-lg py-1">
-                    <dl className="mx-auto mobile:-mt-1 grid gap-px bg-gray-900/5 grid-cols-2">
+                    {/* <div className="xs:hidden"> */}
+                    <dl className="mx-auto mobile:-mt-1 mobile:-mb-1 grid gap-px grid-cols-2">
                         <div className="flex flex-col items-baseline bg-white text-center">
-                            <dt className="desktop:text-sm text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
+                            <dt className="desktop:text-sm mobile:-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
                                 <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('users', currentLanguage)}
                             </dt>
-                            <dd className="desktop:text-3xl mobile:-mt-2 mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
+                            <dd className="desktop:text-3xl xs:text-sm mobile:-mt-2 mr-auto ml-auto text-lg font-bold leading-10 tracking-tight text-gray-900">
                                 {selectedNodeCount >= 0
                                     ? selectedNodeCount.toLocaleString()
                                     : userCount.toLocaleString()}
                             </dd>
                         </div>
                         <div className="flex flex-col items-baseline bg-white text-center">
-                            <dt className="desktop:text-sm text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
+                            <dt className="desktop:text-sm mobile:-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
                                 <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('interactions', currentLanguage)}
                             </dt>
-                            <dd className="desktop:text-3xl mobile:-mt-2 mr-auto ml-auto text-lg font-medium leading-10 tracking-tight text-gray-900">
+                            <dd className="desktop:text-3xl xs:text-sm mobile:-mt-2 mr-auto ml-auto text-lg font-bold leading-10 tracking-tight text-gray-900">
                                 {selectedNodeEdges
                                     ? selectedNodeEdges.length.toLocaleString()
                                     : edgeCount.toLocaleString()}
                             </dd>
                         </div>
                     </dl>
-                    <div className="px-2 py-2 desktop:p-2 w-full ml-auto mr-auto mt-0 grid grid-flow-row-dense grid-cols-3 ">
-                        <div className="col-span-2 mobile:-mt-3 mobile:-ml-0 mb-auto ">
-                            <CustomSearch
-                                currentLanguage={currentLanguage}
-                                onLocate={(node) => {
-                                    const nodeLabel = graph?.getNodeAttribute(node, "label");
-                                    searchParams.set('s', `${nodeLabel}`)
-                                    if (showMootList) {
-                                        searchParams.set('ml', `${showMootList}`);
-                                    }
-                                    setSearchParams(searchParams);
-                                }}
-                            />
-                            {config.overlayLayouts.get(currentLayoutName) && <div className="flex flex-row mt-1">
-                                <div className="flex h-6 items-center">
-                                    <input
-                                        id="clusterLabels"
-                                        name="clusterLabels"
-                                        type="checkbox"
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                        checked={useSubclusterOverlay}
-                                        onChange={() => {
-                                            searchParams.set('sc', !useSubclusterOverlay ? "true" : "false")
+                    {/* </div> */}
+                    <div className="table px-2 xs:py-0 mobile:py-1 py-2 desktop:p-3 w-full">
+                        <div className="table-row-group">
+                            <div className="table-row">
+                                <div className="table-cell w-5/12">
+                                    <div className="flex flex-row">
+                                        <div className="flex h-6 items-center">
+                                            <input
+                                                id="clusterLabels"
+                                                name="clusterLabels"
+                                                type="checkbox"
+                                                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                checked={showClusterLabels}
+                                                onChange={() => setShowClusterLabels(!showClusterLabels)}
+                                            />
+                                        </div>
+                                        <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
+                                            <label
+                                                htmlFor="clusterLabels"
+                                                className="font-medium text-gray-900"
+                                            >
+                                                {getTranslation('labels_of_clusters', currentLanguage, { viewPort, xs: 18, mobile: 23 })}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="table-cell w-1/12 mobile:w-0">
+                                    {/* empty */}
+                                </div>
+                                <div className="table-cell w-5/12">
+                                    <div className="flex flex-row">
+                                        <div className="flex h-6 items-center mt-auto mb-auto">
+                                            <input
+                                                id="neighbors"
+                                                name="neighbors"
+                                                type="checkbox"
+                                                className="h-4 w-4 ml-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                checked={showSecondDegreeNeighbors}
+                                                onChange={() =>
+                                                    setShowSecondDegreeNeighbors(!showSecondDegreeNeighbors)
+                                                }
+                                            />
+                                        </div>
+                                        <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
+                                            <label
+                                                htmlFor="neighbors"
+                                                className="font-medium text-gray-900"
+                                            >
+                                                {getTranslation('interactions_of_friends', currentLanguage, { viewPort, xs: 18, mobile: 23 })}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="table-row">
+                                <div className="table-cell w-5/12">
+                                    {config.overlayLayouts.get(currentLayoutName) &&
+                                        <div className="flex flex-row">
+                                            <div className="flex h-6 items-center">
+                                                <input
+                                                    id="clusterLabels"
+                                                    name="clusterLabels"
+                                                    type="checkbox"
+                                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                    checked={useSubclusterOverlay}
+                                                    onChange={() => {
+                                                        searchParams.set('sc', !useSubclusterOverlay ? "true" : "false")
+                                                        setSearchParams(searchParams);
+                                                        setUseSubclusterOverlay(!useSubclusterOverlay);
+                                                        setLoading(true);
+                                                        setGraphShouldUpdate(true);
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="desktop:text-sm flex text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
+                                                <label
+                                                    htmlFor="clusterLabels"
+                                                    className="font-medium text-gray-900"
+                                                >
+                                                    {getTranslation('show_communities', currentLanguage, { viewPort, xs: 18, mobile: 23 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                                </label>
+                                            </div>
+                                        </div>}
+                                </div>
+                                <div className="table-cell w-1/12 mobile:w-0">
+                                    {/* empty */}
+                                </div>
+                                <div className="table-cell w-5/12">
+                                    <div className="flex flex-row">
+                                        <div className="flex h-6 items-center">
+                                            <input
+                                                id="clusterLabels"
+                                                name="clusterLabels"
+                                                type="checkbox"
+                                                className="h-4 w-4 ml-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                checked={legend}
+                                                onChange={() => setLegend(!legend)}
+                                            />
+                                        </div>
+                                        <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
+                                            <label
+                                                htmlFor="clusterLabels"
+                                                className="font-medium text-gray-900"
+                                            >
+                                                {getTranslation('more_details', currentLanguage, { viewPort, xs: 18, mobile: 23 })}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="table-row">
+                                <div className="table-cell w-5/12">
+                                    {hiddenClusters && hiddenClusters.size > 0 && <div>
+                                        <div className="flex flex-row">
+                                            <div className="flex h-6 items-center">
+                                                <input
+                                                    id="clusterLabels"
+                                                    name="clusterLabels"
+                                                    type="checkbox"
+                                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                                    checked={showHiddenClusters}
+                                                    onChange={() => { setLoading(true); setShowHiddenClusters(!showHiddenClusters); setGraphShouldUpdate(true); }}
+                                                />
+                                            </div>
+                                            <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
+                                                <label
+                                                    htmlFor="clusterLabels"
+                                                    className="font-medium text-gray-900"
+                                                >
+                                                    {getTranslation('show_hidden_clusters', currentLanguage, { viewPort, xs: 18, mobile: 23 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>}
+                                </div>
+                                <div className="table-cell w-1/12 mobile:w-0">
+                                    {/* empty */}
+                                </div>
+                                <div className="table-cell w-5/12">
+
+                                </div>
+                            </div>
+                            <div className="table-row">
+                                <div className="table-cell w-5/12">
+                                    <CustomSearch
+                                        viewPort={viewPort}
+                                        currentLanguage={currentLanguage}
+                                        onLocate={(node) => {
+                                            const nodeLabel = graph?.getNodeAttribute(node, "label");
+                                            searchParams.set('s', `${nodeLabel}`)
+                                            if (showMootList) {
+                                                searchParams.set('ml', `${showMootList}`);
+                                            }
                                             setSearchParams(searchParams);
-                                            setUseSubclusterOverlay(!useSubclusterOverlay);
-                                            setLoading(true);
-                                            setGraphShouldUpdate(true);
                                         }}
                                     />
                                 </div>
-                                <div className="desktop:text-sm flex text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
-                                    <label
-                                        htmlFor="clusterLabels"
-                                        className="font-medium text-gray-900"
-                                    >
-                                        {getTranslation('show_communities', currentLanguage)}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
-                                    </label>
+                                <div className="table-cell">
+                                    {/* empty */}
                                 </div>
-                            </div>}
-                            {/* <div className="flex flex-row">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="clusterLabels"
-                      name="clusterLabels"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                      checked={showExperimental}
-                      onChange={() => { setShowExperimental(!showExperimental); if (showExperimental && showHiddenClusters) { setLoading(true); setShowHiddenClusters(false); setGraphShouldUpdate(true); } }}
-                    />
-                  </div>
-                  <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
-                    <label
-                      htmlFor="clusterLabels"
-                      className="font-medium text-gray-500"
-                    >{getTranslation('experimental_options')}
-                    </label>
-                  </div>
-                </div> */}
-                            {hiddenClusters && hiddenClusters.size > 0 && <div>
-                                <div className="flex flex-row">
-                                    <div className="flex h-6 items-center">
-                                        <input
-                                            id="clusterLabels"
-                                            name="clusterLabels"
-                                            type="checkbox"
-                                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                            checked={showHiddenClusters}
-                                            onChange={() => { setLoading(true); setShowHiddenClusters(!showHiddenClusters); setGraphShouldUpdate(true); }}
-                                        />
-                                    </div>
-                                    <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto">
-                                        <label
-                                            htmlFor="clusterLabels"
-                                            className="font-medium text-gray-900"
-                                        >
-                                            {getTranslation('show_hidden_clusters', currentLanguage)}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
-                                        </label>
-                                    </div>
+                                <div className="table-cell w-5/12">
+                                    <LayoutMenu
+                                        setLoading={setLoading}
+                                        setGraphShouldUpdate={setGraphShouldUpdate}
+                                        searchParams={searchParams}
+                                        setSearchParams={setSearchParams}
+                                        moderator={moderator}
+                                        currentLanguage={currentLanguage} />
                                 </div>
-                            </div>}
-                        </div>
-                        <div className="relative flex gap-x-3 ml-4 mobile:-mt-4 mobile:-ml-12 xs:-ml-4 w-fit flex-col">
-                            <div className="flex flex-row">
-                                <div className="flex h-6 items-center mt-auto mb-auto">
-                                    <input
-                                        id="neighbors"
-                                        name="neighbors"
-                                        type="checkbox"
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                        checked={showSecondDegreeNeighbors}
-                                        onChange={() =>
-                                            setShowSecondDegreeNeighbors(!showSecondDegreeNeighbors)
-                                        }
-                                    />
-                                </div>
-                                <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
-                                    <label
-                                        htmlFor="neighbors"
-                                        className="font-medium text-gray-900"
-                                    >
-                                        {getTranslation('interactions', currentLanguage)}{" "}<span className="xs:hidden inline">{getTranslation('of_friends', currentLanguage)}</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="flex flex-row">
-                                <div className="flex h-6 items-center">
-                                    <input
-                                        id="clusterLabels"
-                                        name="clusterLabels"
-                                        type="checkbox"
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                        checked={showClusterLabels}
-                                        onChange={() => setShowClusterLabels(!showClusterLabels)}
-                                    />
-                                </div>
-                                <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
-                                    <label
-                                        htmlFor="clusterLabels"
-                                        className="font-medium text-gray-900"
-                                    >
-                                        {getTranslation('labels', currentLanguage)}{" "}<span className="xs:hidden inline">{getTranslation('of_clusters', currentLanguage)}</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="flex flex-row">
-                                <div className="flex h-6 items-center">
-                                    <input
-                                        id="clusterLabels"
-                                        name="clusterLabels"
-                                        type="checkbox"
-                                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                                        checked={legend}
-                                        onChange={() => setLegend(!legend)}
-                                    />
-                                </div>
-                                <div className="flex desktop:text-sm text-xs leading-6 pl-1 desktop:pl-3 mb-auto mt-auto mr-2">
-                                    <label
-                                        htmlFor="clusterLabels"
-                                        className="font-medium text-gray-900"
-                                    >
-                                        {getTranslation('more_details', currentLanguage)}{" "}<span className="xs:hidden inline">{getTranslation('on_clusters', currentLanguage)}</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div className="flex flex-row">
-                                <LayoutMenu
-                                    setLoading={setLoading}
-                                    setGraphShouldUpdate={setGraphShouldUpdate}
-                                    searchParams={searchParams}
-                                    setSearchParams={setSearchParams}
-                                    moderator={moderator}
-                                    currentLanguage={currentLanguage} />
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                </div >
+            )
+            }
+        </div >
     )
 }
 

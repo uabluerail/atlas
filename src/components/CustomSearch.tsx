@@ -9,6 +9,8 @@ type SearchLabelKeys = "text" | "placeholder";
  * Properties for `SearchControl` component
  */
 export interface SearchControlProps {
+
+  viewPort: { width: number, height: number }
   /**
    * HTML id
    */
@@ -57,6 +59,7 @@ function getUniqueKey(): string {
 }
 
 export const CustomSearch: React.FC<SearchControlProps> = ({
+  viewPort,
   id,
   className,
   style,
@@ -180,8 +183,8 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
       <input
         id={inputId}
         type="text"
-        className="block w-full text-xs xs:max-w-36 mobile:max-w-40 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 desktop:text-sm desktop:leading-6 pl-3"
-        placeholder={labels["placeholder"] || getTranslation('search_for_a_handle', currentLanguage)}
+        className="block w-full text-xs xs:max-w-36 mobile:max-w-44 desktop:max-w-80 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 desktop:text-sm pl-3"
+        placeholder={labels["placeholder"] || getTranslation('search_for_a_handle', currentLanguage, { viewPort, xs: 17 })}
         list={`${inputId}-datalist`}
         value={search}
         onChange={onInputChange}

@@ -4,6 +4,13 @@
     font-variant: small-caps;
 }
 
+.ellipsis {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: block;
+    overflow: hidden
+}
+
 .whiteShadow {
     text-shadow: 1px 1px 1px white, -1px -1px 1px white, -1px 1px 1px white,
         1px -1px 1px white;

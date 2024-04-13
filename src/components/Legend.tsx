@@ -100,11 +100,11 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
 
     return (
         <div className="bg-white shadow desktop:rounded-md absolute
-    mobile:top-1 mobile:left-0 mobile:right-0 mobile:w-full
+    mobile:top-1 smobile:left-0 mobile:right-0 mobile:w-full
     desktop:right-1/2 desktop:top-2 desktop:right-2 desktop:w-5/12 desktop:max-w-lg
     z-50">
-            <div className="border-b divide-y divide-gray-200 border-gray-200 bg-white px-3 py-3 desktop:px-6">
-                <div className="-ml-4 -mt-2 desktop:mt-0 flex flex-wrap items-center justify-between desktop:flex-nowrap">
+            <div className="border-b divide-y divide-gray-200 border-gray-200 bg-white px-3 py-2 desktop:px-6">
+                <div className="-ml-4 -mt-2 -mb-1 desktop:mt-0 flex flex-wrap items-center justify-between desktop:flex-nowrap">
                     <div className="ml-4">
                         <h3 className="text-base font-semibold leading-6 text-gray-900">
                             {getTranslation('clusters_legend', currentLanguage)}
@@ -118,7 +118,6 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                             }}
                             className={
                                 `relative inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
-
                                 " bg-gray-500 hover:bg-gray-600 focus-visible:ring-green-500"
                             }
                         >
@@ -126,7 +125,7 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                         </button>
                     </div>
                 </div>
-                <div className="z-50 mt-2 desktop:mt-2 text-sm text-gray-500 xs:max-h-64 mobile:max-h-80 desktop:max-h-96 overflow-scroll">
+                <div className="z-50 mt-2 desktop:mt-2 text-sm text-gray-500 xs:max-h-72 mobile:max-h-80 desktop:max-h-96 overflow-scroll">
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         {getTranslation('overview_title', currentLanguage)}
                     </h5>

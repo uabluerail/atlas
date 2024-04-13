@@ -37,12 +37,41 @@ const autoPickLanguage = () => {
 
 const resolvedLanguage = autoPickLanguage();
 
-const getTranslation = (key: string, language: string) => {
+const getTranslation = (key: string, language: string, truncate?: {
+    viewPort: {
+        width: number,
+        height: number
+    },
+    xs?: number,
+    mobile?: number,
+    desktop?: number
+}) => {
+    const maxViewport = {
+        mobile: 700,
+        xs: 370
+    }
+    const minViewport = {
+        mobile: 370,
+        xs: 320
+    }
     language = language ?? resolvedLanguage;
     const translation: { key: string, value: string }[] = translationMap[language].translation;
     const translationEntry = translation.filter(entry => entry.key === key)[0]
         ?? translationMap[fallbackLanguage].translation.filter(entry => entry.key === key)[0];
-    return translationEntry ? translationEntry.value : key;
+    const translationText = translationEntry ? translationEntry.value : key;
+    const viewPortType = truncate?.viewPort?.width && (
+        truncate?.viewPort?.width > maxViewport.mobile ? "desktop"
+            : truncate?.viewPort?.width > maxViewport.xs ? "mobile"
+                : "xs");
+    const truncateLength = truncate && viewPortType && truncate[viewPortType];
+    const maxLength = truncateLength && (truncateLength * truncate?.viewPort?.width / minViewport[viewPortType]);
+    return maxLength
+        ? truncateText(translationText, maxLength)
+        : translationText;
+}
+
+const truncateText = (text: string, size: number): string => {
+    return text.length > size ? text?.substring(0, size).trim() + "..." : text;
 }
 
 const getPickerLanguages = () => {
@@ -85,4 +114,4 @@ const lang2ToNames = (lang2: string[] | null) => {
     return (lang2 && lang2.map(lang2 => translationMap[lang2].name ?? lang2).toString());
 }
 
-export { getTranslation, getPickerLanguages, getLanguageName, getLanguageOrDefault, getLanguageByName, getValueByLanguage, lang2ToNames, getValueByLanguageFromMap }
+export { getTranslation, truncateText, getPickerLanguages, getLanguageName, getLanguageOrDefault, getLanguageByName, getValueByLanguage, lang2ToNames, getValueByLanguageFromMap }

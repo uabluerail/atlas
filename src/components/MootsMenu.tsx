@@ -1,6 +1,6 @@
 import { FC, Dispatch, useState, useEffect, SetStateAction } from "react";
 import { MultiDirectedGraph } from "graphology";
-import { getTranslation, getValueByLanguage } from "../common/translation";
+import { getTranslation, truncateText, getValueByLanguage } from "../common/translation";
 import { SetURLSearchParams } from "react-router-dom";
 import { config } from '../common/visualConfig';
 import { MootNode } from "../model";
@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretUp, faCaretDown, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
 
 interface MootsMenuProps {
+    hideMenu: boolean;
     currentLayoutName: string;
     currentLanguage: string;
     selectedNode: string;
@@ -153,6 +154,7 @@ const buildClusters = (
 }
 
 const MootsMenu: FC<MootsMenuProps> = ({
+    hideMenu,
     currentLayoutName,
     currentLanguage,
     selectedNode,
@@ -194,8 +196,8 @@ const MootsMenu: FC<MootsMenuProps> = ({
     const selectedNodeColor = config.getNodeColor(community, currentLayoutName, useSubclusterOverlay)
     return (
         <div className="fixed bg-white shadow rounded-md absolute
-        mobile:top-0 mobile:transform mobile:w-full mobile:translate-x-0
-        desktop:top-2 desktop:transform desktop:left-2 desktop:max-w-lg desktop:translate-x-0
+        mobile:top-0 mobile:w-full
+        desktop:top-2 desktop:transform desktop:left-2 desktop:max-w-md desktop:translate-x-0
         z-50">
             <div className={`fixed mt-1 ml-2 right-2`}>
                 <button
@@ -217,7 +219,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                 </button>
             </div>
             {!hideNodeInfo && (<div>
-                <div className="border-b border-gray-200 bg-white px-4 py-5 -mr-2 desktop:px-6">
+                <div className="border-b border-gray-200 bg-white px-4 py-5 mr-0 desktop:px-6">
                     <div className="ml-4 flex flex-nowrap items-center justify-between">
                         <div className="-ml-4 -mr-2 -mt-2 max-w-xl text-xs text-gray-500">
                             <p>
@@ -231,7 +233,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                     )}`}
                                     target="_blank"
                                 >
-                                    {config.truncateText(graph?.getNodeAttribute(selectedNode, "label"), 30)}
+                                    {truncateText(graph?.getNodeAttribute(selectedNode, "label"), 30)}
                                     {" "}
                                     <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                                 </a>
@@ -335,7 +337,10 @@ const MootsMenu: FC<MootsMenuProps> = ({
                             </div>)}
                     </div>
                 </div>
-                <div className="z-50 divide-y divide-gray-200 mobile:max-h-36 desktop:max-h-96 md:max-h-screen overflow-auto">
+                <div className={`z-50 divide-y divide-gray-200
+                ${hideMenu ? 'xs:max-h-80' : 'xs:max-h-40'}
+                ${hideMenu ? 'mobile:max-h-80' : 'mobile:h-44'}
+                desktop:max-h-96 md:max-h-screen overflow-auto`}>
                     {showMootList && (
                         <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
                             <div className="table-header-group">
@@ -371,7 +376,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                                     setSelectedNode(moot.node)
                                                 }}
                                             >
-                                                {config.truncateText(moot.label, 25)}
+                                                {truncateText(moot.label, 25)}
                                             </a>
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
@@ -425,7 +430,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                                     setSelectedNode(moot.node)
                                                 }}
                                             >
-                                                {config.truncateText(moot.label, 25)}
+                                                {truncateText(moot.label, 25)}
                                             </a>
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
@@ -473,7 +478,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                                     setSelectedNode(moot.node)
                                                 }}
                                             >
-                                                {config.truncateText(moot.label, 25)}
+                                                {truncateText(moot.label, 25)}
                                             </a>
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
