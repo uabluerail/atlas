@@ -34,8 +34,8 @@ jobs:
         id: cache-graph
         uses: actions/cache@v3
         with:
-          path: ./
-          key: ${{ runner.os }}-graph-${{ vars.CURRENT_GRAPH_VERSION }}
+          path: ./graph.json
+          key: ${{ runner.os }}-graph-${{ env.CURRENT_GRAPH_VERSION }}
       - name: Fetch graph data
         env:
           GRAPH_URL: "${{ vars.GRAPH_URL }}"
@@ -44,18 +44,19 @@ jobs:
           cd exporter
           echo "CACHED_GRAPH_VERSION=$(yarn getGraphVersion | grep graphVersion | cut -c 14)" >> $GITHUB_ENV
           echo $CACHED_GRAPH_VERSION
-        if: steps.cache-graph.outputs.cache-hit != 'true' || vars.CURRENT_GRAPH_VERSION != vars.CACHED_GRAPH_VERSION
+        if: steps.cache-graph.outputs.cache-hit != 'true'
       - name: Cache layouts
         id: cache-layouts
         uses: actions/cache@v3
         with:
           path: ./exporter/out/
-          key: ${{ runner.os }}-exporter-out-${{ hashFiles('**/*layout.json') }}
+          key: ${{ runner.os }}-exporter-out-${{ env.CURRENT_GRAPH_VERSION }}-${{ hashFiles('exporter/**/*.ts') }}
       - name: Generate layout
         run: |
           mkdir -p exporter/out
           cd exporter
           yarn start graph.json
+        if: steps.cache-layouts.outputs.cache-hit != 'true'
       - name: Build
         run: |
           yarn build
