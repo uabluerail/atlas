@@ -172,7 +172,7 @@ const Menu: FC<MenuProps> = ({
                                                 htmlFor="clusterLabels"
                                                 className="font-medium text-gray-900"
                                             >
-                                                {getTranslation('labels_of_clusters', currentLanguage, { viewPort, xs: 20, mobile: 24 })}
+                                                {getTranslation('labels_of_clusters', currentLanguage, { viewPort, xs: 20, mobile: 23 })}
                                             </label>
                                         </div>
                                     </div>
@@ -199,7 +199,7 @@ const Menu: FC<MenuProps> = ({
                                                 htmlFor="neighbors"
                                                 className="font-medium text-gray-900"
                                             >
-                                                {getTranslation('interactions_of_friends', currentLanguage, { viewPort, xs: 20, mobile: 24 })}
+                                                {getTranslation('interactions_of_friends', currentLanguage, { viewPort, xs: 20, mobile: 23 })}
                                             </label>
                                         </div>
                                     </div>
@@ -230,7 +230,7 @@ const Menu: FC<MenuProps> = ({
                                                     htmlFor="clusterLabels"
                                                     className="font-medium text-gray-900"
                                                 >
-                                                    {getTranslation('show_communities', currentLanguage, { viewPort, xs: 20, mobile: 24 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                                    {getTranslation('show_communities', currentLanguage, { viewPort, xs: 20, mobile: 23 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
                                                 </label>
                                             </div>
                                         </div>}
@@ -255,7 +255,7 @@ const Menu: FC<MenuProps> = ({
                                                 htmlFor="clusterLabels"
                                                 className="font-medium text-gray-900"
                                             >
-                                                {getTranslation('more_details', currentLanguage, { viewPort, xs: 20, mobile: 24 })}
+                                                {getTranslation('more_details', currentLanguage, { viewPort, xs: 20, mobile: 23 })}
                                             </label>
                                         </div>
                                     </div>
@@ -280,7 +280,7 @@ const Menu: FC<MenuProps> = ({
                                                     htmlFor="clusterLabels"
                                                     className="font-medium text-gray-900"
                                                 >
-                                                    {getTranslation('show_hidden_clusters', currentLanguage, { viewPort, xs: 20, mobile: 24 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
+                                                    {getTranslation('show_hidden_clusters', currentLanguage, { viewPort, xs: 20, mobile: 23 })}{" "}<span className="mobile:hidden inline">{getTranslation('graph_will_refresh', currentLanguage)}</span>
                                                 </label>
                                             </div>
                                         </div>
