@@ -19,7 +19,7 @@ export default {
       },
       screens: {
         desktop: { 'min': '701px' },
-        // => @media (min-width: 601px) { ... }
+        // => @media (min-width: 701px) { ... }
         mobile: { 'max': '700px' },
         // => @media (max-width: 600px) { ... }
         xs: { 'max': '370px' }

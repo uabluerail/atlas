@@ -2,8 +2,11 @@ import { FC, Dispatch, SetStateAction } from "react";
 import { config } from "../common/visualConfig"
 import { getTranslation, getValueByLanguage, lang2ToNames } from "../common/translation";
 import { GroupLegend, ClusterConfig } from "../../exporter/src/common/model";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faXmark } from '@fortawesome/free-solid-svg-icons'
 
 interface LegendProps {
+    hideMenu: boolean;
     legend: boolean;
     setLegend: Dispatch<SetStateAction<boolean>>;
     layoutName: string;
@@ -35,7 +38,13 @@ const buildExtras = (extras: string[]) => {
     return <div>{compiledExtras}</div>;
 }
 
-const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClusters, currentLanguage }) => {
+const Legend: FC<LegendProps> = ({
+    hideMenu,
+    legend,
+    setLegend,
+    layoutName,
+    showHiddenClusters,
+    currentLanguage }) => {
     const buildLegend = (legendGroup: GroupLegend) => {
         const clusterLegends: any[] = [];
         legendGroup.clusters.forEach(clusterName => {
@@ -118,14 +127,19 @@ const Legend: FC<LegendProps> = ({ legend, setLegend, layoutName, showHiddenClus
                             }}
                             className={
                                 `relative inline-flex items-center rounded-md px-2 py-1 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
-                                " bg-gray-500 hover:bg-gray-600 focus-visible:ring-green-500"
+                                " bg-gray-400 hover:bg-gray-500 focus-visible:ring-green-500"
                             }
                         >
-                            x
+                            <FontAwesomeIcon icon={faXmark} />
                         </button>
                     </div>
                 </div>
-                <div className="z-50 mt-2 desktop:mt-2 text-sm text-gray-500 xs:max-h-64 mobile:max-h-80 desktop:max-h-96 overflow-scroll">
+                <div className={`z-50 mt-2 desktop:mt-2 text-sm text-gray-500
+                ${hideMenu
+                        ? 'mobile:h-[80lvh]'
+                        : 'mobile:h-[55lvh]'}
+                desktop:h-[50lvh]
+                overflow-scroll`}>
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         {getTranslation('overview_title', currentLanguage)}
                     </h5>

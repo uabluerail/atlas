@@ -5,7 +5,7 @@ import { SetURLSearchParams } from "react-router-dom";
 import { config } from '../common/visualConfig';
 import { MootNode } from "../model";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretUp, faCaretDown, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
+import { faCaretLeft, faCaretRight, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
 
 interface MootsMenuProps {
     hideMenu: boolean;
@@ -92,7 +92,7 @@ const buildClusters = (
                             setSearchParams(searchParams);
                         }}
                         className={
-                            `relative ml-1 inline-flex items-center rounded-sm px-1 py-0 text-xs font-semibold text-white shadow-sm  focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
+                            `relative ml-1 inline-flex items-center rounded-sm px-1 py-0 text-xs font-semibold text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2` +
                             (showClusterList
                                 ? " bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600"
                                 : " bg-orange-500 hover:bg-orange-600 focus-visible:ring-orange-500")
@@ -197,9 +197,9 @@ const MootsMenu: FC<MootsMenuProps> = ({
     return (
         <div className="fixed bg-white shadow rounded-md absolute
         mobile:top-0 mobile:w-full
-        desktop:top-2 desktop:transform desktop:left-2 desktop:max-w-md desktop:translate-x-0
+        desktop:top-2 desktop:transform desktop:left-2 desktop:max-w-md desktop:translate-x-0 desktop:w-full
         z-50">
-            <div className={`fixed mt-1 ml-2 right-2`}>
+            <div className={`fixed absolute mt-2 ml-2 ${hideNodeInfo ? 'left-1' : 'right-3'} `}>
                 <button
                     type="button"
                     onClick={() => {
@@ -215,7 +215,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                         " bg-gray-400 hover:bg-gray-500 focus-visible:ring-green-500"
                     }
                 >
-                    {hideNodeInfo ? <FontAwesomeIcon icon={faCaretDown} /> : <FontAwesomeIcon icon={faCaretUp} />}
+                    {hideNodeInfo ? <FontAwesomeIcon icon={faCaretRight} /> : <FontAwesomeIcon icon={faCaretLeft} />}
                 </button>
             </div>
             {!hideNodeInfo && (<div>
@@ -339,9 +339,9 @@ const MootsMenu: FC<MootsMenuProps> = ({
                 </div>
                 {(showMootList || showCommunityList || showClusterList) && (
                     <div className={`z-50 divide-y divide-gray-200
-                ${hideMenu ? 'xs:max-h-80' : 'xs:max-h-40'}
-                ${hideMenu ? 'mobile:max-h-80' : 'mobile:h-44'}
-                desktop:max-h-96 md:max-h-screen overflow-auto`}>
+                ${hideMenu ? 'xs:max-h-[60lvh]' : 'xs:max-h-[30lvh]'}
+                ${hideMenu ? 'mobile:max-h-[60lvh]' : 'mobile:max-h-[25lvh]'}
+                desktop:max-h-[40lvh] overflow-auto`}>
                         {showMootList && (
                             <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
                                 <div className="table-header-group">

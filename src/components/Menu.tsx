@@ -7,7 +7,6 @@ import { SetURLSearchParams } from "react-router-dom";
 import LayoutMenu from "./LayoutMenu"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons'
-import { is } from "date-fns/locale";
 
 interface MenuProps {
     isMobile: boolean;
@@ -72,8 +71,8 @@ const Menu: FC<MenuProps> = ({
     return (
         <div className="
         xs:bottom-7 mobile:bottom-14 mobile:left-0 mobile:right-0 mobile:w-full mobile:h-3/7
-        desktop:left-1/2 desktop:bottom-14 desktop:transform desktop:-translate-x-1/2 desktop:w-8/12
-         z-40 fixed">
+        desktop:left-1/2 desktop:bottom-14 desktop:transform desktop:-translate-x-1/2 desktop:w-[35rem]
+        z-40 fixed">
             <div className={`${hideMenu ? 'xs:-mt-8 mobile:-mt-6 desktop:-mt-4' : 'mt-1'} fixed right-2 left:1/2`}>
                 <button
                     type="button"

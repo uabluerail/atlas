@@ -571,6 +571,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           />
         )}
         {legend && (<Legend
+          hideMenu={hideMenu}
           legend={legend}
           setLegend={setLegend}
           layoutName={currentLayoutName}
