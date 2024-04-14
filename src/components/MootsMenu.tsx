@@ -6,6 +6,7 @@ import { config } from '../common/visualConfig';
 import { MootNode } from "../model";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretLeft, faCaretRight, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
+import Credits from "./Credits";
 
 interface MootsMenuProps {
     hideMenu: boolean;
@@ -339,8 +340,8 @@ const MootsMenu: FC<MootsMenuProps> = ({
                 </div>
                 {(showMootList || showCommunityList || showClusterList) && (
                     <div className={`z-50 divide-y divide-gray-200
-                ${hideMenu ? 'xs:max-h-[60lvh]' : 'xs:max-h-[30lvh]'}
-                ${hideMenu ? 'mobile:max-h-[60lvh]' : 'mobile:max-h-[25lvh]'}
+                ${hideMenu ? 'xs:max-h-[47lvh]' : 'xs:max-h-[28lvh]'}
+                ${hideMenu ? 'mobile:max-h-[45lvh]' : 'mobile:max-h-[25lvh]'}
                 desktop:max-h-[40lvh] overflow-auto`}>
                         {showMootList && (
                             <div className="table text-xs ml-4 mr-4 mt-0 w-11/12 border-spacing-2 xs:border-spacing-1">
@@ -499,7 +500,6 @@ const MootsMenu: FC<MootsMenuProps> = ({
                 )}
             </div>
             )}
-
         </div >
     )
 }

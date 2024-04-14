@@ -7,57 +7,53 @@ import LanguagePicker from "./LanguagePicker"
 import { SetURLSearchParams } from 'react-router-dom';
 
 interface FooterProps {
+    currentLanguage: string;
     graph: MultiDirectedGraph | null;
     searchParams: URLSearchParams;
     setSearchParams: SetURLSearchParams;
-    currentLanguage: string;
     setCurrentLanguage: Dispatch<SetStateAction<string>>;
 }
 
 const Footer: FC<FooterProps> = ({
+    currentLanguage,
     graph,
     searchParams,
     setSearchParams,
-    currentLanguage,
     setCurrentLanguage }) => {
     return (
         <footer className="bg-white fixed bottom-0 text-center w-full z-40">
-            <div className="mx-auto max-w-7xl px-2">
-                <span className="footer-text text-xs">
-                    {config.legend.author &&
-                        <div className="xs:mb-1">
-                            <span>{"🌐 "}{getTranslation('language', currentLanguage)}{": "}</span>
-                            <LanguagePicker
-                                searchParams={searchParams}
-                                setSearchParams={setSearchParams}
-                                currentLanguage={currentLanguage}
-                                setCurrentLanguage={setCurrentLanguage} />
-                            <span className="xs:hidden">
-                                <span className='ml-2'>{" "}{getTranslation('cluster_algo_made_by', currentLanguage)}{" "}</span>
-                                <a
-                                    href={config.legend.author.url}
-                                    target="_blank"
-                                    className="font-bold underline-offset-1 underline"
-                                >
-                                    {config.legend.author.name}
-                                </a>
-                                {". "}
-                                <a
-                                    href="https://github.com/uabluerail/atlas"
-                                    target="_blank"
-                                >
-                                    <img
-                                        src="/github.svg"
-                                        className="inline-block h-3.5 w-4 mb-0.5"
-                                    />
-                                </a>
-                            </span>
-                        </div>
-                    }
-                </span>
-            </div>
             <div className='mb-0.5'>
-                <span className="xs:hidden footer-text text-xs">
+                {config.legend.author &&
+                    <span className="footer-text text-xs">
+                        <span className='xs:hidden'>{"🌐 "}{getTranslation('language', currentLanguage)}{": "}</span>
+                        <LanguagePicker
+                            searchParams={searchParams}
+                            setSearchParams={setSearchParams}
+                            currentLanguage={currentLanguage}
+                            setCurrentLanguage={setCurrentLanguage} />
+                    </span>
+                }
+                <span className={`footer-text text-xs`}>
+                    <span className='ml-0.5'>{" "}{getTranslation('cluster_algo_made_by', currentLanguage)}{" "}</span>
+                    <a
+                        href={config.legend.author.url}
+                        target="_blank"
+                        className="font-bold underline-offset-1 underline"
+                    >
+                        {config.legend.author.name}
+                    </a>
+                    {". "}
+                    <a
+                        href="https://github.com/uabluerail/atlas"
+                        target="_blank"
+                    >
+                        <img
+                            src="/github.svg"
+                            className="inline-block h-3.5 w-4 mb-0.5"
+                        />
+                    </a>
+                </span>
+                <span className={`footer-text block text-xs`}>
                     {getTranslation('visualization', currentLanguage)}{" "}
                     <a
                         href="https://bsky.jazco.dev/atlas"

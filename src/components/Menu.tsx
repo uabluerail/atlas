@@ -70,7 +70,7 @@ const Menu: FC<MenuProps> = ({
     const hiddenClusters = config.hiddenClusters.get(currentLayoutName);
     return (
         <div className="
-        xs:bottom-7 mobile:bottom-14 mobile:left-0 mobile:right-0 mobile:w-full mobile:h-3/7
+        xs:bottom-11 mobile:bottom-11 mobile:left-0 mobile:right-0 mobile:w-full mobile:h-3/7
         desktop:left-1/2 desktop:bottom-14 desktop:transform desktop:-translate-x-1/2 desktop:w-[35rem]
         z-40 fixed">
             <div className={`${hideMenu ? 'xs:-mt-8 mobile:-mt-6 desktop:-mt-4' : 'mt-1'} fixed right-2 left:1/2`}>
@@ -93,8 +93,8 @@ const Menu: FC<MenuProps> = ({
                 <div className="bg-white shadow desktop:rounded-lg py-1">
                     {/* <div className="xs:hidden"> */}
                     <dl className="mx-auto mobile:-mt-1 xs:-mb-0 mobile:-mb-1 grid gap-px grid-cols-2">
-                        <div className="flex flex-col items-baseline bg-white text-center">
-                            <dt className="desktop:text-sm mobile:-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
+                        <div className="flex flex-col mobile:-ml-2 desktop:-ml-4 items-baseline bg-white text-center">
+                            <dt className="desktop:text-sm mobile:4-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
                                 <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('users', currentLanguage)}
                             </dt>
                             <dd className="desktop:text-3xl mobile:text-lg xs:text-sm mobile:-mt-2 mr-auto ml-auto text-lg font-bold leading-10 tracking-tight text-gray-900">
@@ -103,7 +103,7 @@ const Menu: FC<MenuProps> = ({
                                     : userCount.toLocaleString()}
                             </dd>
                         </div>
-                        <div className="flex flex-col -ml-10 items-baseline bg-white text-center">
+                        <div className="flex flex-col mobile:-ml-8 desktop:-ml-12 items-baseline bg-white text-center">
                             <dt className="desktop:text-sm mobile:-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
                                 <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('interactions', currentLanguage)}
                             </dt>
@@ -120,7 +120,7 @@ const Menu: FC<MenuProps> = ({
                             <div className="table-row">
                                 <div className="table-cell w-5/12">
                                     <div className="flex flex-row">
-                                        <div className="flex h-8 items-center">
+                                        <div className="flex h-8 desktop:h-10 xs:ml-0 mobile:ml-2 desktop:ml-5 items-center">
                                             <CustomSearch
                                                 viewPort={viewPort}
                                                 currentLanguage={currentLanguage}
@@ -141,7 +141,7 @@ const Menu: FC<MenuProps> = ({
                                 </div>
                                 <div className="table-cell w-6/12">
                                     <div className="flex flex-row">
-                                        <div className="flex h-4 items-center">
+                                        <div className="flex h-3 desktop:h-4 xs:ml-1 mobile:ml-4 desktop:ml-10 items-center">
                                             <LayoutMenu
                                                 setLoading={setLoading}
                                                 setGraphShouldUpdate={setGraphShouldUpdate}

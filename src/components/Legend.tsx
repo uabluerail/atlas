@@ -4,6 +4,8 @@ import { getTranslation, getValueByLanguage, lang2ToNames } from "../common/tran
 import { GroupLegend, ClusterConfig } from "../../exporter/src/common/model";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
+import Footer from "./Footer";
+import Credits from "./Credits";
 
 interface LegendProps {
     hideMenu: boolean;
@@ -136,8 +138,8 @@ const Legend: FC<LegendProps> = ({
                 </div>
                 <div className={`z-50 mt-2 desktop:mt-2 text-sm text-gray-500
                 ${hideMenu
-                        ? 'mobile:h-[80lvh]'
-                        : 'mobile:h-[55lvh]'}
+                        ? 'mobile:h-[70lvh] xs:h-[73lvh]'
+                        : 'mobile:h-[50lvh] xs:h-[54lvh]'}
                 desktop:h-[50lvh]
                 overflow-scroll`}>
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">

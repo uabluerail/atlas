@@ -8,8 +8,8 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const translationMap = {
     "pl": { lang2: "pl", translation: translation_pl, name: "Polski 🇵🇱", picker: true },
     "uk": { lang2: "uk", translation: translation_uk, name: "Українська 🇺🇦", picker: true },
-    "en": { lang2: "en", translation: translation_en, name: "English 🇬🇧", picker: false },
-    "en-GB": { lang2: "en", translation: translation_en, name: "English 🇬🇧", picker: true },
+    "en": { lang2: "en", translation: translation_en, name: "English 🇺🇸", picker: false },
+    // "en-GB": { lang2: "en", translation: translation_en, name: "English 🇬🇧", picker: true },
     "en-US": { lang2: "en", translation: translation_en, name: "English 🇺🇸", picker: true }
 }
 

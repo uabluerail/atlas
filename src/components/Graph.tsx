@@ -639,10 +639,10 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           setHideMenu={setHideMenu} />
       </SigmaContainer>
       <Footer
+        currentLanguage={currentLanguage}
         graph={graph}
         searchParams={searchParams}
         setSearchParams={setSearchParams}
-        currentLanguage={currentLanguage}
         setCurrentLanguage={setCurrentLanguage} />
     </div>
   );
