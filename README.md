@@ -1,8 +1,14 @@
-# [BSky Atlas](https://bsky.jazco.dev)
+# [Atlas of interactions](https://atlas.uabluerail.org)
 
-The BSky Atlas is a visualization of data built by the Graph Builder in [`bsky-experiments`](https://github.com/ericvolp12/bsky-experiments).
+The BSky Atlas is a visualization of graph data.
 
-The site itself is hosted through [Cloudflare Pages](https://pages.cloudflare.com/) and is fully static until this repo is bumped with new data.
+- Where to get graph data?
+Previously, Atlas by Jaz https://github.com/ericvolp12/bsky-graph graph data (graph.json) was built by the Graph Builder in [`bsky-experiments`](https://github.com/ericvolp12/bsky-experiments).
+
+This fork of Atlas still supports same `graph.json` format, although it also needs `conf.json` to work. `conf.json` structure is described in AtlasSettings interface in `/exporter/src/common/model.ts`
+
+To generate `graph.json` you'll first need to get some data and then process it. We're using our own indexer of Bsky data: https://github.com/uabluerail/indexer.
+`graph.json` can be generated using any Graph DB. We recommend using Neo4j.
 
 ## Exporter
 
@@ -15,18 +21,17 @@ This file can grow to be quite large (10s of MBs easily) and will only continue 
 The exporter filters the incoming data, drops low-weight edges and nodes, then creats a layout as follows:
 
 1. Place all nodes in a giant circle
-2. Run ForceAtlas2 on the nodes for 600 iterations
-3. Run Louvain Community Detection on the resulting graph
-4. Filter out any communities with fewer than 50 members
-5. Identify communities that have Representatives present and assign them labels
+2. Identify layouts that need to be rendered from current `conf.json`.
+3. Run ForceAtlas2 on each layout with the settings specific to that layout (iteration count, gravity, rotation angle etc.).
+4. Get representatives from `conf.json` file and apply to each rendered layout.
 
-After these steps, we export the graph in Graphology's JSON format to `public/exported_graph_minified.json` which is `gzipped` by Cloudflare on deployment, heavily compressing the repetitive JSON.
+After these steps, we export each graph in Graphology's JSON format to `exporter/out/[layout_name]_layout.json`
 
 ### Running the Exporter
 
 Run `yarn install` with `node 18+` to grab dependencies.
 
-Assuming you have an instance of the `graph-builder` running at `http://localhost:6060`, you can run `yarn start` inside the `exporter` directory to grab a snapshot, run the simulations, and build the graph.
+Assuming you have a `graph.json` and `conf.json` in the root folder, you may run `yarn start` inside the `exporter` directory to grab a snapshot, run the simulations, and build the graph.
 
 ## Visualization
 
@@ -34,12 +39,16 @@ The visualization is the primary part of this project and is powered by `Vite`, 
 
 The components that make up the visualization are in the `src/components` folder and are a bit messy at the moment.
 
-- `Graph.tsx` includes the graph rendering logic, MootList, etc.
+- `src/components/Graph.tsx` includes the graph rendering logic.
+- `src/components/*.tsx` includes various components, MootList, LayoutMenu etc.
 - `CustomSearch.tsx` is a forked verison of the `Search` component provided by `React-Sigma` with lots of custom styling and functionality for better UX.
 
 ### Running the Visualization
 
-This project ships with the latest graph snapshot in the `main` branch, so you can visualize the current version of the graph right now!
+TBD: add sample `graph.json` and `conf.json`
+
+(not available yet:)
+This project ships with the sample graph snapshot, so you can visualize one of the versions of the graph right now!
 
 Ensure you're using `node 18+` and install dependencies with: `yarn install`
 
