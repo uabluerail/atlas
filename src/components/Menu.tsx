@@ -103,7 +103,7 @@ const Menu: FC<MenuProps> = ({
                                     : userCount.toLocaleString()}
                             </dd>
                         </div>
-                        <div className="flex flex-col mobile:-ml-8 desktop:-ml-12 items-baseline bg-white text-center">
+                        <div className="flex flex-col mobile:-ml-8 desktop:-ml-16 items-baseline bg-white text-center">
                             <dt className="desktop:text-sm mobile:-mt-0 text-xs font-medium leading-6 text-gray-500 ml-auto mr-auto mt-1">
                                 <span className="hidden desktop:inline-block">{getTranslation('represented', currentLanguage)}{" "}</span>{" "}{getTranslation('interactions', currentLanguage)}
                             </dt>
@@ -120,7 +120,7 @@ const Menu: FC<MenuProps> = ({
                             <div className="table-row">
                                 <div className="table-cell w-5/12">
                                     <div className="flex flex-row">
-                                        <div className="flex h-8 desktop:h-10 xs:ml-0 mobile:ml-2 desktop:ml-5 items-center">
+                                        <div className="flex h-8 desktop:h-10 xs:ml-0 mobile:ml-2 desktop:ml-6 items-center">
                                             <CustomSearch
                                                 viewPort={viewPort}
                                                 currentLanguage={currentLanguage}
@@ -141,7 +141,7 @@ const Menu: FC<MenuProps> = ({
                                 </div>
                                 <div className="table-cell w-6/12">
                                     <div className="flex flex-row">
-                                        <div className="flex h-3 desktop:h-4 xs:ml-1 mobile:ml-4 desktop:ml-10 items-center">
+                                        <div className="flex h-3 desktop:h-4 xs:ml-1 mobile:ml-4 desktop:ml-12 items-center">
                                             <LayoutMenu
                                                 setLoading={setLoading}
                                                 setGraphShouldUpdate={setGraphShouldUpdate}
