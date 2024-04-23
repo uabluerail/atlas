@@ -1,12 +1,16 @@
 import { MultiDirectedGraph } from "graphology";
-import { Cluster } from "../common/model"
+import { AtlasLayout, Cluster } from "../common/model"
 
 function assignClusterPositions(
     log: (msg: string) => void,
+    layout: AtlasLayout,
     communityClusters: { [key: string]: Cluster },
     graph: MultiDirectedGraph) {
     graph.forEachNode((_, atts) => {
-        if (atts.community === undefined || atts.community === null) return;
+        if (atts.community === undefined
+            || atts.community === null
+            || layout?.nodeMapping?.community?.type === "none"
+        ) return;
         const cluster = communityClusters[atts.community];
         if (cluster === undefined) return;
         cluster.positions.push({ x: atts.x, y: atts.y });

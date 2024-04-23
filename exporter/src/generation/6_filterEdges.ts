@@ -21,7 +21,7 @@ function filterEdges(
             graph.setEdgeAttribute(edge, 'stay', true);
         });
     });
-    // Reduce all edges to the top n outbound edges for each node (m for Ukrainians)
+    // Reduce all edges to the top n outbound edges for each node
     graph.forEachNode((node, attrs) => {
         const edges = graph.outEdges(node);
         const sortedEdges = edges.sort((a, b) => {

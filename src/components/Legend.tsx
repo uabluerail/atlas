@@ -49,7 +49,7 @@ const Legend: FC<LegendProps> = ({
     currentLanguage }) => {
     const buildLegend = (legendGroup: GroupLegend) => {
         const clusterLegends: any[] = [];
-        legendGroup.clusters.forEach(clusterName => {
+        legendGroup.clusters?.forEach(clusterName => {
             const cluster: ClusterConfig = config.getClusterByName(clusterName);
             const hideCluster = !includedClusters.get(clusterName) //not included in the graph
                 || (hiddenClusters.get(clusterName) && !showHiddenClusters); //hidden when option show all clusters is off
@@ -96,14 +96,17 @@ const Legend: FC<LegendProps> = ({
 
     const legendGroups: any[] = [];
     const includedClusters: Map<string, boolean> = config.includedClusters.get(layoutName) ?? new Map();
+    const includedClusterTemplates: Map<string, boolean> = config.includedClusterTemplates.get(layoutName) ?? new Map();
     const hiddenClusters: Map<string, boolean> = config.hiddenClusters.get(layoutName) ?? new Map();
-    const currentLayoutLegend = config.getLayout(layoutName) && config.getLayout(layoutName).legend;
-    const currentLayoutLegends: GroupLegend[] = config.legend.legends.filter(legend => legend.name === currentLayoutLegend)[0].groups ?? [];
+    const currentLayoutLegendName = config.getLayout(layoutName) && config.getLayout(layoutName).legend;
+    const currentLayoutLegend = config.legend.legends.filter(legend => legend.name === currentLayoutLegendName)[0];
+    const currentLayoutLegends: GroupLegend[] = currentLayoutLegend.groups ?? [];
 
     currentLayoutLegends.forEach(group => {
-        const hasIncludedClusters = group.clusters.filter(clusterName => includedClusters.get(clusterName)
+        const hasIncludedTemplates = group.cluster_templates && group.cluster_templates.filter(templateName => includedClusterTemplates.get(templateName));
+        const hasIncludedClusters = group.clusters && group.clusters.filter(clusterName => includedClusters.get(clusterName)
             && (showHiddenClusters || !hiddenClusters.get(clusterName))).length > 0;
-        const shouldShowGroup = hasIncludedClusters && group.hide !== true;
+        const shouldShowGroup = hasIncludedTemplates || (hasIncludedClusters && group.hide !== true);
         if (shouldShowGroup) {
             legendGroups.push(buildLegend(group));
         }
@@ -161,12 +164,14 @@ const Legend: FC<LegendProps> = ({
                         {getTranslation('algo_note', currentLanguage)}{" "}
                         {getTranslation('available_languages', currentLanguage)}{": "}{lang2ToNames(config.settings.languages)}
                     </p>
-                    {getValueByLanguage(config.legend.overview, currentLanguage) && getValueByLanguage(config.legend.overview, currentLanguage).arrows && <p className="mt-2">
-                        {getValueByLanguage(config.legend.overview, currentLanguage).arrows}
-                    </p>}
-                    {getValueByLanguage(config.legend.overview, currentLanguage) && getValueByLanguage(config.legend.overview, currentLanguage).algo && <p className="mt-2">
-                        {getValueByLanguage(config.legend.overview, currentLanguage).algo}
-                    </p>}
+                    {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage) && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows &&
+                        <p className="mt-2">
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows}
+                        </p>}
+                    {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage) && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).algo &&
+                        <p className="mt-2">
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).algo}
+                        </p>}
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         {getTranslation('overview_clusters', currentLanguage)}
                     </h5>

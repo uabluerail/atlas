@@ -15,11 +15,18 @@ interface Node {
 interface MootNode {
     node: string;
     size: number;
+    total?: number;
     community: number;
     avatarUrl?: string;
     label: string;
     did: string;
     weight: number;
+}
+
+interface SearchNode {
+    did: string;
+    handle: string;
+    communities: string[];
 }
 
 interface Cluster {
@@ -33,4 +40,4 @@ interface Cluster {
     positions: { x: number; y: number }[];
 }
 
-export type { Edge, Node, MootNode, Cluster };
+export type { Edge, Node, MootNode, SearchNode, Cluster };

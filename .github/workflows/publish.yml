@@ -36,6 +36,18 @@ jobs:
         with:
           path: ./graph.json
           key: ${{ runner.os }}-graph-${{ env.CURRENT_GRAPH_VERSION }}
+      - name: Cache graph ua
+        id: cache-graph-ua
+        uses: actions/cache@v3
+        with:
+          path: ./graph_ua.json
+          key: ${{ runner.os }}-graph_ua-${{ env.CURRENT_GRAPH_VERSION }}
+      - name: Cache search
+        id: cache-search
+        uses: actions/cache@v3
+        with:
+          path: ./search.json
+          key: ${{ runner.os }}-search-${{ env.CURRENT_GRAPH_VERSION }}
       - name: Fetch graph data
         env:
           GRAPH_URL: "${{ vars.GRAPH_URL }}"
@@ -45,6 +57,20 @@ jobs:
           echo "CACHED_GRAPH_VERSION=$(yarn getGraphVersion | grep graphVersion | cut -c 14)" >> $GITHUB_ENV
           echo $CACHED_GRAPH_VERSION
         if: steps.cache-graph.outputs.cache-hit != 'true'
+      - name: Fetch graph-ua data
+        env:
+          GRAPH_UA_URL: "${{ vars.GRAPH_UA_URL }}"
+        run: |
+          wget -O graph_ua.json "$GRAPH_UA_URL"
+          cd exporter
+        if: steps.cache-graph-ua.outputs.cache-hit != 'true'
+      - name: Fetch search data
+        env:
+          SEARCH_URL: "${{ vars.SEARCH_URL }}"
+        run: |
+          wget -O search.json "$SEARCH_URL"
+          cd exporter
+        if: steps.cache-search.outputs.cache-hit != 'true'
       - name: Cache layouts
         id: cache-layouts
         uses: actions/cache@v3

@@ -9,7 +9,9 @@ const clusterRepresentatives: Map<string, ClusterRepPrio> = new Map();
 var groupMaxEdgeOverrides: Map<string, number> = new Map();
 var maxEdgesOverrides: Map<string, number> = new Map();
 const toBeExcludedCommunities: Map<string, Map<number, boolean>> = new Map();
+const toBeIncludedTemplates: Map<string, Map<string, boolean>> = new Map();
 const includedClusters: Map<string, Map<string, boolean>> = new Map();
+const includedClusterTemplates: Map<string, Map<string, boolean>> = new Map();
 const hiddenClusters: Map<string, Map<string, boolean>> = new Map();
 const overlayLayouts: Map<string, boolean> = new Map();
 
@@ -25,12 +27,17 @@ if (configVersion == null) {
 var allLayouts: AtlasLayout[] = configJson.layout.layouts;
 
 for (var layout of allLayouts) {
-    var includedInLayers: Map<string, boolean> = new Map();
+    var clustersIncludedInLayers: Map<string, boolean> = new Map();
+    var clusterTemplatesIncludedInLayers: Map<string, boolean> = new Map();
+    var layoutToBeIncludedCommunitiesByTemplates: Map<string, boolean> = new Map();
+    var layoutToBeIncludedTemplates: Map<string, boolean> = new Map();
     var layoutToBeExcludedCommunities: Map<number, boolean> = new Map();
     var layoutHiddenClusters: Map<string, boolean> = new Map();
     var allClusterGroups: LayoutClusterGroup[] = layout.groups.main;
-    toBeExcludedCommunities.set(layout.name, layoutToBeExcludedCommunities)
-    includedClusters.set(layout.name, includedInLayers)
+    toBeExcludedCommunities.set(layout.name, layoutToBeExcludedCommunities);
+    toBeIncludedTemplates.set(layout.name, layoutToBeIncludedCommunitiesByTemplates);
+    includedClusters.set(layout.name, clustersIncludedInLayers);
+    includedClusterTemplates.set(layout.name, layoutToBeIncludedTemplates);
     hiddenClusters.set(layout.name, layoutHiddenClusters);
 
     if (layout.groups.hidden) {
@@ -46,39 +53,53 @@ for (var layout of allLayouts) {
     }
 
     for (var clusterInGroup of allClusterGroups) {
-        includedInLayers.set(clusterInGroup.name, true);
+        clustersIncludedInLayers.set(clusterInGroup.name, true);
         if (clusterInGroup.overlay) {
             overlayLayouts.set(layout.name, true);
             for (var clusterNameInOverlay of clusterInGroup.overlay) {
-                includedInLayers.set(clusterNameInOverlay, true);
+                clustersIncludedInLayers.set(clusterNameInOverlay, true);
             }
         }
         if (clusterInGroup.underlay) {
             for (var clusterNameInUnderlay of clusterInGroup.underlay) {
-                includedInLayers.set(clusterNameInUnderlay, true);
+                clustersIncludedInLayers.set(clusterNameInUnderlay, true);
             }
         }
     }
 
-    for (var cluster of importedJson.clusters) {
-        const shouldBeRemoved = !includedInLayers.get(cluster.name);
-        if (shouldBeRemoved && cluster.community !== -1) {
-            layoutToBeExcludedCommunities.set(cluster.community, true)
+    if (configJson.clusters && configJson.clusters.length > 0) {
+        for (var cluster of configJson.clusters) {
+            const shouldBeRemoved = !clustersIncludedInLayers.get(cluster.name);
+            if (shouldBeRemoved && cluster.community !== -1) {
+                layoutToBeExcludedCommunities.set(cluster.community, true)
+            }
+        }
+    }
+
+    if (configJson.cluster_templates && configJson.clusters.length > 0) {
+        for (var cluster_template of configJson.cluster_templates) {
+            const shouldBeIncluded = clusterTemplatesIncludedInLayers.get(cluster_template.name);
+            if (shouldBeIncluded) {
+                layoutToBeIncludedCommunitiesByTemplates.set(cluster_template.community, true);
+                layoutToBeIncludedTemplates.set(cluster_template.name, true);
+            }
         }
     }
 }
 
-for (var cluster of importedJson.clusters) {
-    const maxEdgesOverride = cluster.group && groupMaxEdgeOverrides.get(cluster.group);
-    if (maxEdgesOverride) {
-        maxEdgesOverrides.set(cluster.name, maxEdgesOverride)
-    }
+if (configJson.clusters && configJson.clusters.length > 0) {
+    for (var cluster of configJson.clusters) {
+        const maxEdgesOverride = cluster.group && groupMaxEdgeOverrides.get(cluster.group);
+        if (maxEdgesOverride) {
+            maxEdgesOverrides.set(cluster.name, maxEdgesOverride)
+        }
 
-    if (cluster.leader) {
-        clusterRepresentatives.set(cluster.leader, {
-            label: cluster.name,
-            prio: cluster.prio ?? 0
-        });
+        if (cluster.leader) {
+            clusterRepresentatives.set(cluster.leader, {
+                label: cluster.name,
+                prio: cluster.prio ?? 0
+            });
+        }
     }
 }
 
@@ -121,13 +142,13 @@ function identifyClusters(community: number, currentLayoutName: string) {
     const currentLayout = config.getLayout(currentLayoutName);
     const clusterByCommunity = config.getClusterByCommunity(community);
     const clusterByCommunityLayout = currentLayout.groups.main
-        .filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity.name) != -1)[0]
-        || currentLayout.groups.hidden?.filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity.name) != -1)[0];
-    const normalClusterByDetailedName = currentLayout.groups.main.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0];
-    const hiddenClusterByDetailedName = currentLayout.groups.hidden?.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity.name) != -1)[0];
+        .filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity?.name) != -1)[0]
+        || currentLayout.groups.hidden?.filter(group => group.underlay && group.underlay.indexOf(clusterByCommunity?.name) != -1)[0];
+    const normalClusterByDetailedName = currentLayout.groups.main.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity?.name) != -1)[0];
+    const hiddenClusterByDetailedName = currentLayout.groups.hidden?.filter(group => group.overlay && group.overlay.indexOf(clusterByCommunity?.name) != -1)[0];
     const mainClusterByDetailedName = normalClusterByDetailedName?.name || hiddenClusterByDetailedName?.name;
-    const mainGroupByLayoutName = currentLayout.groups.main.filter(group => group.name === clusterByCommunity.name)[0]
-    const hiddenGroupByLayoutName = currentLayout.groups.hidden?.filter(group => group.name === clusterByCommunity.name)[0];
+    const mainGroupByLayoutName = currentLayout.groups.main.filter(group => group.name === clusterByCommunity?.name)[0]
+    const hiddenGroupByLayoutName = currentLayout.groups.hidden?.filter(group => group.name === clusterByCommunity?.name)[0];
     const clusterByLayoutName = mainGroupByLayoutName?.name || hiddenGroupByLayoutName?.name;
     const superClusterOnlyName = clusterByCommunityLayout?.underlay;
     const mainCluster = mainClusterByDetailedName ? config.getClusterByName(mainClusterByDetailedName)
@@ -158,12 +179,12 @@ function getNodeColor(community: number, currentLayoutName: string, useSubcluste
     if (useSubclusterOverlay && detailedCluster) {
         return detailedCluster.color;
     } else {
-        return mainCluster?.color ?? superCluster.color;
+        return mainCluster?.color ?? superCluster?.color;
     }
 }
 
 const config = {
-    ...importedJson,
+    ...configJson,
     configVersion,
     json: importedJson,
     getAllLayouts: getAllLayoutsByMode,
@@ -175,9 +196,11 @@ const config = {
     identifyClusters,
     getNodeColor,
     includedClusters: includedClusters,
+    includedClusterTemplates: includedClusterTemplates,
     overlayLayouts: overlayLayouts,
     maxEdgesOverrides: maxEdgesOverrides,
     toBeExcludedCommunities: toBeExcludedCommunities,
+    toBeIncludedTemplates: toBeIncludedTemplates,
     hiddenClusters: hiddenClusters,
     clusterRepresentatives: clusterRepresentatives,
 }

@@ -1,6 +1,7 @@
 import { MultiDirectedGraph } from "graphology";
 import { config } from "../common/config";
 import { Node, IndexNode, AtlasLayout } from "../common/model"
+import { size } from "lodash";
 
 function addNodes(
     log: (msg: string) => void,
@@ -23,18 +24,22 @@ function addNodes(
         if (i % 10000 === 0) {
             log(`Adding node ${i} of ${ctx.totalNodes - 1} `);
         }
-        const node = ctx.nodes[i];
+        const node: any = ctx.nodes[i];
         const indexNode = {
             key: i,
             did: node.did,
             label: node.handle,
             community: node.community,
+            size: node.size,
+            cType: node.cType
         };
         const graphNode = {
             key: i,
             label: node.handle,
             did: node.did,
             community: node.community,
+            size: node.size,
+            cType: node.cType
         };
         if (excludedCommunities && excludedCommunities.get(node.community)) {
             ctx.hiddenNodes.set(node.did, true);

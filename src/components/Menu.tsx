@@ -123,6 +123,7 @@ const Menu: FC<MenuProps> = ({
                                         <div className="flex h-8 desktop:h-10 xs:ml-0 mobile:ml-2 desktop:ml-6 items-center">
                                             <CustomSearch
                                                 viewPort={viewPort}
+                                                currentLayoutName={currentLayoutName}
                                                 currentLanguage={currentLanguage}
                                                 onLocate={(node) => {
                                                     const nodeLabel = graph?.getNodeAttribute(node, "label");

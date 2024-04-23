@@ -194,6 +194,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
         selectedNode,
         "community"
     );
+    const layout = config.getLayout(currentLayoutName);
     const selectedNodeColor = config.getNodeColor(community, currentLayoutName, useSubclusterOverlay)
     return (
         <div className="fixed bg-white shadow rounded-md absolute
@@ -242,7 +243,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                     backgroundColor: selectedNodeColor,
                                     color: config.getContrastColor(selectedNodeColor)
                                 }}>
-                                    {graph?.getNodeAttribute(selectedNode, "size")}
+                                    {graph?.getNodeAttribute(selectedNode, layout.nodeMapping?.score?.property || "size")}
                                 </span>
                             </p>
                         </div>
@@ -392,7 +393,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                                         backgroundColor: config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay),
                                                         color: config.getContrastColor(config.getNodeColor(moot.community, currentLayoutName, useSubclusterOverlay))
                                                     }}>
-                                                    {moot.size}
+                                                    {moot[layout.nodeMapping?.score?.property || "size"]}
                                                 </span>
                                             </div>
                                         </div>

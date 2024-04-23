@@ -1,15 +1,16 @@
-import { Edge, Node, InputGraphData } from "../common/model"
+import { Edge, Node, InputGraphData, AtlasLayout } from "../common/model"
 import * as fs from "fs";
 import { config } from "../common/config";
 
 async function fetchGraph(
-    log: (msg: string) => void
+    log: (msg: string) => void,
+    fileName: string
 ) {
 
     var graphVersion: number = -1;
     log("Loading graph...");
 
-    var data = JSON.parse(fs.readFileSync("../graph.json", "utf8")) as InputGraphData;
+    var data = JSON.parse(fs.readFileSync("../" + fileName, "utf8")) as InputGraphData;
 
     //if graph version matches - parse community names, leaders, etc. from the json
     //otherwise - use legacy cluster logic

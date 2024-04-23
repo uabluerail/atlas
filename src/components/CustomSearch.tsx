@@ -2,6 +2,8 @@ import React, { ChangeEvent, useEffect, useState, CSSProperties } from "react";
 import { Attributes } from "graphology-types";
 import { getTranslation } from "../common/translation";
 import { useRegisterEvents, useCamera, useSigma } from "@react-sigma/core";
+import { config } from "../common/visualConfig";
+import { SearchNode } from "../model";
 
 type SearchLabelKeys = "text" | "placeholder";
 
@@ -25,6 +27,8 @@ export interface SearchControlProps {
    * HTML CSS style
    */
   style?: CSSProperties;
+
+  currentLayoutName: string;
 
   currentLanguage: string;
 
@@ -63,6 +67,7 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
   id,
   className,
   style,
+  currentLayoutName,
   currentLanguage,
   labels = {},
   onLocate,
@@ -76,14 +81,34 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
   // Search value
   const [search, setSearch] = useState<string>("");
   // Datalist values
-  const [values, setValues] = useState<Array<{ id: string; label: string }>>(
-    []
-  );
+  const [values, setValues] = useState<Map<string, { id: string, label: string }>>(new Map());
   // Selected
   const [selected, setSelected] = useState<string | null>(null);
   // random id for the input
   const [inputId, setInputId] = useState<string>("");
 
+
+  const layout = config.getLayout(currentLayoutName);
+
+  const [handleSearchMap, setHandlesSearchMap] = useState<Map<string, SearchNode>>(new Map());
+  const [searchLoaded, setSearchLoaded] = useState<boolean>(false);
+
+  async function fetchSearch() {
+    let responseJSON: {
+      graphVersion: number;
+      nodes: SearchNode[]
+    };
+    if (layout.searchFileName) {
+      const textGraph = await fetch("./exporter/out/" + layout.searchFileName);
+      responseJSON = await textGraph.json();
+      const searchMap = new Map();
+      responseJSON.nodes.forEach(node => {
+        searchMap.set(node.handle, node);
+      });
+      setHandlesSearchMap(searchMap);
+      setSearchLoaded(true);
+    }
+  }
   /**
    * When component mount, we set a random input id.
    */
@@ -91,21 +116,57 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
     setInputId(`search-${getUniqueKey()}`);
   }, []);
 
+  useEffect(() => {
+    if (!searchLoaded) {
+      fetchSearch();
+    }
+  }, [searchLoaded]);
+
   /**
    * When the search input changes, recompute the autocomplete values.
    */
   useEffect(() => {
-    const newValues: Array<{ id: string; label: string }> = [];
-    if (!selected && search.length > 1) {
-      sigma
-        .getGraph()
-        .forEachNode((key: string, attributes: Attributes): void => {
+    const newValues: Map<string, { id: string, label: string }> = new Map();
+    if (!selected && search.length > 4) {
+      if (layout.searchFileName) {
+        const foundValues: Map<string, string> = new Map();
+        handleSearchMap.forEach((node, key) => {
           if (
-            attributes.label &&
-            attributes.label.toLowerCase().includes(search.toLowerCase())
+            key &&
+            key.toLowerCase().startsWith(search.toLowerCase())
           )
-            newValues.push({ id: key, label: attributes.label });
+            node.communities.forEach(name => {
+              if (!foundValues.get(name)) {
+                foundValues.set(name, key);
+              }
+            })
         });
+        sigma
+          .getGraph()
+          .forEachNode((key: string, attributes: Attributes): void => {
+            foundValues.forEach((user, name) => {
+              if (
+                attributes.label &&
+                attributes.label.toLowerCase().includes(name.toLowerCase())
+              )
+                if (!newValues.get(key)) {
+                  newValues.set(key, { id: key, label: user + ":" + name });
+                }
+            });
+          });
+      } else {
+        sigma
+          .getGraph()
+          .forEachNode((key: string, attributes: Attributes): void => {
+            if (
+              attributes.label &&
+              attributes.label.toLowerCase().includes(search.toLowerCase())
+            )
+              if (!newValues.get(key)) {
+                newValues.set(key, { id: key, label: attributes.label });
+              }
+          });
+      }
     }
     setValues(newValues);
   }, [search]);
@@ -157,10 +218,10 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
    */
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const searchString = e.target.value;
-    const valueItem = values.find((value) => value.label === searchString);
+    const valueItem = Array.from(values.values()).find((value) => value.label === searchString);
     if (valueItem) {
       setSearch(valueItem.label);
-      setValues([]);
+      setValues(new Map());
       setSelected(valueItem.id);
     } else {
       setSelected(null);
@@ -190,7 +251,7 @@ export const CustomSearch: React.FC<SearchControlProps> = ({
         onChange={onInputChange}
       />
       <datalist id={`${inputId}-datalist`}>
-        {values.map((value: { id: string; label: string }) => (
+        {Array.from(values.values()).map((value: { id: string; label: string }) => (
           <option key={value.id} value={value.label}>
             {value.label}
           </option>

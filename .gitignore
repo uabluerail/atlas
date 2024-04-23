@@ -29,5 +29,6 @@ out/
 .env
 graph.tsv
 *graph*.json
-config.json
+config*.json
+search*.json
 *.pem

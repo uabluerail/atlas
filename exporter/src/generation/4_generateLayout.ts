@@ -30,7 +30,7 @@ function generateLayout(
     // reduces exponential to nlogn complexity
     // under 5 minutes generation vs. 10+ minutes
 
-    settings.barnesHutOptimize = config.settings.blackHoleGravity > 0;
+    settings.barnesHutOptimize = (layout.blackHoleGravity && layout.blackHoleGravity > 0) || config.settings.blackHoleGravity > 0;
 
     // -------------barnesHutOptimize----------------
 
@@ -40,7 +40,7 @@ function generateLayout(
 
 
     // for harmonic atlas
-    settings.barnesHutTheta = config.settings.blackHoleGravity;
+    settings.barnesHutTheta = layout.blackHoleGravity || config.settings.blackHoleGravity;
 
     // examples for harmonic atlas
 

@@ -167,10 +167,11 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         if (communityClusters === null) {
           return;
         }
-        const palette = iwanthue(
-          Object.keys(communityClusters).length -
+        const colorCount = Object.keys(communityClusters).length -
           Object.keys(config.knownClusterColorMappings).length -
-          Object.keys(config.knownOverlayClusterColorMappings).length,
+          Object.keys(config.knownOverlayClusterColorMappings).length || 1;
+        const palette = iwanthue(
+          colorCount,
           {
             seed: "bskyCommunityClusters3",
             colorSpace: "intense",
@@ -329,6 +330,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
               acc.push({
                 node: key,
                 size: graph?.getNodeAttribute(key, "size"),
+                total: graph?.getNodeAttribute(key, "total"),
                 community: graph?.getNodeAttribute(key, "community"),
                 weight: weight,
                 label: label,
@@ -351,6 +353,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
           return {
             node: key,
             size: graph?.getNodeAttribute(key, "size"),
+            total: graph?.getNodeAttribute(key, "total"),
             community: graph?.getNodeAttribute(key, "community"),
             weight: graph?.getNodeAttribute(key, "size"),
             label: graph?.getNodeAttribute(key, "label"),

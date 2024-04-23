@@ -4,6 +4,8 @@ interface InputGraphData {
         did: string;
         handle?: string;
         community: number;
+        size?: number;
+        cType?: string
     }[];
     rels: {
         source: string;
@@ -23,6 +25,8 @@ interface Node {
     did: string;
     handle: string;
     community: number;
+    size?: number;
+    cType?: string;
 }
 
 interface IndexNode {
@@ -55,6 +59,7 @@ interface ClusterConfig {
     "hide-label"?: boolean;
     color: string;
     type: string;
+    prio?: number;
     group?: string;
     legend?: {
         [language: string]: {
@@ -68,6 +73,11 @@ interface ClusterConfig {
     }
 }
 
+interface ClusterTemplateConfig {
+    community: string;
+    name: string;
+}
+
 interface AtlasSettings {
     settings: {
         graphVersion: number;
@@ -78,7 +88,6 @@ interface AtlasSettings {
         rotate: boolean;
         angle: number;
         globus: boolean;
-        maxHistoricWeightSum: number;
         iterationCount: number;
         blackHoleGravity: number;
         hiddenClusterColor: string;
@@ -86,6 +95,7 @@ interface AtlasSettings {
     legend: AtlasLegend;
     layout: AtlasLayoutSettings;
     clusters: ClusterConfig[];
+    cluster_templates: ClusterTemplateConfig[];
 }
 
 interface AtlasLegend {
@@ -93,14 +103,14 @@ interface AtlasLegend {
         name: string;
         url: string
     },
-    overview: {
-        [language: string]: {
-            arrows: string;
-            algo: string;
-        }
-    }
     legends: {
         name: string;
+        overview?: {
+            [language: string]: {
+                arrows: string;
+                algo: string;
+            }
+        },
         groups: GroupLegend[]
     }[];
 }
@@ -115,8 +125,38 @@ interface AtlasLayoutSettings {
 
 interface AtlasLayout {
     name: string;
+    fileName: string;
+    searchFileName?: string;
     angle?: number;
+    minSize?: number;
+    maxSize?: number;
+    maxHistoricWeightSum: number;
+    blackHoleGravity?: number;
     label: { [key: string]: string };
+    nodeMapping?: {
+        id: {
+            nodeProperty: string,
+        }
+        community: {
+            type: "none" | "fromProperty" | string
+            nodeProperty?: string
+        }
+        weight: {
+            type: "harmonicFromEdges" | "fromProperty" | string
+            nodeProperty?: string
+        }
+        label: {
+            nodeProperty?: string
+        }
+        color: {
+            type: "fromColorMapByPropertyType" | "fromClusters" | string
+            nodeProperty?: string
+            colorMap?: { [key: string]: string }
+        }
+        score: {
+            property?: string
+        }
+    }
     isMobile?: boolean;
     groups: {
         main: LayoutClusterGroup[],
@@ -138,7 +178,8 @@ interface LayoutClusterGroup {
 interface GroupLegend {
     name: string;
     hide?: boolean;
-    clusters: string[],
+    clusters?: string[],
+    cluster_templates?: string[],
     legend: {
         [language: string]: {
             label: string;
