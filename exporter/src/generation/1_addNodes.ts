@@ -18,7 +18,8 @@ function addNodes(
 
     const excludedCommunities = config.toBeExcludedCommunities.get(layout.name);
 
-    log(`Communities to be skipped: ${excludedCommunities && Array.from(excludedCommunities.keys())}`);
+    if (layout.nodeMapping?.community?.type !== "none")
+        log(`Communities to be skipped: ${excludedCommunities && Array.from(excludedCommunities.keys())}`);
 
     for (let i = 0; i < ctx.totalNodes; i++) {
         if (i % 10000 === 0) {
@@ -41,7 +42,8 @@ function addNodes(
             size: node.size,
             cType: node.cType
         };
-        if (excludedCommunities && excludedCommunities.get(node.community)) {
+        if (excludedCommunities && excludedCommunities.get(node.community)
+            && layout.nodeMapping?.community?.type !== "none") {
             ctx.hiddenNodes.set(node.did, true);
         } else {
             graph.addNode(i, graphNode);
