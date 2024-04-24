@@ -152,13 +152,25 @@ const Legend: FC<LegendProps> = ({
                     </h5>
                     {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage) &&
                         <div>
-                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_nodes &&
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).summary &&
                                 <p>
-                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_nodes}
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).summary}
                                 </p>}
-                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows &&
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodes &&
                                 <p>
-                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows}
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodes}
+                                </p>}
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight &&
+                                <p>
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight}
+                                </p>}
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationships &&
+                                <p>
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationships}
+                                </p>}
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationshipWeight &&
+                                <p>
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationshipWeight}
                                 </p>}
                             {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_red_arrows &&
                                 <p className="mt-2">
