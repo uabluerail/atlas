@@ -36,7 +36,7 @@ function addEdges(
     const logMinWeight = Math.log(minWeight);
     const logMaxWeight = Math.log(maxWeight);
     const minEdgeSize = 0.2;
-    const maxEdgeSize = 4;
+    const maxEdgeSize = 10;
     for (let i = 0; i < ctx.totalEdges; i++) {
         if (i % 100000 === 0) {
             log(`Adding edge ${i} of ${ctx.totalEdges - 1}`);

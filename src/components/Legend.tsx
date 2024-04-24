@@ -4,8 +4,6 @@ import { getTranslation, getValueByLanguage, lang2ToNames } from "../common/tran
 import { GroupLegend, ClusterConfig } from "../../exporter/src/common/model";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
-import Footer from "./Footer";
-import Credits from "./Credits";
 
 interface LegendProps {
     hideMenu: boolean;
@@ -145,33 +143,39 @@ const Legend: FC<LegendProps> = ({
                         : 'mobile:h-[50lvh] xs:h-[54lvh]'}
                 desktop:h-[50lvh]
                 overflow-scroll`}>
-                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        {getTranslation('overview_title', currentLanguage)}
-                    </h5>
-                    <p>
-                        {getTranslation('overview_part1', currentLanguage)}
-                    </p>
-                    <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{getTranslation('red_arrows', currentLanguage)}</span> - {getTranslation('interactions_from_you', currentLanguage)}.
-                    </p>
-                    <p className="mt-2">
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{getTranslation('blue_arrows', currentLanguage)}</span> - {getTranslation('interactions_to_you', currentLanguage)}.
-                    </p>
-                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
-                        {getTranslation('algo', currentLanguage)}
-                    </h5>
                     <p className="bg-green-100 text-green-800">
                         {getTranslation('algo_note', currentLanguage)}{" "}
                         {getTranslation('available_languages', currentLanguage)}{": "}{lang2ToNames(config.settings.languages)}
                     </p>
-                    {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage) && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows &&
-                        <p className="mt-2">
-                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows}
-                        </p>}
-                    {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage) && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).algo &&
-                        <p className="mt-2">
-                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).algo}
-                        </p>}
+                    <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                        {getTranslation('overview_title', currentLanguage)}
+                    </h5>
+                    {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage) &&
+                        <div>
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_nodes &&
+                                <p>
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_nodes}
+                                </p>}
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows &&
+                                <p>
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).arrows}
+                                </p>}
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_red_arrows &&
+                                <p className="mt-2">
+                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">{getTranslation('red_arrows', currentLanguage)}</span> - {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_red_arrows}.
+                                </p>}
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_blue_arrows &&
+                                <p className="mt-2">
+                                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">{getTranslation('blue_arrows', currentLanguage)}</span> - {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_blue_arrows}.
+                                </p>}
+                            <h5 className="text-sm font-semibold leading-10 text-gray-600">
+                                {getTranslation('algo', currentLanguage)}
+                            </h5>
+                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).algo &&
+                                <p className="mt-2">
+                                    {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).algo}
+                                </p>}
+                        </div>}
                     <h5 className="text-sm font-semibold leading-10 text-gray-600">
                         {getTranslation('overview_clusters', currentLanguage)}
                     </h5>
