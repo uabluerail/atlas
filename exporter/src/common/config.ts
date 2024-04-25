@@ -114,7 +114,7 @@ function getAllLayouts(): AtlasLayout[] {
 }
 
 function getDefaultLayout(moderator: boolean, isMobile?: boolean): string {
-    var searchForLayout = getAllLayoutsByMode(moderator).filter(layout => isMobile === layout.isMobile || (!isMobile && !layout.isMobile))[0];
+    var searchForLayout = getAllLayoutsByMode(moderator).filter(layout => isMobile === layout.isMobile || (!layout.isMobile))[0];
     return searchForLayout.name;
 }
 
