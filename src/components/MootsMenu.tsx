@@ -1,12 +1,17 @@
 import { FC, Dispatch, useState, useEffect, SetStateAction } from "react";
 import { MultiDirectedGraph } from "graphology";
-import { getTranslation, truncateText, getValueByLanguage } from "../common/translation";
+import { getTranslation, truncateText, getValueByLanguage, getTranslationWithOverride } from "../common/translation";
 import { SetURLSearchParams } from "react-router-dom";
 import { config } from '../common/visualConfig';
 import { MootNode } from "../model";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretLeft, faCaretRight, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
-import Credits from "./Credits";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faQuestion, faCaretLeft, faCaretRight, faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import {
+    Popover,
+    PopoverHandler,
+    PopoverContent,
+    Button,
+} from "@material-tailwind/react";
 
 interface MootsMenuProps {
     hideMenu: boolean;
@@ -99,7 +104,7 @@ const buildClusters = (
                                 : " bg-orange-500 hover:bg-orange-600 focus-visible:ring-orange-500")
                         }
                     >
-                        {showClusterList ? getTranslation('hide_community', currentLanguage) : getTranslation('show_community', currentLanguage)}
+                        {showClusterList ? getTranslationWithOverride({ key: 'hide_community', language: currentLanguage, currentLayoutName }) : getTranslationWithOverride({ key: 'show_community', language: currentLanguage, currentLayoutName })}
                     </button>
                     <span className="xs:hidden"> - {mainCluster.legend && getValueByLanguage(mainCluster.legend, currentLanguage).description}</span>
                 </p>
@@ -194,7 +199,13 @@ const MootsMenu: FC<MootsMenuProps> = ({
         selectedNode,
         "community"
     );
+    const currentLayoutDidType = config.getLayout(currentLayoutName)?.nodeMapping?.id?.type;
+    const selectedDid = graph?.getNodeAttribute(
+        selectedNode,
+        "did"
+    );
     const layout = config.getLayout(currentLayoutName);
+    const currentLayoutLegend = config.legend.legends.filter(legend => legend.name === layout.legend)[0];
     const selectedNodeColor = config.getNodeColor(community, currentLayoutName, useSubclusterOverlay)
     return (
         <div className="fixed bg-white shadow rounded-md absolute
@@ -229,10 +240,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                 {avatarURI && " "}
                                 <a
                                     className="font-bold underline text-xs underline-offset-1 underline break-all"
-                                    href={`https://bsky.app/profile/${graph?.getNodeAttribute(
-                                        selectedNode,
-                                        "did"
-                                    )}`}
+                                    href={`https://bsky.app/profile/${currentLayoutDidType === "concatUnderscore" ? selectedDid.split("_").pop() : selectedDid}`}
                                     target="_blank"
                                 >
                                     {truncateText(graph?.getNodeAttribute(selectedNode, "label"), 30)}
@@ -245,6 +253,21 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                 }}>
                                     {graph?.getNodeAttribute(selectedNode, layout.nodeMapping?.score?.property || "size")}
                                 </span>
+                                {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight && (
+                                    <Popover
+                                        animate={{
+                                            mount: { scale: 1, y: 0 },
+                                            unmount: { scale: 0, y: 25 },
+                                        }}
+                                    >
+                                        <PopoverHandler>
+                                            <Button placeholder={""} className="-mt-1 ml-1 bg-gray-500 px-1"><FontAwesomeIcon icon={faQuestion} /></Button>
+                                        </PopoverHandler>
+                                        <PopoverContent placeholder={""} className="z-50 p-1 text-xs w-40">
+                                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight}
+                                        </PopoverContent>
+                                    </Popover>
+                                )}
                             </p>
                         </div>
                     </div>
@@ -289,7 +312,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                         : " bg-green-500 hover:bg-green-600 focus-visible:ring-green-500")
                                 }
                             >
-                                {showMootList ? getTranslation('hide_top', currentLanguage) : getTranslation('show_top', currentLanguage)}
+                                {showMootList ? getTranslation('hide_top', currentLanguage, undefined, currentLayoutName) : getTranslation('show_top', currentLanguage, undefined, currentLayoutName)}
                             </button>
                         </div>
                     </div>
@@ -297,10 +320,13 @@ const MootsMenu: FC<MootsMenuProps> = ({
                         {showMootList &&
                             (<div className="z-50 mt-2 desktop:mt-4 xs:hidden max-w-xl text-xs text-gray-500">
                                 <p>
-                                    {getTranslation('these_are_top_moots_that', currentLanguage)}{" "}
+                                    {getTranslationWithOverride({ key: 'these_are_top_moots_that', language: currentLanguage, currentLayoutName })}{" "}
                                     <a
                                         className="font-bold underline text-xs underline-offset-1 underline break-all"
-                                        href={`https://bsky.app/profile/${graph?.getNodeAttribute(
+                                        href={`https://bsky.app/profile/${currentLayoutDidType === "concatUnderscore" ? graph?.getNodeAttribute(
+                                            selectedNode,
+                                            "did"
+                                        ).split("_").pop() : graph?.getNodeAttribute(
                                             selectedNode,
                                             "did"
                                         )}`}
@@ -308,7 +334,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                     >
                                         {graph?.getNodeAttribute(selectedNode, "label")}
                                     </a>{" "}
-                                    {getTranslation('has_interacted_with', currentLanguage)}{":"}
+                                    {getTranslationWithOverride({ key: 'has_interacted_with', language: currentLanguage, currentLayoutName })}{":"}
                                 </p>
                             </div>)}
                         {showCommunityList && communityList.length > 0 &&
@@ -352,13 +378,63 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                             {"#"}
                                         </div>
                                         <div className="table-cell font-medium text-gray-900 truncate">
-                                            {getTranslation('user', currentLanguage)}
+                                            {getTranslationWithOverride({ key: 'user', language: currentLanguage, currentLayoutName })}
+                                            {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight && (
+                                                <Popover
+                                                    animate={{
+                                                        mount: { scale: 1, y: 0 },
+                                                        unmount: { scale: 0, y: 25 },
+                                                    }}
+                                                >
+                                                    <PopoverHandler>
+                                                        <Button placeholder={""} className="-mt-1 ml-1 bg-gray-500 px-1"><FontAwesomeIcon icon={faQuestion} /></Button>
+                                                    </PopoverHandler>
+                                                    <PopoverContent placeholder={""} className="z-50 p-1 text-xs w-40">
+                                                        {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodes}
+                                                    </PopoverContent>
+                                                </Popover>
+                                            )}
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
                                             {getTranslation('interactions_weight', currentLanguage)}
+                                            {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationshipWeight && (
+                                                <Popover
+                                                    animate={{
+                                                        mount: { scale: 1, y: 0 },
+                                                        unmount: { scale: 0, y: 25 },
+                                                    }}
+                                                >
+                                                    <PopoverHandler>
+                                                        <Button placeholder={""} className="-mt-1 ml-1 bg-gray-500 px-1"><FontAwesomeIcon icon={faQuestion} /></Button>
+                                                    </PopoverHandler>
+                                                    <PopoverContent placeholder={""} className="z-50 p-1 text-xs w-40">
+                                                        <p>
+                                                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationships}
+                                                        </p>
+                                                        <p>
+                                                            {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationshipWeight}
+                                                        </p>
+                                                    </PopoverContent>
+                                                </Popover>
+                                            )}
                                         </div>
                                         <div className="table-cell ml-2 flex-shrink-0 flex">
                                             {getTranslation('node', currentLanguage)}<span className="xs:hidden">{' '}{getTranslation('size', currentLanguage)}</span>
+                                            {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight && (
+                                                <Popover
+                                                    animate={{
+                                                        mount: { scale: 1, y: 0 },
+                                                        unmount: { scale: 0, y: 25 },
+                                                    }}
+                                                >
+                                                    <PopoverHandler>
+                                                        <Button placeholder={""} className="-mt-1 ml-1 bg-gray-500 px-1"><FontAwesomeIcon icon={faQuestion} /></Button>
+                                                    </PopoverHandler>
+                                                    <PopoverContent placeholder={""} className="z-50 p-1 text-xs w-40">
+                                                        {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight}
+                                                    </PopoverContent>
+                                                </Popover>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -368,7 +444,7 @@ const MootsMenu: FC<MootsMenuProps> = ({
                                             <div className="table-cell font-medium text-gray-900 truncate">
                                                 {++i}
                                             </div>
-                                            <div className="table-cell underline font-medium text-gray-900 truncate">
+                                            <div className={`table-cell underline font-bold ${moot.direction ? 'text-red-700' : 'text-blue-700'} truncate`}>
                                                 {moot.avatarUrl && <img className="inline-block size-6 rounded-full" src={moot.avatarUrl} />}
                                                 {moot.avatarUrl && " "}
                                                 <a
@@ -500,7 +576,8 @@ const MootsMenu: FC<MootsMenuProps> = ({
                     </div>
                 )}
             </div>
-            )}
+            )
+            }
         </div >
     )
 }
