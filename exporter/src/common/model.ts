@@ -117,6 +117,9 @@ interface AtlasLegend {
                 overview_blue_arrows: string
             }
         },
+        translation_overrides?: {
+            [language: string]: { key: string, value: string }[]
+        }
         groups: GroupLegend[]
     }[];
 }
@@ -141,6 +144,7 @@ interface AtlasLayout {
     label: { [key: string]: string };
     nodeMapping?: {
         id: {
+            type: "concatUnderscore" | string
             nodeProperty: string,
         }
         community: {

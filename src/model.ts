@@ -20,6 +20,7 @@ interface MootNode {
     avatarUrl?: string;
     label: string;
     did: string;
+    direction: boolean;
     weight: number;
 }
 

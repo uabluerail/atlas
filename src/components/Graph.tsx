@@ -333,6 +333,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
                 total: graph?.getNodeAttribute(key, "total"),
                 community: graph?.getNodeAttribute(key, "community"),
                 weight: weight,
+                direction: source === selectedNode,
                 label: label,
                 did: did,
               });
@@ -356,6 +357,7 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
             total: graph?.getNodeAttribute(key, "total"),
             community: graph?.getNodeAttribute(key, "community"),
             weight: graph?.getNodeAttribute(key, "size"),
+            direction: true,
             label: graph?.getNodeAttribute(key, "label"),
             did: graph?.getNodeAttribute(key, "did"),
           }
@@ -367,9 +369,9 @@ const GraphContainer: React.FC<GraphProps> = ({ fetchURL }) => {
         setCommunityList(communityList);
 
         const clusters = config.identifyClusters(graph?.getNodeAttribute(selectedNode, "community"), currentLayoutName);
-        console.log(clusters.mainClusterChildren);
+
         const clusterList: MootNode[] = graph?.filterNodes((_, atts) => {
-          console.log(atts.community);
+
           return clusters.mainClusterChildren ? clusters.mainClusterChildren?.indexOf(atts.community) !== -1
             : clusters.mainCluster?.community === atts.community;
         }).map(key => {

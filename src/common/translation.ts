@@ -37,6 +37,22 @@ const autoPickLanguage = () => {
 
 const resolvedLanguage = autoPickLanguage();
 
+const getTranslationWithOverride = (config: {
+    key: string,
+    language: string,
+    truncate?: {
+        viewPort: {
+            width: number,
+            height: number
+        },
+        xs?: number,
+        mobile?: number,
+        desktop?: number
+    }, currentLayoutName?: string
+}) => {
+    return getTranslation(config.key, config.language, config.truncate, config.currentLayoutName);
+};
+
 const getTranslation = (key: string, language: string, truncate?: {
     viewPort: {
         width: number,
@@ -45,7 +61,7 @@ const getTranslation = (key: string, language: string, truncate?: {
     xs?: number,
     mobile?: number,
     desktop?: number
-}) => {
+}, currentLayoutName?: string) => {
     const maxViewport = {
         mobile: 700,
         xs: 370
@@ -55,7 +71,10 @@ const getTranslation = (key: string, language: string, truncate?: {
         xs: 320
     }
     language = language ?? resolvedLanguage;
-    const translation: { key: string, value: string }[] = translationMap[language].translation;
+    const currentLayoutLegendName = currentLayoutName && config.getLayout(currentLayoutName) && config.getLayout(currentLayoutName).legend;
+    const currentLayoutLegend = currentLayoutLegendName && config.legend.legends.filter(legend => legend.name === currentLayoutLegendName)[0];
+    const translation: { key: string, value: string }[] = (currentLayoutLegend && currentLayoutLegend.translation_overrides && currentLayoutLegend.translation_overrides[translationMap[language].lang2] &&
+        currentLayoutLegend.translation_overrides[translationMap[language].lang2].filter(entry => entry.key === key).length === 1) ? currentLayoutLegend.translation_overrides[translationMap[language].lang2] : translationMap[language].translation;
     const translationEntry = translation.filter(entry => entry.key === key)[0]
         ?? translationMap[fallbackLanguage].translation.filter(entry => entry.key === key)[0];
     const translationText = translationEntry ? translationEntry.value : key;
@@ -114,4 +133,4 @@ const lang2ToNames = (lang2: string[] | null) => {
     return (lang2 && lang2.map(lang2 => translationMap[lang2].name ?? lang2).toString());
 }
 
-export { getTranslation, truncateText, getPickerLanguages, getLanguageName, getLanguageOrDefault, getLanguageByName, getValueByLanguage, lang2ToNames, getValueByLanguageFromMap }
+export { getTranslation, getTranslationWithOverride, truncateText, getPickerLanguages, getLanguageName, getLanguageOrDefault, getLanguageByName, getValueByLanguage, lang2ToNames, getValueByLanguageFromMap }
