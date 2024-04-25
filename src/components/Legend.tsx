@@ -153,23 +153,23 @@ const Legend: FC<LegendProps> = ({
                     {currentLayoutLegend.overview && getValueByLanguage(currentLayoutLegend.overview, currentLanguage) &&
                         <div>
                             {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).summary &&
-                                <p>
+                                <p className="mt-2">
                                     {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).summary}
                                 </p>}
                             {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodes &&
-                                <p>
+                                <p className="mt-2">
                                     {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodes}
                                 </p>}
                             {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight &&
-                                <p>
+                                <p className="mt-2">
                                     {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).nodeWeight}
                                 </p>}
                             {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationships &&
-                                <p>
+                                <p className="mt-2">
                                     {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationships}
                                 </p>}
                             {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationshipWeight &&
-                                <p>
+                                <p className="mt-2">
                                     {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).relationshipWeight}
                                 </p>}
                             {getValueByLanguage(currentLayoutLegend.overview, currentLanguage).overview_red_arrows &&
