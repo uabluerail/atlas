@@ -107,8 +107,14 @@ interface AtlasLegend {
         name: string;
         overview?: {
             [language: string]: {
-                arrows: string;
-                algo: string;
+                summary: string,
+                nodes: string,
+                nodeWeight: string,
+                relationships: string,
+                relationshipWeight: string,
+                algo: string,
+                overview_red_arrows: string,
+                overview_blue_arrows: string
             }
         },
         groups: GroupLegend[]
